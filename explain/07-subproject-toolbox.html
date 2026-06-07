@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>🧰 4 件套 = 4 个子项目的"开工通知"</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFF9C4 0%, #B3E5FC 50%, #C8E6C9 100%);
+    min-height: 100vh;
+    padding: 30px 20px;
+    line-height: 1.9;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #BF360C;
+    font-size: 2.2em;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #5D4037;
+    margin-bottom: 40px;
+    font-size: 1.1em;
+  }
+  .story {
+    background: white;
+    border: 3px dashed #FF6F00;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    font-size: 1.05em;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+  .story h2 { color: #E65100; margin-bottom: 15px; }
+  .lego {
+    background: white;
+    border: 3px solid #5E35B1;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+  }
+  .lego h2 { color: #4527A0; text-align: center; margin-bottom: 20px; }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin: 25px 0;
+  }
+  .teammate {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    border: 3px solid #5C6BC0;
+  }
+  .teammate-icon { font-size: 3em; }
+  .teammate-name { font-weight: bold; color: #283593; margin: 10px 0 5px; font-size: 1.2em; }
+  .teammate-task { font-size: 0.9em; color: #555; }
+  .papers {
+    background: #FFF8E1;
+    border: 3px solid #FFA000;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  .papers h3 { color: #E65100; margin-bottom: 15px; }
+  .paper {
+    background: white;
+    border-left: 6px solid #FF6F00;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+  }
+  .paper-title { font-weight: bold; color: #BF360C; }
+  .file {
+    background: #263238;
+    color: #B0BEC5;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    margin: 10px 0;
+    font-size: 0.9em;
+  }
+  .file-name { color: #FFD54F; font-weight: bold; }
+  .rocket {
+    background: linear-gradient(180deg, #E1BEE7 0%, #90CAF9 100%);
+    border-radius: 20px;
+    padding: 25px;
+    margin: 25px 0;
+  }
+  .rocket h2 { color: #4A148C; text-align: center; margin-bottom: 20px; }
+  .stage {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 12px 0;
+    border-left: 8px solid #7B1FA2;
+  }
+  .stage-num {
+    display: inline-block;
+    background: #7B1FA2;
+    color: white;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  .stage-title { font-weight: bold; color: #4A148C; }
+  .compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .compare-item {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 3px solid #FF9800;
+  }
+  .compare-item.bad { border-color: #E53935; background: #FFEBEE; }
+  .compare-item.ok { border-color: #43A047; background: #E8F5E9; }
+  .compare-num { font-size: 2em; font-weight: bold; color: #BF360C; }
+  .compare-verdict { font-size: 0.9em; color: #555; margin-top: 8px; }
+  .summary {
+    background: #E8F5E9;
+    border: 3px solid #4CAF50;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 30px 0;
+    text-align: center;
+    font-size: 1.15em;
+  }
+  .summary h2 { color: #1B5E20; margin-bottom: 15px; }
+  .emoji { font-size: 1.4em; }
+  .footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    color: #5D4037;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🧰 4 件套 = 子项目的"开工通知"</h1>
+  <p class="subtitle">4 个子项目 × 4 件套 = 16 个文件。每个子项目开工前必须有它,缺一个就开不了工。</p>
+
+  <!-- 故事 1:乐高玩具盒 -->
+  <div class="story">
+    <h2>📖 故事 1:你买了 4 盒乐高</h2>
+    <p>你想拼 4 辆小车(后端车、前端车、AI 车、网管车)。</p>
+    <p>你买了 <strong>4 盒乐高</strong>,每盒子上贴着 <strong>4 张纸条</strong>:</p>
+    <div class="papers">
+      <div class="paper">
+        <span class="paper-title">📋 第 1 张:你是谁</span> · CLAUDE.md
+        <br>告诉孩子"这辆车叫啥,长啥样,谁能开,谁不能开"
+      </div>
+      <div class="paper">
+        <span class="paper-title">📝 第 2 张:拼装步骤</span> · feature_list.json
+        <br>告诉孩子"先拼轮子,再拼车身,最后拼方向盘"
+      </div>
+      <div class="paper">
+        <span class="paper-title">✅ 第 3 张:今天拼到哪</span> · progress.txt
+        <br>告诉孩子"昨天拼了 5 块,今天接着拼第 6 块"
+      </div>
+      <div class="paper">
+        <span class="paper-title">🔌 第 4 张:电源开关</span> · init.sh
+        <br>告诉孩子"按这个按钮,灯泡就亮了,车就能跑"
+      </div>
+    </div>
+    <p style="margin-top:15px;">
+      <span class="emoji">😱</span> <strong>没这 4 张纸条会怎样?</strong>
+      <br>孩子(AI)打开盒子,看着 500 块零件,完全不知道从哪开始。
+      <br>于是它瞎拼,拼出一辆" 4 个轮子朝天的车",然后跟你说"我干完了" 🤯
+    </p>
+  </div>
+
+  <!-- 故事 2:新员工入职 -->
+  <div class="story">
+    <h2>📖 故事 2:4 个新员工入职</h2>
+    <p>公司来了 4 个新员工,HR(主控 = 你)给每人发 4 张纸:</p>
+
+    <div class="team-grid">
+      <div class="teammate">
+        <div class="teammate-icon">🖥️</div>
+        <div class="teammate-name">老后</div>
+        <div class="teammate-task">后端程序员 · 写 API · 管数据库</div>
+      </div>
+      <div class="teammate">
+        <div class="teammate-icon">🎨</div>
+        <div class="teammate-name">小前</div>
+        <div class="teammate-task">前端设计师 · 画页面 · 接 API</div>
+      </div>
+      <div class="teammate">
+        <div class="teammate-icon">🧙</div>
+        <div class="teammate-name">阿 AI</div>
+        <div class="teammate-task">AI 调度员 · 召唤 12 法师</div>
+      </div>
+      <div class="teammate">
+        <div class="teammate-icon">🌐</div>
+        <div class="teammate-name">小运</div>
+        <div class="teammate-task">网管 · Docker · 数据库 · 服务器</div>
+      </div>
+    </div>
+
+    <p>HR 说: <strong>"这 4 张纸,缺一张不能开工。"</strong></p>
+    <ul style="padding-left: 30px; margin-top: 10px;">
+      <li>📋 岗位说明书(CLAUDE.md)— 知道自己干什么</li>
+      <li>📝 任务清单(feature_list.json)— 知道今天做什么</li>
+      <li>✅ 工作日志(progress.txt)— 知道做到哪了</li>
+      <li>🔌 工卡(init.sh)— 进门刷一下,电脑开了</li>
+    </ul>
+  </div>
+
+  <!-- 故事 3:组装赛车 -->
+  <div class="story">
+    <h2>📖 故事 3:4 个人一起组装赛车</h2>
+    <p>4 个人要一起组装一辆赛车( = 云笔 AI 小说助手)。</p>
+    <p>主控 = <strong>车队经理</strong>,只查"小本子"(progress.txt),不亲自拧螺丝。</p>
+
+    <p><strong>每个人的小本子长这样:</strong></p>
+    <div class="file">
+      <span class="file-name">backend/progress.txt</span><br>
+      ================================<br>
+      Day 1: 装好数据库 (PostgreSQL)<br>
+      Day 2: 写完登录 API (POST /api/auth/login)<br>
+      Day 3: 写完项目 API (GET /api/projects)<br>
+      Day 4: 联调 - 前端调用登录,通了 ✅<br>
+      Day 5: 写章节 API,做到一半...<br>
+    </div>
+
+    <p style="margin-top:15px;">
+      <span class="emoji">👀</span> 经理每天看一眼小本子:
+      <br>· "哦,老后今天做到第 3 步了,不错"
+      <br>· "小前还在第 1 步,催一下"
+      <br>· "小运已经装好数据库,可以去联调了"
+    </p>
+  </div>
+
+  <!-- 故事 4:为什么 4 件不是 3 件也不是 5 件 -->
+  <div class="story">
+    <h2>📖 故事 4:为啥是 4 件套,不是 3 件或 5 件?</h2>
+
+    <div class="compare">
+      <div class="compare-item bad">
+        <div class="compare-num">1 件</div>
+        <div class="compare-verdict">❌ 啥都不知道<br>→ 瞎干</div>
+      </div>
+      <div class="compare-item bad">
+        <div class="compare-num">2 件</div>
+        <div class="compare-verdict">❌ 知道做啥<br>但不会启动<br>→ 干瞪眼</div>
+      </div>
+      <div class="compare-item bad">
+        <div class="compare-num">3 件</div>
+        <div class="compare-verdict">❌ 能干活<br>但不记日志<br>→ 出错找不到原因</div>
+      </div>
+      <div class="compare-item ok">
+        <div class="compare-num">4 件</div>
+        <div class="compare-verdict">✅ 刚好<br>身份 + 目标 + 进度 + 启动</div>
+      </div>
+      <div class="compare-item bad">
+        <div class="compare-num">5 件</div>
+        <div class="compare-verdict">❌ 多一张<br>"团队合影"<br>→ 没用</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 故事 5:四级火箭 -->
+  <div class="rocket">
+    <h2>🚀 故事 5:施工队的"四级火箭"</h2>
+
+    <div class="stage">
+      <span class="stage-num">1</span>
+      <span class="stage-title">CLAUDE.md · 身份</span><br>
+      "我是谁?我干什么?我不准干什么?"
+    </div>
+
+    <div class="stage">
+      <span class="stage-num">2</span>
+      <span class="stage-title">feature_list.json · 目标</span><br>
+      "我要完成哪些任务?按什么顺序?谁依赖谁?"
+    </div>
+
+    <div class="stage">
+      <span class="stage-num">3</span>
+      <span class="stage-title">progress.txt · 进度</span><br>
+      "今天做到第几步了?哪些做完了?哪些卡住了?"
+    </div>
+
+    <div class="stage">
+      <span class="stage-num">4</span>
+      <span class="stage-title">init.sh · 执行</span><br>
+      "一行命令,把项目从 0 跑到能看"
+    </div>
+  </div>
+
+  <!-- 实际文件长什么样 -->
+  <div class="story">
+    <h2>📂 4 件套文件长什么样?</h2>
+    <p>以 <strong>backend/</strong> 为例:</p>
+
+    <div class="file">
+<span class="file-name">backend/CLAUDE.md</span>  ← 岗位说明书
+─────────────────────────────────
+# 后端 (Backend)
+
+## 你是谁
+NestJS 后端服务,负责 230+ 个 API 端点。
+
+## 你的命令书
+必须严格遵守 ../contracts/openapi/ 下的所有 YAML。
+不准改字段名,不准删端点,改完要通知主控。
+
+## 你的禁区
+❌ 不准改 contracts/ (那是主控的)
+❌ 不准自己设计 API (主控已设计好)
+✅ 你只负责: 写实现 + 跑测试 + 写日志
+    </div>
+
+    <div class="file">
+<span class="file-name">backend/feature_list.json</span>  ← 任务清单
+─────────────────────────────────
+[
+  { "id": "B-01", "title": "搭建 NestJS 骨架", "passes": true },
+  { "id": "B-02", "title": "对接 PostgreSQL", "passes": true },
+  { "id": "B-03", "title": "实现登录 API", "passes": false },
+  { "id": "B-04", "title": "实现项目 API", "passes": false },
+  { "id": "B-05", "title": "联调 - 前端登录页", "passes": false }
+]
+    </div>
+
+    <div class="file">
+<span class="file-name">backend/progress.txt</span>  ← 工作日志
+─────────────────────────────────
+2026-06-07  Day 1  装好 NestJS 骨架,跑通 hello world
+2026-06-08  Day 2  对接 PostgreSQL,写完 user 表 migration
+2026-06-09  Day 3  实现 POST /api/auth/login,待前端联调
+    </div>
+
+    <div class="file">
+<span class="file-name">backend/init.sh</span>  ← 一键启动
+─────────────────────────────────
+#!/bin/bash
+docker compose up -d postgres
+pnpm install
+pnpm run db:migrate
+pnpm run start:dev
+echo "✅ 后端起在 http://localhost:3000"
+    </div>
+  </div>
+
+  <div class="summary">
+    <h2>🎯 一句话总结</h2>
+    <p>
+      <strong>4 个子项目 × 4 件套 = 16 个文件</strong><br>
+      16 个文件全到位,4 个施工队就能同时开工。<br>
+      缺 1 个文件,就有 1 个队不知道干啥;<br>
+      缺 4 个文件,4 个队全傻眼。<br>
+      <br>
+      教练建议:<strong>16 个文件一次写完</strong>,写完一起 git commit,<br>
+      4 个队就能"同时启动" 🚀
+    </p>
+  </div>
+
+  <div class="footer">
+    🌈 <strong>下一步:你回"开始"</strong>,我 1-2 小时内写完 16 个文件 🌈
+  </div>
+
+</div>
+</body>
+</html>

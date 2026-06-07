@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 子 Agent 实施方案 · 主控调度子项目实战指南</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #E8E8E8;
+    line-height: 1.8;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 40px 30px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    margin-bottom: 40px;
+  }
+  .hero h1 {
+    font-size: 2.5em;
+    background: linear-gradient(135deg, #00DBDE 0%, #FC00FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero .sub { color: #B0BEC5; font-size: 1.1em; margin: 8px 0; }
+  .hero .badges {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-top: 20px;
+  }
+  .badge {
+    background: rgba(0,219,222,0.15);
+    border: 1px solid #00DBDE;
+    color: #00DBDE;
+    padding: 6px 14px; border-radius: 14px;
+    font-size: 0.85em; font-weight: bold;
+  }
+  .badge.pink { background: rgba(252,0,255,0.15); border-color: #FC00FF; color: #FC00FF; }
+  .badge.yellow { background: rgba(255,193,7,0.15); border-color: #FFC107; color: #FFC107; }
+
+  /* 章节 */
+  .section {
+    background: rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 30px 35px;
+    margin: 28px 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+  }
+  .section h2 {
+    color: #00DBDE;
+    font-size: 1.6em;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(0,219,222,0.3);
+  }
+  .section h3 {
+    color: #FFD93D;
+    font-size: 1.2em;
+    margin: 18px 0 10px;
+  }
+  .section p { margin: 10px 0; color: #CFD8DC; }
+  .section strong { color: #FF6B9D; }
+  .section em { color: #00DBDE; font-style: normal; font-weight: bold; }
+
+  /* 架构图 */
+  .arch {
+    background: #0F1419;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 30px;
+    margin: 20px 0;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .arch-master {
+    display: inline-block;
+    background: linear-gradient(135deg, #00DBDE 0%, #FC00FF 100%);
+    color: white;
+    padding: 18px 28px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 1.15em;
+    box-shadow: 0 6px 20px rgba(0,219,222,0.4);
+    margin-bottom: 10px;
+  }
+  .arch-line {
+    color: #00DBDE;
+    font-size: 1.5em;
+    margin: 8px 0;
+  }
+  .arch-children {
+    display: flex; gap: 12px; justify-content: center;
+    flex-wrap: wrap; margin-top: 10px;
+  }
+  .arch-child {
+    background: rgba(255,255,255,0.08);
+    border: 2px solid;
+    padding: 14px 18px;
+    border-radius: 12px;
+    min-width: 140px;
+  }
+  .arch-child.fe { border-color: #4FC3F7; color: #4FC3F7; }
+  .arch-child.be { border-color: #FFD54F; color: #FFD54F; }
+  .arch-child.ai { border-color: #FC00FF; color: #FC00FF; }
+  .arch-child.kg { border-color: #66BB6A; color: #66BB6A; }
+  .arch-child.in { border-color: #FF8A65; color: #FF8A65; }
+  .arch-shared {
+    margin-top: 18px;
+    padding: 12px;
+    background: rgba(255,217,61,0.1);
+    border: 2px dashed #FFD93D;
+    border-radius: 12px;
+    color: #FFD93D;
+    font-weight: bold;
+  }
+
+  /* 步骤卡片 */
+  .step {
+    background: linear-gradient(135deg, rgba(0,219,222,0.08), rgba(252,0,255,0.05));
+    border-left: 4px solid #00DBDE;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin: 18px 0;
+    position: relative;
+  }
+  .step-num {
+    position: absolute;
+    top: -12px; left: 20px;
+    background: linear-gradient(135deg, #00DBDE 0%, #FC00FF 100%);
+    color: white;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    box-shadow: 0 4px 12px rgba(0,219,222,0.4);
+  }
+  .step h3 { margin-top: 8px; color: #FFD93D; }
+
+  /* 代码块 */
+  pre {
+    background: #0F1419;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 18px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+    color: #C5E1A5;
+  }
+  pre .cmt { color: #607D8B; font-style: italic; }
+  pre .kw { color: #FF6B9D; font-weight: bold; }
+  pre .str { color: #FFD54F; }
+  pre .var { color: #4FC3F7; }
+  pre .fn { color: #FC00FF; }
+  code.inline {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #FFD93D;
+    font-size: 0.92em;
+  }
+
+  /* 表格 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  th {
+    background: linear-gradient(135deg, #00DBDE 0%, #6B5BFF 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+  td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #CFD8DC;
+    font-size: 0.92em;
+  }
+  tr:hover td { background: rgba(255,255,255,0.04); }
+  td code {
+    background: rgba(0,219,222,0.15);
+    color: #00DBDE;
+    padding: 2px 6px; border-radius: 4px;
+    font-family: monospace; font-size: 0.85em;
+  }
+
+  /* 4 件套 */
+  .toolbox {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .tool {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 18px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .tool:hover {
+    transform: translateY(-3px);
+    border-color: #00DBDE;
+  }
+  .tool-icon { font-size: 1.8em; margin-bottom: 8px; }
+  .tool-name { color: #FFD93D; font-weight: bold; margin-bottom: 5px; }
+  .tool-file {
+    background: #0F1419;
+    color: #00DBDE;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.82em;
+    display: inline-block;
+    margin: 5px 0;
+  }
+  .tool-desc { font-size: 0.88em; color: #B0BEC5; margin-top: 6px; }
+
+  /* 锚点 */
+  .anchors {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 15px 0;
+  }
+  .anchor {
+    background: rgba(255,217,61,0.1);
+    border-left: 4px solid #FFD93D;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .anchor-name { color: #FFD93D; font-weight: bold; font-size: 0.95em; }
+  .anchor-desc { color: #CFD8DC; font-size: 0.85em; margin-top: 5px; }
+
+  /* 并行 vs 串行 */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  .compare-card {
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .compare-card.parallel {
+    background: rgba(102,187,106,0.1);
+    border: 1px solid #66BB6A;
+  }
+  .compare-card.serial {
+    background: rgba(255,138,101,0.1);
+    border: 1px solid #FF8A65;
+  }
+  .compare-card h4 { margin-bottom: 10px; }
+  .compare-card.parallel h4 { color: #66BB6A; }
+  .compare-card.serial h4 { color: #FF8A65; }
+  .compare-card li { margin-left: 18px; font-size: 0.9em; color: #CFD8DC; }
+
+  /* 主控职责 */
+  .duties {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 15px 0;
+  }
+  .duty {
+    background: rgba(0,219,222,0.08);
+    border: 1px solid #00DBDE;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .duty-icon { font-size: 2em; }
+  .duty-name { color: #00DBDE; font-weight: bold; margin: 6px 0; }
+  .duty-desc { font-size: 0.85em; color: #CFD8DC; }
+
+  /* 5 个坑 */
+  .pitfalls table th {
+    background: linear-gradient(135deg, #FF5252 0%, #FF6B9D 100%);
+  }
+
+  /* 行动计划 */
+  .plan-day {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 10px 0;
+    border-left: 4px solid;
+  }
+  .plan-day.d1 { border-color: #00DBDE; }
+  .plan-day.d2 { border-color: #FFD93D; }
+  .plan-day.d3 { border-color: #FC00FF; }
+  .plan-day.d4 { border-color: #66BB6A; }
+  .plan-day-title { font-weight: bold; font-size: 1.05em; margin-bottom: 6px; }
+  .plan-day.d1 .plan-day-title { color: #00DBDE; }
+  .plan-day.d2 .plan-day-title { color: #FFD93D; }
+  .plan-day.d3 .plan-day-title { color: #FC00FF; }
+  .plan-day.d4 .plan-day-title { color: #66BB6A; }
+  .plan-day ul { margin-left: 22px; font-size: 0.9em; color: #CFD8DC; }
+
+  /* 结尾 */
+  .cta {
+    background: linear-gradient(135deg, #00DBDE 0%, #FC00FF 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 35px 30px;
+    text-align: center;
+    margin: 40px 0 20px;
+    box-shadow: 0 15px 40px rgba(252,0,255,0.3);
+  }
+  .cta h2 { font-size: 1.8em; margin-bottom: 15px; }
+  .cta-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .cta-option {
+    background: rgba(255,255,255,0.2);
+    padding: 14px;
+    border-radius: 10px;
+    text-align: left;
+    backdrop-filter: blur(5px);
+  }
+  .cta-option strong { display: block; margin-bottom: 5px; font-size: 1.05em; }
+
+  .footer {
+    text-align: center;
+    color: #607D8B;
+    padding: 20px;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 高亮 */
+  .hl-red { color: #FF6B9D; font-weight: bold; }
+  .hl-yellow { color: #FFD93D; font-weight: bold; }
+  .hl-cyan { color: #00DBDE; font-weight: bold; }
+  .hl-green { color: #66BB6A; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🚀 子 Agent 实施方案</h1>
+    <p class="sub">主控如何调度多个子项目 Agent · 每个子 Agent 用 /harness-l3-v4 管理</p>
+    <div class="badges">
+      <span class="badge">⚡ 7 步实施</span>
+      <span class="badge pink">⚠️ 5 个坑</span>
+      <span class="badge yellow">📅 4 天启动计划</span>
+    </div>
+  </div>
+
+  <!-- 1. 推荐架构 -->
+  <div class="section">
+    <h2>🏗️ 推荐架构 · 星型结构</h2>
+    <p><strong>核心思想:</strong> 主控 Agent 当"指挥塔",派任务给 N 个子 Agent,通过 <em>contracts/</em> 共享对话。</p>
+
+    <div class="arch">
+      <div class="arch-master">🎩 主控 Agent (orchestrator)</div>
+      <div class="arch-line">↓ 派任务 + 给契约 ↓</div>
+      <div class="arch-children">
+        <div class="arch-child fe">🎨 frontend<br><small>Vue 3</small></div>
+        <div class="arch-child be">⚙️ backend<br><small>NestJS</small></div>
+        <div class="arch-child ai">🧙 ai-orches.<br><small>Python</small></div>
+        <div class="arch-child kg">🗺️ knowledge<br><small>pgvector</small></div>
+        <div class="arch-child in">🔧 infra<br><small>Docker</small></div>
+      </div>
+      <div class="arch-shared">📜 共享 contracts/ (所有 agent 只读)</div>
+    </div>
+
+    <p><strong>3 个关键约定:</strong></p>
+    <ul style="margin-left:22px; color:#CFD8DC;">
+      <li>🎩 主控 Agent <span class="hl-red">永不下场写代码</span>,只发图纸 + 看进度</li>
+      <li>📜 所有子 Agent <span class="hl-yellow">只读 contracts/</span>,不允许私自修改</li>
+      <li>🔒 每个子 Agent <span class="hl-cyan">在独立 worktree</span>,互不干扰</li>
+    </ul>
+  </div>
+
+  <!-- 2. 7 步实施 -->
+  <div class="section">
+    <h2>🚦 7 步实施流程</h2>
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>隔离工作目录 · git worktree</h3>
+      <p>避免多个 agent 互改对方代码:</p>
+<pre><span class="cmt"># 方法 A: 手动创建 worktree</span>
+<span class="kw">cd</span> master/
+<span class="fn">git worktree add</span> ../wt-backend  backend-dev
+<span class="fn">git worktree add</span> ../wt-frontend frontend-dev
+<span class="fn">git worktree add</span> ../wt-ai       ai-dev
+
+<span class="cmt"># 方法 B: 用 Agent 工具自动隔离 (推荐)</span>
+Agent({
+  <span class="var">isolation</span>: <span class="str">"worktree"</span>,
+  <span class="var">subagent_type</span>: <span class="str">"general-purpose"</span>,
+  ...
+})</pre>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>每个子项目放"4 件套"</h3>
+      <p>子 agent 一开工就要看到这些:</p>
+      <div class="toolbox">
+        <div class="tool">
+          <div class="tool-icon">📋</div>
+          <div class="tool-name">1. 你是谁</div>
+          <div class="tool-file">CLAUDE.md</div>
+          <div class="tool-desc">边界、职责、不允许做什么</div>
+        </div>
+        <div class="tool">
+          <div class="tool-icon">📝</div>
+          <div class="tool-name">2. 任务清单</div>
+          <div class="tool-file">feature_list.json</div>
+          <div class="tool-desc">从主控 37 任务里抽的子集</div>
+        </div>
+        <div class="tool">
+          <div class="tool-icon">✅</div>
+          <div class="tool-name">3. 进度日志</div>
+          <div class="tool-file">progress.txt</div>
+          <div class="tool-desc">每完一步追加一行</div>
+        </div>
+        <div class="tool">
+          <div class="tool-icon">🔌</div>
+          <div class="tool-name">4. l3-v4 配置</div>
+          <div class="tool-file">harness.config.json</div>
+          <div class="tool-desc">5 阶段研究/规划/构建/复盘/调试</div>
+        </div>
+      </div>
+      <p style="margin-top:10px;"><span class="hl-red">⚠️ 没 4 件套就别派任务,否则子 agent 会瞎拼车!</span></p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>派任务时给"3 个锚点"</h3>
+      <p>每个子 agent 启动时,主控必须给:</p>
+      <div class="anchors">
+        <div class="anchor">
+          <div class="anchor-name">🎯 任务 ID</div>
+          <div class="anchor-desc">"你做 S0-18 auth 模块"</div>
+        </div>
+        <div class="anchor">
+          <div class="anchor-name">📜 契约路径</div>
+          <div class="anchor-desc">"看 contracts/openapi/auth.yaml"</div>
+        </div>
+        <div class="anchor">
+          <div class="anchor-name">✅ 验收标准</div>
+          <div class="anchor-desc">"curl 登录返回 token"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>用 /harness-l3-v4 包装每个子 Agent</h3>
+      <p>每个子 agent 内部走 5 阶段:</p>
+<pre><span class="cmt"># backend/harness.config.json</span>
+{
+  <span class="var">"harness"</span>: {
+    <span class="var">"version"</span>: <span class="str">"l3-v4"</span>,
+    <span class="var">"phases"</span>: [
+      { <span class="var">"id"</span>: <span class="str">"research"</span>, <span class="var">"inputs"</span>: [<span class="str">"../master/contracts/openapi/auth.yaml"</span>] },
+      { <span class="var">"id"</span>: <span class="str">"plan"</span>,     <span class="var">"outputs"</span>: [<span class="str">"docs/adr-auth.md"</span>] },
+      { <span class="var">"id"</span>: <span class="str">"build"</span>,    <span class="var">"outputs"</span>: [<span class="str">"src/modules/auth/"</span>] },
+      { <span class="var">"id"</span>: <span class="str">"review"</span>,   <span class="var">"scripts"</span>: [<span class="str">"pnpm test:auth"</span>] },
+      { <span class="var">"id"</span>: <span class="str">"debug"</span>,    <span class="var">"description"</span>: <span class="str">"修复 review 阶段发现的问题"</span> }
+    ]
+  }
+}</pre>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-num">5</div>
+      <h3>并行 vs 串行(看依赖)</h3>
+      <div class="compare-grid">
+        <div class="compare-card parallel">
+          <h4>✅ 能并行(同时跑)</h4>
+          <ul>
+            <li>后端 auth 模块</li>
+            <li>前端登录页面</li>
+            <li>17 个 World Tab 契约编写</li>
+            <li>infra Docker 编排</li>
+          </ul>
+          <p style="margin-top:8px; font-size:0.85em;">→ 都不依赖对方运行</p>
+        </div>
+        <div class="compare-card serial">
+          <h4>❌ 必须串行(排队)</h4>
+          <ul>
+            <li>前端登录 ← 等后端 auth 跑起来</li>
+            <li>AI SSE ← 等前端编辑器写完</li>
+            <li>蒸馏 ← 等 BullMQ + Redis</li>
+            <li>E2E 测试 ← 等所有人完工</li>
+          </ul>
+          <p style="margin-top:8px; font-size:0.85em;">→ 看 feature_list.json 的 depends 字段</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step">
+      <div class="step-num">6</div>
+      <h3>主控当"裁判" · 每天 30 分钟</h3>
+      <p>主控不下场写代码,只做 3 件事:</p>
+      <div class="duties">
+        <div class="duty">
+          <div class="duty-icon">👀</div>
+          <div class="duty-name">看进度</div>
+          <div class="duty-desc">读各 progress.txt,谁卡住?</div>
+        </div>
+        <div class="duty">
+          <div class="duty-icon">🔍</div>
+          <div class="duty-name">查违规</div>
+          <div class="duty-desc">跑 contract-lint,谁改契约?</div>
+        </div>
+        <div class="duty">
+          <div class="duty-icon">⚖️</div>
+          <div class="duty-name">解冲突</div>
+          <div class="duty-desc">前后端吵架时仲裁</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="step">
+      <div class="step-num">7</div>
+      <h3>完工交接协议</h3>
+      <p>子 agent 完成任务时,必须:</p>
+      <ul style="margin-left:22px; color:#CFD8DC;">
+        <li>✅ 更新自己的 <code class="inline">progress.txt</code></li>
+        <li>✅ 在 <code class="inline">feature_list.json</code> 把 <code class="inline">passes: false</code> 改成 <code class="inline">true</code></li>
+        <li>✅ 跑通验收命令,贴输出</li>
+        <li>✅ 写一行总结发回主控</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. 具体启动姿势 -->
+  <div class="section">
+    <h2>🎬 具体启动姿势(代码示范)</h2>
+
+    <h3>Step 1 · 派 backend agent</h3>
+<pre>Agent({
+  <span class="var">subagent_type</span>: <span class="str">"general-purpose"</span>,
+  <span class="var">name</span>: <span class="str">"backend-agent"</span>,
+  <span class="var">isolation</span>: <span class="str">"worktree"</span>,
+  <span class="var">run_in_background</span>: <span class="kw">true</span>,
+  <span class="var">prompt</span>: <span class="str">`
+    你是 backend 子项目 agent。
+
+    1. 必读: master/contracts/openapi/auth.yaml
+    2. 任务: 完成 S0-18 auth 模块 (8 端点 + JWT + 心跳)
+    3. 流程: 用 /harness-l3-v4 走 5 阶段
+    4. 产出: backend/src/modules/auth/
+    5. 验收: curl http://localhost:3000/api/auth/login
+             返回 { success: true, data: { token, user } }
+    6. 完工后: 更新 backend/progress.txt
+              在 feature_list.json 把 S0-18 标 passes: true
+  `</span>
+})</pre>
+
+    <h3>Step 2 · 同时派 frontend agent(并行)</h3>
+<pre>Agent({
+  <span class="var">name</span>: <span class="str">"frontend-agent"</span>,
+  <span class="var">isolation</span>: <span class="str">"worktree"</span>,
+  <span class="var">run_in_background</span>: <span class="kw">true</span>,
+  <span class="var">prompt</span>: <span class="str">"做 S0-22 Vue 3 骨架, 不依赖后端先跑起来"</span>
+})</pre>
+
+    <h3>Step 3 · 主控等通知 → 派下一批</h3>
+    <p>用 <code class="inline">TaskOutput</code> 看子 agent 的输出,根据进度派后续任务。</p>
+  </div>
+
+  <!-- 4. 5 个坑 -->
+  <div class="section pitfalls">
+    <h2>⚠️ 5 个坑 · 过来人血泪经验</h2>
+    <table>
+      <thead>
+        <tr><th>❌ 坑</th><th>✅ 怎么避</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>子 agent 互改对方代码</td><td>必须用 <code>isolation: "worktree"</code> 隔离</td></tr>
+        <tr><td>子 agent 偷偷改契约</td><td>主控加 contract-lint,子 agent 只读 contracts/</td></tr>
+        <tr><td>进度看不到</td><td>子 agent 每完一步 <strong>立即写</strong> progress.txt</td></tr>
+        <tr><td>同时 10 个 agent 跑爆 token</td><td>一次最多 <span class="hl-red">3-5 个并发</span></td></tr>
+        <tr><td>子 agent "自由发挥"</td><td>CLAUDE.md 里 <strong>写死边界</strong>,列清楚不能做啥</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. 第一步具体怎么做 -->
+  <div class="section">
+    <h2>📅 4 天启动计划</h2>
+
+    <div class="plan-day d1">
+      <div class="plan-day-title">Day 1 · 主控补齐缺的图纸</div>
+      <ul>
+        <li>写 S0-09 chapter.yaml(11 端点)</li>
+        <li>写 S0-10 outline.yaml(22 端点)</li>
+        <li>写 S0-14 routing-rules.yaml(AI 路由规则)</li>
+        <li>给每个子项目写 CLAUDE.md(4 件套之一)</li>
+      </ul>
+    </div>
+
+    <div class="plan-day d2">
+      <div class="plan-day-title">Day 2 · 派 1 个 agent 试水</div>
+      <ul>
+        <li>启动 infra-agent</li>
+        <li>任务: S0-04 init.sh + S0-15 docker-compose.yml</li>
+        <li>验收: <code class="inline">./init.sh dev</code> 启动 PG+Redis+MinIO 健康检查通过</li>
+        <li>主控复盘: 这套调度模式行不行?有没有坑?</li>
+      </ul>
+    </div>
+
+    <div class="plan-day d3">
+      <div class="plan-day-title">Day 3 · 派 3 个 agent 并行</div>
+      <ul>
+        <li>backend-agent → 做 S0-16(NestJS 骨架) + S0-17(Prisma schema)</li>
+        <li>frontend-agent → 做 S0-22(Vue 3 骨架)</li>
+        <li>ai-agent → 做 S0-30 准备(读 DeepSeek 文档)</li>
+        <li>主控盯进度,30 分钟看一次 progress.txt</li>
+      </ul>
+    </div>
+
+    <div class="plan-day d4">
+      <div class="plan-day-title">Day 4-7 · 主链冲刺</div>
+      <ul>
+        <li>backend: S0-18(auth)→ S0-19(project)→ S0-20(chapter)</li>
+        <li>frontend: S0-23(登录)→ S0-24(列表)→ S0-25(三栏)</li>
+        <li>ai: S0-29(SSE)→ S0-30(DeepSeek)</li>
+        <li>tests: S0-31(E2E 冒烟跑通)</li>
+        <li>验收: <strong>注册 → 登录 → 写 100 字 → AI 续写 → 采纳</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6. 关键命令速查 -->
+  <div class="section">
+    <h2>📌 关键命令速查表</h2>
+    <table>
+      <thead>
+        <tr><th>动作</th><th>命令 / 工具</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>创建 worktree</td><td><code>git worktree add ../wt-backend backend-dev</code></td></tr>
+        <tr><td>派子 agent (后台)</td><td><code>Agent({ run_in_background: true, ... })</code></td></tr>
+        <tr><td>查子 agent 输出</td><td><code>TaskOutput({ taskId: "..." })</code></td></tr>
+        <tr><td>停止子 agent</td><td><code>TaskStop({ taskId: "..." })</code></td></tr>
+        <tr><td>给子 agent 发消息</td><td><code>SendMessage({ to: "backend-agent", ... })</code></td></tr>
+        <tr><td>跑契约校验</td><td><code>python scripts/contract-lint.py</code></td></tr>
+        <tr><td>启动全栈</td><td><code>./init.sh dev</code></td></tr>
+        <tr><td>E2E 测试</td><td><code>./init.sh e2e</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>🎤 接下来你想做啥?</h2>
+    <p>教练给你 3 个选项,挑一个我立马动手帮你:</p>
+    <div class="cta-options">
+      <div class="cta-option">
+        <strong>A. 启动模板</strong>
+        我给你写一个可直接复制的子 agent 启动 prompt
+      </div>
+      <div class="cta-option">
+        <strong>B. 补齐图纸</strong>
+        我帮你写完 S0-09 / S0-10 / S0-14 三个缺的契约
+      </div>
+      <div class="cta-option">
+        <strong>C. 4 件套</strong>
+        我帮你写每个子项目的 CLAUDE.md
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🚀 主控 Orchestrator v1.0 · 子 Agent 实施方案 · 2026-06-07<br>
+    <em>把人变成调度员,把 AI 变成施工队</em>
+  </div>
+
+</div>
+</body>
+</html>

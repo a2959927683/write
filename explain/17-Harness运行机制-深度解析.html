@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔬 Harness-l3-v4 运行机制 · 深度解析</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,219,222,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(102,187,106,0.1) 0%, transparent 50%),
+      linear-gradient(135deg, #0A1929 0%, #1A2A3F 50%, #1F3A5F 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #E0E7FF;
+    line-height: 1.85;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1150px; margin: 0 auto; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 40px 30px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 24px;
+    border: 1px solid rgba(0,219,222,0.2);
+    backdrop-filter: blur(20px);
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-size: 2.4em;
+    background: linear-gradient(135deg, #00DBDE 0%, #66BB6A 50%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero .sub { color: #B0BEC5; font-size: 1.1em; }
+  .badges {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-top: 20px;
+  }
+  .badge {
+    background: rgba(0,219,222,0.15);
+    border: 1px solid #00DBDE;
+    color: #00DBDE;
+    padding: 6px 14px; border-radius: 14px;
+    font-size: 0.9em; font-weight: bold;
+  }
+  .badge.g { background: rgba(102,187,106,0.15); border-color: #66BB6A; color: #66BB6A; }
+  .badge.y { background: rgba(255,215,0,0.15); border-color: #FFD700; color: #FFD700; }
+  .badge.p { background: rgba(252,0,255,0.15); border-color: #FC00FF; color: #FC00FF; }
+
+  /* 章节 */
+  .section {
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    padding: 32px 38px;
+    margin: 28px 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .section h2 {
+    color: #00DBDE;
+    font-size: 1.65em;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(0,219,222,0.3);
+  }
+  .section h3 {
+    color: #FFD700;
+    font-size: 1.2em;
+    margin: 18px 0 10px;
+  }
+  .section p { color: #CFD8DC; margin: 10px 0; }
+  .section strong { color: #FFD700; }
+  .section em { color: #00DBDE; font-style: normal; font-weight: bold; }
+
+  .sec-badge {
+    position: absolute;
+    top: -15px;
+    left: 25px;
+    padding: 7px 18px;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 0.95em;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .bg-arch { background: linear-gradient(135deg, #1565C0, #42A5F5); }
+  .bg-script { background: linear-gradient(135deg, #2E7D32, #66BB6A); }
+  .bg-agent { background: linear-gradient(135deg, #6A1B9A, #AB47BC); }
+  .bg-fresh { background: linear-gradient(135deg, #E65100, #FFA726); }
+  .bg-scope { background: linear-gradient(135deg, #C62828, #EF5350); }
+
+  /* 总架构图 */
+  .arch-tree {
+    background: #0A0E1A;
+    border: 1px solid rgba(0,219,222,0.3);
+    border-radius: 14px;
+    padding: 30px;
+    margin: 18px 0;
+    text-align: center;
+  }
+  .arch-root {
+    display: inline-block;
+    background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+    color: white;
+    padding: 18px 30px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 8px 25px rgba(102,187,106,0.4);
+  }
+  .arch-root-sub { font-size: 0.85em; opacity: 0.95; margin-top: 4px; }
+  .arch-levels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 25px;
+  }
+  .arch-level {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid;
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .arch-level.l1 { border-color: #42A5F5; }
+  .arch-level.l2 { border-color: #66BB6A; }
+  .arch-level.l3 { border-color: #AB47BC; }
+  .arch-level-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+  }
+  .arch-level.l1 .arch-level-title { color: #42A5F5; }
+  .arch-level.l2 .arch-level-title { color: #66BB6A; }
+  .arch-level.l3 .arch-level-title { color: #AB47BC; }
+  .arch-level-desc { font-size: 0.88em; color: #B0BEC5; }
+  .arch-level-items {
+    margin-top: 10px;
+    font-size: 0.85em;
+    color: #90A4AE;
+  }
+  .arch-level-items code {
+    background: rgba(0,219,222,0.15);
+    color: #00DBDE;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  /* 脚本表 */
+  .script-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 15px 0;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .script-table th {
+    background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.92em;
+  }
+  .script-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #CFD8DC;
+    font-size: 0.9em;
+  }
+  .script-table tr:hover td { background: rgba(255,255,255,0.04); }
+  .script-table code {
+    background: rgba(0,219,222,0.15);
+    color: #00DBDE;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.85em;
+  }
+  .script-table .comp { color: #66BB6A; font-weight: bold; }
+  .script-table .inf { color: #FFA726; font-weight: bold; }
+
+  /* Agent 网格 */
+  .agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin: 18px 0;
+  }
+  .agent-card {
+    background: rgba(0,0,0,0.3);
+    border: 2px solid;
+    border-radius: 12px;
+    padding: 16px 14px;
+  }
+  .agent-card.rw { border-color: #66BB6A; }   /* 能改 */
+  .agent-card.ro { border-color: #42A5F5; }   /* 只读 */
+  .agent-card-name {
+    font-weight: bold;
+    font-size: 1.05em;
+    margin-bottom: 6px;
+  }
+  .agent-card.rw .agent-card-name { color: #66BB6A; }
+  .agent-card.ro .agent-card-name { color: #42A5F5; }
+  .agent-card-tools {
+    font-size: 0.78em;
+    color: #90A4AE;
+    margin: 6px 0;
+    font-family: monospace;
+  }
+  .agent-card-job { font-size: 0.88em; color: #CFD8DC; }
+  .agent-card-flag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+  .agent-card.rw .agent-card-flag { background: #66BB6A; color: white; }
+  .agent-card.ro .agent-card-flag { background: #42A5F5; color: white; }
+
+  /* 核心发现盒 */
+  .discovery {
+    background: linear-gradient(135deg, rgba(255,107,157,0.15), rgba(255,213,79,0.1));
+    border: 2px solid #FF6B9D;
+    border-radius: 15px;
+    padding: 22px;
+    margin: 18px 0;
+  }
+  .discovery-title {
+    color: #FF6B9D;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 12px;
+  }
+  .discovery p { color: #E0E7FF; font-size: 1.02em; }
+  .discovery code {
+    background: rgba(0,0,0,0.4);
+    color: #FFD700;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.92em;
+  }
+
+  /* 文档管理范围表 */
+  .scope-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 15px 0;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .scope-table th {
+    background: linear-gradient(135deg, #C62828 0%, #FF6F00 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+  .scope-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #CFD8DC;
+  }
+  .scope-table tr:hover td { background: rgba(255,255,255,0.04); }
+  .scope-table .g { color: #66BB6A; font-weight: bold; }
+  .scope-table .y { color: #FFA726; font-weight: bold; }
+  .scope-table .r { color: #EF5350; font-weight: bold; }
+
+  /* 总结 */
+  .summary-box {
+    background: linear-gradient(135deg, #00DBDE 0%, #66BB6A 50%, #FFD700 100%);
+    color: #0A1929;
+    border-radius: 20px;
+    padding: 35px 30px;
+    text-align: center;
+    margin: 35px 0 25px;
+    box-shadow: 0 15px 40px rgba(0,219,222,0.3);
+  }
+  .summary-box h3 {
+    font-size: 1.6em;
+    margin-bottom: 18px;
+    text-shadow: 2px 2px 0 rgba(255,255,255,0.3);
+  }
+  .summary-box p {
+    font-size: 1.1em;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+    line-height: 2;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #607D8B;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🔬 Harness-l3-v4 运行机制</h1>
+    <p class="sub">9 脚本 + 8 Agent + 5 阶段 · 源码级深度解析</p>
+    <div class="badges">
+      <span class="badge">📦 9 脚本</span>
+      <span class="badge g">🤖 8 Agent</span>
+      <span class="badge y">📚 文档管理</span>
+      <span class="badge p">🎯 范围</span>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 第 1 节 · 总架构 -->
+  <!-- ============================================ -->
+  <div class="section">
+    <span class="sec-badge bg-arch">🏗️ 第 1 节</span>
+    <h2>Harness 总架构 · 3 层结构</h2>
+
+    <div class="arch-tree">
+      <div class="arch-root">
+        🎩 主控(你)
+        <div class="arch-root-sub">人 + Claude Code 会话</div>
+      </div>
+
+      <div class="arch-levels">
+        <div class="arch-level l1">
+          <div class="arch-level-title">📋 L1 · 5 阶段</div>
+          <div class="arch-level-desc">研究 / 规划 / 执行 / 验证 / 复盘</div>
+          <div class="arch-level-items">流程驱动 · 人和 AI 对话推进</div>
+        </div>
+        <div class="arch-level l2">
+          <div class="arch-level-title">⚙️ L2 · 9 脚本</div>
+          <div class="arch-level-desc">自动执行工具 · 由 5 阶段调用</div>
+          <div class="arch-level-items">计算式(<code>check-arch</code>)+ 推理式(<code>check-freshness</code>)</div>
+        </div>
+        <div class="arch-level l3">
+          <div class="arch-level-title">🤖 L3 · 8 Agent</div>
+          <div class="arch-level-desc">按需召唤 · 7 只读 + 1 能改</div>
+          <div class="arch-level-items">独立子任务 · 不阻塞主流程</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 第 2 节 · 9 脚本详解 -->
+  <!-- ============================================ -->
+  <div class="section">
+    <span class="sec-badge bg-script">⚙️ 第 2 节</span>
+    <h2>9 个脚本 · 计算式 vs 推理式</h2>
+
+    <h3>🟢 计算式(7 个 · 毫秒级,确定,代码执行)</h3>
+    <table class="script-table">
+      <thead>
+        <tr><th>脚本</th><th>职责</th><th>触发时机</th><th>输出</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>validate-config.mjs</code></td>
+          <td>校验 config 13 项完整性</td>
+          <td>config 改动后</td>
+          <td class="comp">PASS / FAIL 列表</td>
+        </tr>
+        <tr>
+          <td><code>check-arch.mjs</code></td>
+          <td>检查 import 依赖方向不能反</td>
+          <td>每步 commit 前</td>
+          <td class="comp">Exit 0 / 2</td>
+        </tr>
+        <tr>
+          <td><code>pre-commit.mjs</code></td>
+          <td>挡 commit:跑 lint+typecheck+check-arch</td>
+          <td>git commit 钩子</td>
+          <td class="comp">BLOCKED 报错</td>
+        </tr>
+        <tr>
+          <td><code>contract-verifier.mjs</code></td>
+          <td>跑 Sprint Contract 断言</td>
+          <td>每功能完成后</td>
+          <td class="comp">Exit 0 / 1</td>
+        </tr>
+        <tr>
+          <td><code>check-entropy.mjs</code></td>
+          <td>算死代码/重复/文件膨胀</td>
+          <td>每 3 功能</td>
+          <td class="comp">写入 metrics.json</td>
+        </tr>
+        <tr>
+          <td><code>check-rules.mjs</code></td>
+          <td>统计规则触发,决定升级/降级</td>
+          <td>每功能完成</td>
+          <td class="comp">触发 ≥3 升级, ≥5 降级</td>
+        </tr>
+        <tr>
+          <td><code>check-overflow-rules.mjs</code></td>
+          <td>列出 .claude/rules/ 溢出规则</td>
+          <td>会话启动时</td>
+          <td class="comp">规则文件清单</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>🟡 推理式(2 个 · 秒级,概率,需判断)</h3>
+    <table class="script-table">
+      <thead>
+        <tr><th>脚本</th><th>职责</th><th>关键限制</th><th>输出</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>check-freshness.mjs</code></td>
+          <td>检查 CLAUDE.md 是否过时(看日期 vs git)</td>
+          <td><span class="inf">⚠️ 只查 CLAUDE.md, 不查其他文档</span></td>
+          <td class="comp">PASS / WARN / STALE</td>
+        </tr>
+        <tr>
+          <td><code>e2e-smoke.mjs</code></td>
+          <td>浏览器打开 dev_url 看是否健康</td>
+          <td>需要 Playwright 环境</td>
+          <td class="comp">PASS / FAIL</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 第 3 节 · 8 Agent 详解 -->
+  <!-- ============================================ -->
+  <div class="section">
+    <span class="sec-badge bg-agent">🤖 第 3 节</span>
+    <h2>8 个 Agent · 7 只读 + 1 能改</h2>
+
+    <h3>🟢 能改文件(1 个)</h3>
+    <div class="agent-grid">
+      <div class="agent-card rw">
+        <div class="agent-card-name">🧹 cleanup-agent</div>
+        <div class="agent-card-tools">Read Grep Glob Bash Edit</div>
+        <div class="agent-card-job">清死代码/重复/膨胀,3 问题模板</div>
+        <div class="agent-card-flag">唯一能改</div>
+      </div>
+    </div>
+
+    <h3>🔵 只读(7 个)</h3>
+    <div class="agent-grid">
+      <div class="agent-card ro">
+        <div class="agent-card-name">🔍 investigator</div>
+        <div class="agent-card-tools">Read Grep Glob Bash</div>
+        <div class="agent-card-job">bug 根因分析(α/β/γ/δ 分类)</div>
+        <div class="agent-card-flag">只读</div>
+      </div>
+
+      <div class="agent-card ro">
+        <div class="agent-card-name">💡 advisor</div>
+        <div class="agent-card-tools">Read Grep Glob</div>
+        <div class="agent-card-job">架构健康分析 + Harness 覆盖评估</div>
+        <div class="agent-card-flag">只读</div>
+      </div>
+
+      <div class="agent-card ro">
+        <div class="agent-card-name">⚔️ adversarial-v4</div>
+        <div class="agent-card-tools">Read Grep Glob Bash</div>
+        <div class="agent-card-job">4 维 × 5 指标加权评分, ≥3.5 通过</div>
+        <div class="agent-card-flag">只读</div>
+      </div>
+
+      <div class="agent-card ro">
+        <div class="agent-card-name">🌱 doc-gardener</div>
+        <div class="agent-card-tools">Read Grep Glob</div>
+        <div class="agent-card-job"><strong>扫 docs/ 下所有 .md</strong>,对比代码引用</div>
+        <div class="agent-card-flag">⭐ 关键</div>
+      </div>
+
+      <div class="agent-card ro">
+        <div class="agent-card-name">✅ correctness</div>
+        <div class="agent-card-tools">(只读类)</div>
+        <div class="agent-card-job">正确性验证(交叉测试)</div>
+        <div class="agent-card-flag">只读</div>
+      </div>
+
+      <div class="agent-card ro">
+        <div class="agent-card-name">🏛️ architecture</div>
+        <div class="agent-card-tools">(只读类)</div>
+        <div class="agent-card-job">架构层级合规性评估</div>
+        <div class="agent-card-flag">只读</div>
+      </div>
+
+      <div class="agent-card ro">
+        <div class="agent-card-name">🧹 cleanup(旧版)</div>
+        <div class="agent-card-tools">Read Grep Glob Bash</div>
+        <div class="agent-card-job">⚠️ 已被 cleanup-agent 替代</div>
+        <div class="agent-card-flag">弃用</div>
+      </div>
+    </div>
+
+    <div class="discovery">
+      <div class="discovery-title">🔑 关键发现</div>
+      <p>
+        Harness 的 Agent 设计是 <strong>"只读为主,极少能改"</strong>。
+        这是为了 <strong>防止 AI 误改代码</strong>(只读是安全网)。
+        需要改动时,主控派人去做,或主控自己 Edit。
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 第 4 节 · 关键发现(深度解析) -->
+  <!-- ============================================ -->
+  <div class="section">
+    <span class="sec-badge bg-fresh">🔍 第 4 节</span>
+    <h2>3 个关键发现(从源码读出的真相)</h2>
+
+    <div class="discovery">
+      <div class="discovery-title">🔍 发现 1 · check-freshness 只管 CLAUDE.md</div>
+      <p>
+        第 14 行注释明确写:<code>Detects whether CLAUDE.md is stale</code>。
+        <strong>不扫其他 76 个文档</strong>。所以"文档自动管理"这件事 Harness <strong>没现成覆盖</strong>。
+      </p>
+    </div>
+
+    <div class="discovery">
+      <div class="discovery-title">🔍 发现 2 · doc-gardener 能扫所有 docs/</div>
+      <p>
+        第 27 行: <code>Glob for all .md under docs/</code>。
+        第 30 行: 用 Grep 验证每个代码引用 vs live source。
+        <strong>这就是我们要扩展的工具</strong> — 它天然能扫全文档。
+      </p>
+    </div>
+
+    <div class="discovery">
+      <div class="discovery-title">🔍 发现 3 · Harness 字段校验"宽松模式"</div>
+      <p>
+        <code>validate-config.mjs</code> 只检查<strong>必填字段是否存在 + 已知字段格式</strong>,
+        <strong>不检查"未知字段"</strong>。所以加 <code>document_registry</code> 字段<strong>绝对安全</strong>,不会报错。
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 第 5 节 · 文档管理范围(直接答你的问题) -->
+  <!-- ============================================ -->
+  <div class="section">
+    <span class="sec-badge bg-scope">🎯 第 5 节</span>
+    <h2>所有文档都要 Harness 管吗?<strong>不是,分 3 档</strong></h2>
+
+    <table class="scope-table">
+      <thead>
+        <tr><th>档</th><th>数量</th><th>怎么管</th><th>现状</th><th>用 Harness 哪个</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="g">🟢 Harness 原生管</td>
+          <td>1</td>
+          <td>check-freshness.mjs 自动扫</td>
+          <td>CLAUDE.md</td>
+          <td><code>check-freshness</code></td>
+        </tr>
+        <tr>
+          <td class="y">🟡 扩展可管</td>
+          <td>~76</td>
+          <td>调 doc-gardener + wrapper 喂分类</td>
+          <td>docs/adr + discussions + sprints + briefs + contracts/</td>
+          <td><code>doc-gardener</code></td>
+        </tr>
+        <tr>
+          <td class="r">⚪ 不需管</td>
+          <td>~25</td>
+          <td>改即覆盖</td>
+          <td>README / HTML 故事 / 快照型文档</td>
+          <td>无</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>🎯 关键判断标准:"这个文档状态会变吗?"</h3>
+    <p>
+      <strong>会变</strong> → 需要 Harness 管(stateful)<br>
+      <strong>只追加不删</strong> → 半自动(append-only)<br>
+      <strong>改时升版本</strong> → 自动(versioned)<br>
+      <strong>改即覆盖无所谓</strong> → 不用管(snapshot)
+    </p>
+
+    <h3>💡 实操建议</h3>
+    <p>
+      1. <strong>第一波</strong> · 用 doc-gardener 扫 docs/ 下所有 .md(76 个,全搞定)<br>
+      2. <strong>第二波</strong> · 给 harness.config.json 加 <code>document_registry</code> 字段(告诉 doc-gardener 按 4 类分组)<br>
+      3. <strong>第三波</strong> · 写 wrapper <code>scan-docs.mjs</code> 调 doc-gardener + 分类逻辑
+    </p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 总结 -->
+  <!-- ============================================ -->
+  <div class="summary-box">
+    <h3>🎯 一句话总结 Harness 运行机制</h3>
+    <p>
+      🏗️ <strong>3 层架构:</strong> 5 阶段流程 + 9 脚本(计算/推理) + 8 Agent(7 只读 + 1 能改)<br>
+      🔍 <strong>关键发现:</strong> Harness 只管 CLAUDE.md 一个文档 · 需扩展用 doc-gardener<br>
+      📚 <strong>文档管理:</strong> 不是所有文档都需要 Harness 管, 按 4 档分类<br>
+      🛡️ <strong>安全特性:</strong> 8 Agent 7 只读 1 能改, 防 AI 误改代码<br>
+      ⚙️ <strong>配置驱动:</strong> 扩展字段加进 config 不报错, Harness 兼容性好
+    </p>
+  </div>
+
+  <div class="footer">
+    🔬 Harness-l3-v4 运行机制 · 教练版 · 2026-06-07<br>
+    <em>基于源码深度解析 · 9 脚本 + 8 Agent · 5 阶段 · 文档管理范围</em><br>
+    <br>
+    📂 完整原版: <code>~/.claude/skills/harness-l3-v4/SKILL.md</code> (752 行)
+  </div>
+
+</div>
+</body>
+</html>

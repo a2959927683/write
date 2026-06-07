@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍱 ADR 0017 · 教练 6 题推荐答案(子 Agent 预消化便当法)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #2C1810 0%, #5D3A1F 30%, #8B5A2B 60%, #D2691E 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #FFF8E7;
+    line-height: 1.85;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* 状态条 */
+  .status-bar {
+    background: linear-gradient(90deg, #FFB300 0%, #FF6F00 100%);
+    color: white;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 25px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(255,111,0,0.45);
+  }
+  .status-bar .icon { margin-right: 8px; font-size: 1.2em; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 35px 25px;
+    background: rgba(255,248,231,0.08);
+    border-radius: 24px;
+    border: 1px solid rgba(255,248,231,0.15);
+    backdrop-filter: blur(15px);
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-size: 2.4em;
+    background: linear-gradient(135deg, #FFD54F 0%, #FF6F00 50%, #FF8A65 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero .sub { color: #FFE0B2; font-size: 1.1em; }
+  .hero .meta {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    background: rgba(255,213,79,0.2);
+    border: 1px solid #FFD54F;
+    color: #FFD54F;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+
+  /* 问题卡 */
+  .q-card {
+    background: rgba(255,248,231,0.06);
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin: 28px 0;
+    border: 1px solid rgba(255,213,79,0.15);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .q-badge {
+    position: absolute;
+    top: -15px;
+    left: 25px;
+    background: linear-gradient(135deg, #FFD54F 0%, #FF6F00 100%);
+    color: #2C1810;
+    padding: 7px 18px;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 0.95em;
+    box-shadow: 0 6px 18px rgba(255,111,0,0.5);
+  }
+  .q-card h2 {
+    color: #FFD54F;
+    font-size: 1.5em;
+    margin: 10px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(255,213,79,0.25);
+  }
+  .q-card p { color: #FFF8E7; margin: 10px 0; }
+  .q-card strong { color: #FFAB40; }
+  .q-card em { color: #FFE082; font-style: normal; font-weight: bold; }
+
+  /* 候选表 */
+  .opt-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 15px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .opt-table th {
+    background: linear-gradient(135deg, #6D4C41 0%, #3E2723 100%);
+    color: #FFD54F;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+  .opt-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,213,79,0.08);
+    color: #FFF8E7;
+    font-size: 0.92em;
+  }
+  .opt-table tr:hover td { background: rgba(255,213,79,0.05); }
+  .opt-table .winner {
+    background: linear-gradient(90deg, rgba(255,213,79,0.2), rgba(255,111,0,0.1));
+  }
+  .opt-table .winner td { color: #FFD54F !important; font-weight: bold; }
+  .crown { color: #FFD700; margin-right: 4px; }
+
+  /* 推荐盒 */
+  .coach-rec {
+    background: linear-gradient(135deg, rgba(255,213,79,0.15) 0%, rgba(255,111,0,0.1) 100%);
+    border: 2px solid #FFD54F;
+    border-radius: 15px;
+    padding: 22px 25px;
+    margin: 18px 0;
+  }
+  .coach-title {
+    color: #FFD54F;
+    font-weight: bold;
+    font-size: 1.15em;
+    margin-bottom: 10px;
+  }
+  .coach-title::before { content: "🏆 "; margin-right: 5px; }
+  .coach-reason {
+    background: rgba(0,0,0,0.25);
+    padding: 12px 16px;
+    border-left: 4px solid #FFAB40;
+    border-radius: 8px;
+    margin: 10px 0;
+    color: #FFE0B2;
+    font-size: 0.95em;
+  }
+  .coach-reason strong { color: #FFAB40; }
+
+  /* brief 模板示范 */
+  .brief-template {
+    background: #1A1108;
+    border: 2px dashed #FFD54F;
+    border-radius: 12px;
+    padding: 22px;
+    margin: 15px 0;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    line-height: 1.8;
+    color: #FFE0B2;
+    overflow-x: auto;
+  }
+  .brief-template .h1 { color: #FFD54F; font-weight: bold; font-size: 1.1em; }
+  .brief-template .h2 { color: #FF8A65; font-weight: bold; margin-top: 6px; display: block; }
+  .brief-template .req { color: #66BB6A; font-weight: bold; }
+  .brief-template .opt { color: #FFB74D; font-style: italic; }
+  .brief-template .note { color: #90A4AE; font-size: 0.92em; }
+  .brief-template .cmt { color: #607D8B; font-style: italic; }
+  .brief-template .new { color: #4FC3F7; font-weight: bold; }
+
+  /* 关键路径 7 个任务 */
+  .critical-path {
+    background: linear-gradient(135deg, rgba(255,138,101,0.15) 0%, rgba(255,111,0,0.1) 100%);
+    border: 2px solid #FF6F00;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+  }
+  .critical-path h3 {
+    color: #FF8A65;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  .path-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .path-item {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #FFAB40;
+  }
+  .path-id {
+    background: #FF6F00;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 0.85em;
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+  .path-name { color: #FFD54F; font-weight: bold; font-size: 0.95em; }
+  .path-tip { color: #B0BEC5; font-size: 0.8em; margin-top: 4px; }
+
+  /* 反馈流程 */
+  .feedback-flow {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 22px;
+    margin: 15px 0;
+  }
+  .flow-step {
+    background: rgba(255,213,79,0.08);
+    border-left: 5px solid;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    color: #FFE0B2;
+  }
+  .flow-step.s1 { border-color: #4FC3F7; }
+  .flow-step.s2 { border-color: #FFAB40; }
+  .flow-step.s3 { border-color: #66BB6A; }
+  .flow-step.s4 { border-color: #FC00FF; }
+  .flow-num {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    margin-right: 10px;
+    color: white;
+  }
+  .flow-step.s1 .flow-num { background: #4FC3F7; }
+  .flow-step.s2 .flow-num { background: #FFAB40; }
+  .flow-step.s3 .flow-num { background: #66BB6A; }
+  .flow-step.s4 .flow-num { background: #FC00FF; }
+
+  /* L3-v4-Lite 调试回流 */
+  .debug-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  .debug-side {
+    background: rgba(255,213,79,0.1);
+    border: 2px solid #FFAB40;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .debug-side h4 { color: #FFD54F; margin-bottom: 8px; }
+  .debug-arrow {
+    color: #FF6F00;
+    font-size: 2em;
+    text-align: center;
+  }
+
+  /* INDEX 维护 */
+  .index-rule {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  .rule-card {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 18px;
+    border-top: 4px solid;
+  }
+  .rule-card.allow { border-color: #66BB6A; }
+  .rule-card.deny { border-color: #EF5350; }
+  .rule-card h4 {
+    margin-bottom: 10px;
+    font-size: 1.05em;
+  }
+  .rule-card.allow h4 { color: #66BB6A; }
+  .rule-card.deny h4 { color: #EF5350; }
+  .rule-list {
+    margin-left: 18px;
+    color: #FFE0B2;
+    font-size: 0.92em;
+  }
+
+  /* 二级 agent 对比 */
+  .agent-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  .agent-side {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 18px;
+    border: 2px solid;
+  }
+  .agent-side.iso { border-color: #4FC3F7; }
+  .agent-side.spawn { border-color: #FC00FF; }
+  .agent-side h4 { margin-bottom: 10px; font-size: 1.05em; }
+  .agent-side.iso h4 { color: #4FC3F7; }
+  .agent-side.spawn h4 { color: #FC00FF; }
+  .pros-cons {
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 8px 0;
+    font-size: 0.9em;
+  }
+  .pros { color: #66BB6A; }
+  .cons { color: #EF5350; }
+
+  /* 汇总表 */
+  .summary-table {
+    background: linear-gradient(135deg, rgba(255,213,79,0.15), rgba(255,138,101,0.1));
+    border: 2px solid #FF6F00;
+    border-radius: 15px;
+    padding: 5px;
+    overflow: hidden;
+  }
+  .summary-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .summary-table th {
+    background: linear-gradient(135deg, #FF6F00 0%, #D84315 100%);
+    color: white;
+    padding: 14px;
+    text-align: left;
+    font-size: 1em;
+  }
+  .summary-table td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(255,213,79,0.08);
+    color: #FFF8E7;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table .qid { color: #FFD54F; font-weight: bold; }
+  .summary-table .ans { color: #FF8A65; font-weight: bold; }
+
+  /* 落地步骤 */
+  .steps-list {
+    list-style: none;
+    counter-reset: step;
+    margin: 15px 0;
+  }
+  .steps-list li {
+    background: rgba(255,213,79,0.08);
+    border-left: 5px solid #FFAB40;
+    border-radius: 8px;
+    padding: 12px 18px 12px 50px;
+    margin: 8px 0;
+    position: relative;
+    counter-increment: step;
+  }
+  .steps-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #FFD54F 0%, #FF6F00 100%);
+    color: #2C1810;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .steps-list .time { color: #FFAB40; font-weight: bold; float: right; }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #FF6F00 0%, #FFD54F 50%, #FF8A65 100%);
+    color: #2C1810;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin: 35px 0 20px;
+    box-shadow: 0 15px 40px rgba(255,111,0,0.4);
+  }
+  .cta-box h2 { font-size: 1.6em; margin-bottom: 15px; color: #2C1810; }
+  .cta-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .cta-opt {
+    background: rgba(44,24,16,0.85);
+    color: white;
+    padding: 16px;
+    border-radius: 10px;
+    text-align: left;
+  }
+  .cta-opt strong { color: #FFD54F; display: block; margin-bottom: 5px; font-size: 1.05em; }
+  .cta-opt small { font-size: 0.88em; color: #FFE0B2; }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #BCAAA4;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 高亮 */
+  .hl-y { color: #FFD54F; font-weight: bold; }
+  .hl-o { color: #FF8A65; font-weight: bold; }
+  .hl-g { color: #66BB6A; font-weight: bold; }
+  code.inline {
+    background: rgba(255,213,79,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #FFD54F;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 状态条 -->
+  <div class="status-bar">
+    <span class="icon">🍱</span>
+    教练答案稿 · ADR 0017 6 题 · "全套业界主流 + 教练推荐"
+  </div>
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🍱 ADR 0017 · 教练 6 题推荐答案</h1>
+    <p class="sub">子 Agent 预消化便当法 · 落地细节全部给出方案</p>
+    <div class="meta">
+      <span class="meta-tag">📅 2026-06-07</span>
+      <span class="meta-tag">🏆 6 题全推荐</span>
+      <span class="meta-tag">🍱 便当法核心已定</span>
+      <span class="meta-tag">⏱️ 看完即可拍板</span>
+    </div>
+  </div>
+
+  <!-- ===== Q1 · brief 模板 ===== -->
+  <div class="q-card">
+    <span class="q-badge">📋 Q1 · brief 模板</span>
+    <h2>brief 字段够不够?要不要加?</h2>
+
+    <p><strong>原 6 字段:</strong> 任务 / 必读契约 / 技术约束 / 验收 / 不要做 / 想深挖再看</p>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:升级到 9 字段(加 3 个)</div>
+
+      <p style="margin:10px 0 8px;"><strong>新增 3 个字段:</strong></p>
+      <ul style="margin-left:22px; color:#FFE0B2;">
+        <li><span class="hl-y">📌 依赖任务</span> · 告诉 agent "等 S0-15 完才能开工"</li>
+        <li><span class="hl-y">⏱️ 估算工时</span> · 1h / 4h / 1day,主控判超时</li>
+        <li><span class="hl-y">🚨 失败回滚</span> · 失败时怎么撤销,不留垃圾</li>
+      </ul>
+
+      <p style="margin:15px 0 8px;"><strong>升级版 brief 模板(9 字段):</strong></p>
+      <div class="brief-template">
+<span class="h1"># S0-18 · auth 模块实现 brief</span>
+
+<span class="cmt">━━━━━━━━━━ 必填 (9 字段) ━━━━━━━━━━</span>
+
+<span class="h2">## 🎯 任务</span> <span class="req">[必填]</span>
+实现 8 个认证端点 + JWT + 30s 心跳
+
+<span class="h2">## 📌 依赖任务</span> <span class="new req">[新增 · 必填]</span>
+- 必须先完成: S0-15 (Docker), S0-17 (Prisma schema)
+- 完工后阻塞: S0-23 (前端登录页)
+
+<span class="h2">## 📜 必读契约</span> <span class="req">[必填]</span>
+- contracts/openapi/auth.yaml
+- contracts/schemas/user.json
+
+<span class="h2">## 🔧 技术约束</span> <span class="req">[必填]</span>
+- JWT HS256, 7 天有效期
+- bcrypt 密码哈希
+- 中文字段名: 最高角色等级
+
+<span class="h2">## ⏱️ 估算工时</span> <span class="new req">[新增 · 必填]</span>
+4 小时 (超 6h 必须报警)
+
+<span class="h2">## ✅ 验收</span> <span class="req">[必填]</span>
+curl http://localhost:3000/api/auth/login → { success, token, user }
+
+<span class="h2">## 🚫 不要做</span> <span class="req">[必填]</span>
+- 不实现注册短信发送 (留 stub)
+- 不碰其他模块
+
+<span class="h2">## 🚨 失败回滚</span> <span class="new req">[新增 · 必填]</span>
+git reset --hard origin/main; prisma migrate reset
+
+<span class="h2">## 📚 想深挖再看</span> <span class="opt">[可选]</span>
+- knowlage/wiki/sources/API认证与架构.md
+      </div>
+
+      <div class="coach-reason">
+        <strong>为什么加这 3 个:</strong>
+        <p>· <strong>依赖任务</strong>:防止 agent 抢跑(后端没好就写前端联调)</p>
+        <p>· <strong>估算工时</strong>:主控判超时(4h 任务卡 8h = 出问题了)</p>
+        <p>· <strong>失败回滚</strong>:防止失败 agent 留下脏数据/脏代码</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q2 · 写 37 还是现写 ===== -->
+  <div class="q-card">
+    <span class="q-badge">📝 Q2 · 写 37 还是现写</span>
+    <h2>brief 一次性写 37 个,还是开工前现写?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>方案</th><th>优</th><th>缺</th><th>适用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A. 一次性写 37 个</td><td>子 agent 启动快</td><td>主控前 3 天纯写</td><td>瀑布式</td></tr>
+        <tr><td>B. 开工前现写</td><td>灵活</td><td>子 agent 等</td><td>纯敏捷</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>C. 三轮分批写</td><td>平衡 + 试错</td><td>需挑批次</td><td>本项目最合适</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:C · 分 3 批写</div>
+
+      <div class="critical-path">
+        <h3>🥇 第 1 批 · 关键路径 7 个(立刻写)</h3>
+        <div class="path-grid">
+          <div class="path-item"><div class="path-id">S0-04</div><div class="path-name">init.sh</div><div class="path-tip">启动脚本</div></div>
+          <div class="path-item"><div class="path-id">S0-15</div><div class="path-name">Docker</div><div class="path-tip">编排</div></div>
+          <div class="path-item"><div class="path-id">S0-16</div><div class="path-name">NestJS</div><div class="path-tip">骨架</div></div>
+          <div class="path-item"><div class="path-id">S0-17</div><div class="path-name">Prisma</div><div class="path-tip">DB schema</div></div>
+          <div class="path-item"><div class="path-id">S0-18</div><div class="path-name">auth</div><div class="path-tip">登录</div></div>
+          <div class="path-item"><div class="path-id">S0-22</div><div class="path-name">Vue 3</div><div class="path-tip">前端骨架</div></div>
+          <div class="path-item"><div class="path-id">S0-29</div><div class="path-name">SSE</div><div class="path-tip">AI 流式</div></div>
+        </div>
+        <p style="text-align:center; margin-top:12px; color:#FFE0B2;">
+          📅 <strong>主控 Day 1 完成,共 7 个 brief 约 1 天</strong>
+        </p>
+      </div>
+
+      <div class="critical-path" style="border-color: #66BB6A;">
+        <h3 style="color:#66BB6A;">🥈 第 2 批 · 主链剩余 15 个(Day 2-3 滚动写)</h3>
+        <p style="text-align:center; color:#FFE0B2;">
+          S0-19 ~ S0-31 中间任务 · <strong>跟着子 agent 开工节奏写</strong>
+        </p>
+      </div>
+
+      <div class="critical-path" style="border-color: #4FC3F7;">
+        <h3 style="color:#4FC3F7;">🥉 第 3 批 · 辅助任务 15 个(按需写)</h3>
+        <p style="text-align:center; color:#FFE0B2;">
+          ADR / 监控 / CI / 文档等 · <strong>真要做才写</strong>
+        </p>
+      </div>
+
+      <div class="coach-reason">
+        <strong>为什么分 3 批:</strong>
+        <p>· <strong>第 1 批快速试点</strong>:7 个 brief 跑通,验证整套机制</p>
+        <p>· <strong>第 2 批边干边写</strong>:试点改进后再批量产</p>
+        <p>· <strong>第 3 批按需写</strong>:防止过早写无效 brief</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q3 · brief 写错怎么办 ===== -->
+  <div class="q-card">
+    <span class="q-badge">🐛 Q3 · brief 写错怎么办</span>
+    <h2>子 agent 发现 brief 错了,能反向修正吗?</h2>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:子 agent 只能反馈,主控决定改不改 + 必须留痕</div>
+
+      <p style="margin:10px 0;"><strong>4 步反馈流程:</strong></p>
+      <div class="feedback-flow">
+        <div class="flow-step s1">
+          <span class="flow-num">1</span>
+          <strong>子 agent 发现 brief 错</strong>
+          <p style="margin-top:5px; font-size:0.9em;">例:brief 说"用 HS256",但契约里写"RS256"</p>
+        </div>
+        <div class="flow-step s2">
+          <span class="flow-num">2</span>
+          <strong>子 agent 立刻停手,写反馈</strong>
+          <p style="margin-top:5px; font-size:0.9em;">在 <code class="inline">backend/progress.txt</code> 写 <code class="inline">🚨 BRIEF_ERROR</code> 标记</p>
+        </div>
+        <div class="flow-step s3">
+          <span class="flow-num">3</span>
+          <strong>主控来仲裁</strong>
+          <p style="margin-top:5px; font-size:0.9em;">主控对比 brief vs 契约,判谁错</p>
+        </div>
+        <div class="flow-step s4">
+          <span class="flow-num">4</span>
+          <strong>主控改 brief,子 agent 继续</strong>
+          <p style="margin-top:5px; font-size:0.9em;">主控更新 brief + commit + 通知 agent 重启</p>
+        </div>
+      </div>
+
+      <div class="coach-reason">
+        <strong>3 条铁律:</strong>
+        <p>· ❌ <strong>子 agent 绝对不能自己改 brief</strong>(否则失去权威)</p>
+        <p>· ✅ <strong>必须留痕</strong>(progress.txt 里记 BRIEF_ERROR,可追溯)</p>
+        <p>· ⏱️ <strong>主控 30 分钟内响应</strong>(否则子 agent 转去做别的任务)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q4 · L3-v4-Lite 调试回流 ===== -->
+  <div class="q-card">
+    <span class="q-badge">🔁 Q4 · 调试回流</span>
+    <h2>L3-v4-Lite 的"调试"阶段如何回流主控?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>选项</th><th>评价</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A. 写在 progress.txt(主控自己看)</td><td>✅ 简单,但易遗漏</td></tr>
+        <tr><td>B. 发 issue 到 master/issues/</td><td>✅ 结构化,可追溯</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>C. A + B 混合 + 标签分级</td><td>🏆 主控不漏问题</td></tr>
+        <tr><td>D. 触发主控 agent 来仲裁</td><td>❌ 过重,延迟高</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:C · 双轨制 + 3 级标签</div>
+
+      <div class="debug-flow">
+        <div class="debug-side">
+          <h4>🟢 小问题</h4>
+          <p style="color:#FFE0B2; font-size:0.9em;">→ 写 progress.txt<br>用 <code class="inline">[INFO]</code> 标签<br>主控定期看</p>
+        </div>
+        <div class="debug-arrow">→</div>
+        <div class="debug-side" style="border-color:#FFAB40;">
+          <h4 style="color:#FFAB40;">🟡 中问题</h4>
+          <p style="color:#FFE0B2; font-size:0.9em;">→ 写 issues/<br>用 <code class="inline">[WARN]</code> 标签<br>主控 1 天内回</p>
+        </div>
+      </div>
+
+      <div class="debug-flow" style="margin-top:15px;">
+        <div class="debug-side" style="border-color:#EF5350;">
+          <h4 style="color:#EF5350;">🔴 大问题(契约错/阻塞)</h4>
+          <p style="color:#FFE0B2; font-size:0.9em;">→ progress + issues 都写<br>用 <code class="inline">[CRITICAL]</code> 标签<br>主控 30 分钟内回</p>
+        </div>
+        <div class="debug-arrow">→</div>
+        <div class="debug-side" style="border-color:#FC00FF;">
+          <h4 style="color:#FC00FF;">📡 紧急广播</h4>
+          <p style="color:#FFE0B2; font-size:0.9em;">→ 触发主控通知<br>SendMessage 推送<br>主控立刻响应</p>
+        </div>
+      </div>
+
+      <div class="coach-reason">
+        <strong>3 级标签的好处:</strong>
+        <p>· 小问题不打扰主控 → <span class="hl-g">效率</span></p>
+        <p>· 大问题不会被埋 → <span class="hl-g">兜底</span></p>
+        <p>· 紧急广播立即响应 → <span class="hl-g">不阻塞主链</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q5 · INDEX 维护 ===== -->
+  <div class="q-card">
+    <span class="q-badge">📚 Q5 · INDEX 维护</span>
+    <h2>knowlage/INDEX.md 谁维护?谁判断"权威"?</h2>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:主控独家维护,子 agent 只能"建议",不能"修改"</div>
+
+      <div class="index-rule">
+        <div class="rule-card allow">
+          <h4>✅ 主控可以做</h4>
+          <ul class="rule-list">
+            <li>新增条目到 INDEX.md</li>
+            <li>修订条目的"权威"标记</li>
+            <li>下线过期的 source</li>
+            <li>合并冲突的 source</li>
+            <li>判定哪条是 authoritative</li>
+          </ul>
+        </div>
+        <div class="rule-card deny">
+          <h4>❌ 子 agent 不能做</h4>
+          <ul class="rule-list">
+            <li>修改 INDEX.md</li>
+            <li>判定权威性</li>
+            <li>新增条目</li>
+            <li>修改 source 文件</li>
+            <li>但可以 → 给主控提建议</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="margin:15px 0 8px;"><strong>子 agent 提建议的格式:</strong></p>
+      <div class="brief-template">
+<span class="cmt"># backend/progress.txt 里追加</span>
+
+<span class="h2">[INDEX_SUGGEST] 2026-06-08 14:30</span>
+建议: 在 knowlage/INDEX.md 新增条目
+  - 路径: wiki/sources/2026-06-08 新发现的 X.md
+  - 主题: Y 模块的某细节
+  - 优先级: 高
+理由: 写 S0-18 时发现该资料未被索引
+      </div>
+
+      <div class="coach-reason">
+        <strong>为什么主控独占:</strong>
+        <p>· <strong>权威性来源唯一</strong>(否则各 agent 自说自话)</p>
+        <p>· <strong>避免循环引用</strong>(A 改 INDEX 影响 B 的判断)</p>
+        <p>· <strong>主控负责裁决冲突</strong>(C01-C11 11 条冲突就是主控决的)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q6 · 二级 agent ===== -->
+  <div class="q-card">
+    <span class="q-badge">🤖 Q6 · 二级 agent</span>
+    <h2>二级 research-agent 用 isolation 还是直接 spawn?</h2>
+
+    <div class="agent-compare">
+      <div class="agent-side iso">
+        <h4>方案 A · isolation worktree</h4>
+        <p style="color:#FFE0B2; font-size:0.92em; margin-bottom:10px;">起独立 git worktree, 完全隔离</p>
+        <div class="pros-cons">
+          <div class="pros">✅ 完全隔离, 不污染父 context</div>
+          <div class="pros">✅ 可并行多个 research</div>
+          <div class="cons">❌ 200-500ms 启动开销</div>
+          <div class="cons">❌ 占磁盘空间</div>
+        </div>
+      </div>
+      <div class="agent-side spawn">
+        <h4>方案 B · 直接 spawn(Task 工具)</h4>
+        <p style="color:#FFE0B2; font-size:0.92em; margin-bottom:10px;">在父 agent 内调 Agent 工具, 共享 context</p>
+        <div class="pros-cons">
+          <div class="pros">✅ 零开销, 立即启动</div>
+          <div class="pros">✅ 简单, 不用管 git</div>
+          <div class="cons">❌ research 失败会污染父 agent</div>
+          <div class="cons">❌ 不能并行多个</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:按场景选 · 默认 B,需并行才用 A</div>
+
+      <p style="margin:10px 0 8px;"><strong>决策规则:</strong></p>
+      <ul style="margin-left:22px; color:#FFE0B2;">
+        <li>🎯 <strong>research-agent 短命 (&lt;5min)</strong> → <span class="hl-y">直接 spawn (B)</span></li>
+        <li>🎯 <strong>研究多个独立主题</strong> → <span class="hl-y">isolation (A)</span> 并行</li>
+        <li>🎯 <strong>需要写文件</strong> → <span class="hl-y">必须 isolation (A)</span> 防污染</li>
+        <li>🎯 <strong>只读 + 总结 + 退场</strong> → <span class="hl-y">直接 spawn (B)</span> 最轻</li>
+      </ul>
+
+      <div class="coach-reason">
+        <strong>实战 90% 用 B:</strong>
+        <p>· research-agent 的核心是"读 + 总结",不写文件</p>
+        <p>· 读完 5 行总结返回 → 父 agent context 几乎不增</p>
+        <p>· 启动开销 0,响应快</p>
+        <p>· <span class="hl-o">只有遇到"3 个 research 主题并行"才上 isolation</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 汇总表 ===== -->
+  <div class="q-card">
+    <span class="q-badge">📊 答案汇总</span>
+    <h2>教练 6 题答案一表速查</h2>
+
+    <div class="summary-table">
+      <table>
+        <thead>
+          <tr><th>问题</th><th>教练推荐</th><th>一句话</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="qid">Q1 brief 模板</span></td>
+            <td class="ans">升级到 9 字段</td>
+            <td>加 依赖任务 / 估算工时 / 失败回滚</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q2 写 37 还是现写</span></td>
+            <td class="ans">C · 3 批写</td>
+            <td>关键 7 → 主链 15 → 辅助 15</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q3 brief 写错</span></td>
+            <td class="ans">只能反馈不能改</td>
+            <td>子 agent 报 BRIEF_ERROR,主控仲裁</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q4 调试回流</span></td>
+            <td class="ans">双轨 + 3 级标签</td>
+            <td>INFO / WARN / CRITICAL 分级响应</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q5 INDEX 维护</span></td>
+            <td class="ans">主控独占</td>
+            <td>子 agent 只能"建议",不能"改"</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q6 二级 agent</span></td>
+            <td class="ans">默认 B · 并行才 A</td>
+            <td>90% 用 spawn,需要并行才 isolation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== 落地清单 ===== -->
+  <div class="q-card">
+    <span class="q-badge">🚀 落地清单</span>
+    <h2>定稿后 1 天搞定 ⏱️</h2>
+
+    <ol class="steps-list">
+      <li>写 <code class="inline">master/briefs/README.md</code> + <code class="inline">_template.md</code>(9 字段) <span class="time">30 分钟</span></li>
+      <li>写第 1 批 7 个 brief(S0-04/15/16/17/18/22/29) <span class="time">3 小时</span></li>
+      <li>写 <code class="inline">harness.config.json</code> 的 l3-v4-lite 模式 <span class="time">20 分钟</span></li>
+      <li>写 <code class="inline">knowlage/INDEX.md</code> 索引文件 <span class="time">1 小时</span></li>
+      <li>写每个子项目 <code class="inline">CLAUDE.md</code> 反馈协议段 <span class="time">30 分钟</span></li>
+      <li>派 1 个 infra-agent 试点(做 S0-15) <span class="time">2 小时</span></li>
+      <li>试点复盘 → 调整模板 → 批量写第 2 批 brief <span class="time">2 小时</span></li>
+    </ol>
+
+    <p style="margin-top:15px; color:#FFD54F; text-align:center; font-size:1.1em;">
+      <strong>合计:约 9 小时 → 整套机制跑起来 🎉</strong>
+    </p>
+  </div>
+
+  <!-- ===== CTA ===== -->
+  <div class="cta-box">
+    <h2>🎤 教练问你拍不拍板?</h2>
+    <p>3 种走法,挑一种:</p>
+    <div class="cta-opts">
+      <div class="cta-opt">
+        <strong>A. 全盘接受</strong>
+        <small>立刻写进 ADR 0017,转 ACCEPTED 并落地</small>
+      </div>
+      <div class="cta-opt">
+        <strong>B. 部分修改</strong>
+        <small>告诉我哪几题想改,重新出方案</small>
+      </div>
+      <div class="cta-opt">
+        <strong>C. 继续讨论</strong>
+        <small>展开讲某一题(说哪题,教练细聊)</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🍱 ADR 0017 · 教练答案稿 · 2026-06-07<br>
+    <em>等用户拍板后转 ACCEPTED,然后才进入落地</em>
+  </div>
+
+</div>
+</body>
+</html>

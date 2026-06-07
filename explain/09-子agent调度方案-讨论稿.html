@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍱 子 Agent 调度方案 · 讨论稿(预消化便当法)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 40%, #FFCCBC 70%, #F8BBD0 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.85;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1050px; margin: 0 auto; }
+
+  /* 顶部状态条 */
+  .status-bar {
+    background: linear-gradient(90deg, #FFB300 0%, #FFA000 100%);
+    color: white;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 25px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    box-shadow: 0 6px 18px rgba(255,160,0,0.4);
+  }
+  .status-bar .dot {
+    display: inline-block;
+    width: 12px; height: 12px;
+    background: #FFEB3B;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* 顶部大标题 */
+  .hero {
+    text-align: center;
+    padding: 30px 25px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-size: 2.3em;
+    color: #D84315;
+    text-shadow: 2px 2px 0 #FFE082;
+    margin-bottom: 10px;
+  }
+  .hero .sub { color: #6B5B95; font-size: 1.1em; }
+  .hero .meta {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    background: linear-gradient(135deg, #FFA726 0%, #FF7043 100%);
+    color: white;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+
+  /* 章节卡 */
+  .card {
+    background: rgba(255,255,255,0.92);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin: 25px 0;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .card h2 {
+    color: #4A148C;
+    font-size: 1.55em;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 3px dashed #FFB74D;
+  }
+  .card h3 {
+    color: #BF360C;
+    font-size: 1.18em;
+    margin: 18px 0 10px;
+  }
+  .card p { margin: 10px 0; color: #444; font-size: 1.02em; }
+  .card strong { color: #BF360C; }
+  .card em { color: #5E35B1; font-style: normal; font-weight: bold; }
+
+  /* 卡侧标签 */
+  .card-tag {
+    position: absolute;
+    top: -12px;
+    left: 25px;
+    background: linear-gradient(135deg, #FFA726 0%, #FF6F00 100%);
+    color: white;
+    padding: 5px 16px;
+    border-radius: 14px;
+    font-size: 0.85em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(255,111,0,0.3);
+  }
+
+  /* 卡点警告盒 */
+  .blocker {
+    background: linear-gradient(135deg, #FFCDD2 0%, #FFAB91 100%);
+    border-left: 6px solid #D32F2F;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 15px 0;
+  }
+  .blocker-title {
+    color: #B71C1C;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+  }
+  .blocker-list { margin-left: 22px; color: #4E342E; font-size: 0.95em; }
+
+  /* 4 解药卡片 */
+  .remedies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .remedy {
+    background: white;
+    border-radius: 15px;
+    padding: 18px 16px;
+    border: 3px solid;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+  }
+  .remedy:hover { transform: translateY(-4px); }
+  .remedy.gold { border-color: #FFB300; background: linear-gradient(180deg, #FFFDE7 0%, #FFF59D 100%); }
+  .remedy.silver { border-color: #90A4AE; background: linear-gradient(180deg, #ECEFF1 0%, #CFD8DC 100%); }
+  .remedy.bronze { border-color: #FF7043; background: linear-gradient(180deg, #FBE9E7 0%, #FFCCBC 100%); }
+  .remedy.honor { border-color: #66BB6A; background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%); }
+  .remedy-rank {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+  }
+  .remedy-name {
+    font-weight: bold;
+    color: #BF360C;
+    font-size: 1.05em;
+    margin-bottom: 6px;
+  }
+  .remedy-core {
+    font-size: 0.92em;
+    color: #555;
+    line-height: 1.6;
+  }
+  .remedy-tag {
+    display: inline-block;
+    background: #FF6F00;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+
+  /* 便当对比 */
+  .compare-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 20px 0;
+  }
+  .compare-side {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid;
+  }
+  .compare-side.bad {
+    border-color: #E53935;
+    background: linear-gradient(180deg, #FFEBEE 0%, #FFCDD2 100%);
+  }
+  .compare-side.good {
+    border-color: #43A047;
+    background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%);
+  }
+  .compare-side h4 { margin-bottom: 12px; font-size: 1.1em; }
+  .compare-side.bad h4 { color: #C62828; }
+  .compare-side.good h4 { color: #2E7D32; }
+  .compare-side .flow {
+    background: rgba(255,255,255,0.7);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.85em;
+    margin: 8px 0;
+    line-height: 1.6;
+  }
+
+  /* 便当结构 */
+  .bento {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE082 100%);
+    border: 3px dashed #FF6F00;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+  }
+  .bento-title {
+    color: #BF360C;
+    font-weight: bold;
+    font-size: 1.15em;
+    margin-bottom: 12px;
+  }
+  .bento-item {
+    background: white;
+    padding: 10px 14px;
+    border-left: 4px solid #FFA726;
+    border-radius: 6px;
+    margin: 8px 0;
+    font-size: 0.95em;
+  }
+  .bento-icon { font-size: 1.2em; margin-right: 6px; }
+
+  /* 效果对比表 */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 15px 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  th {
+    background: linear-gradient(135deg, #6A1B9A 0%, #AB47BC 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #EEE;
+    font-size: 0.92em;
+  }
+  tr:nth-child(even) td { background: #FAFAFA; }
+  tr:hover td { background: #FFF59D; }
+  .num-bad { color: #C62828; font-weight: bold; }
+  .num-good { color: #2E7D32; font-weight: bold; }
+
+  /* 组合拳 */
+  .combo {
+    background: linear-gradient(135deg, #E1BEE7 0%, #B39DDB 100%);
+    color: white;
+    border-radius: 18px;
+    padding: 25px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .combo h3 { color: white; margin-bottom: 15px; font-size: 1.3em; }
+  .combo-flow {
+    background: rgba(255,255,255,0.2);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 12px auto;
+    max-width: 600px;
+    font-size: 1.05em;
+    line-height: 1.8;
+  }
+
+  /* 铁律盒 */
+  .iron-rule {
+    background: linear-gradient(135deg, #FFD600 0%, #FF6B9D 100%);
+    color: white;
+    border-radius: 18px;
+    padding: 25px;
+    margin: 25px 0;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(255,107,157,0.3);
+  }
+  .iron-rule h3 {
+    font-size: 1.3em;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+  }
+  .iron-rule p {
+    font-size: 1.08em;
+    margin: 8px 0;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+  }
+
+  /* 未决问题 */
+  .question-list {
+    list-style: none;
+  }
+  .question-list li {
+    background: #FFF3E0;
+    border-left: 5px solid #FB8C00;
+    padding: 12px 18px;
+    margin: 10px 0;
+    border-radius: 8px;
+    font-size: 0.95em;
+  }
+  .question-list .q-id {
+    background: #FB8C00;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FFA726 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin: 35px 0 20px;
+    box-shadow: 0 12px 35px rgba(255,107,157,0.3);
+  }
+  .cta-box h2 { font-size: 1.6em; margin-bottom: 15px; }
+  .cta-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .cta-opt {
+    background: rgba(255,255,255,0.25);
+    padding: 14px;
+    border-radius: 10px;
+    text-align: left;
+    backdrop-filter: blur(5px);
+  }
+  .cta-opt strong { display: block; margin-bottom: 4px; font-size: 1.05em; }
+  .cta-opt small { font-size: 0.88em; opacity: 0.95; }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #6B5B95;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 高亮 */
+  .hl { background: linear-gradient(120deg, transparent 0%, #FFF59D 15%, #FFF59D 85%, transparent 100%); padding: 0 4px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 状态条 -->
+  <div class="status-bar">
+    <span class="dot"></span>
+    讨论中 · 未定稿 · 等待用户拍板后转 ADR 0017 ACCEPTED 状态
+  </div>
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🍱 子 Agent 调度方案 · 讨论稿</h1>
+    <p class="sub">预消化便当法 + 4 解药组合拳 · 让子 agent 不再为研究阶段烧 token</p>
+    <div class="meta">
+      <span class="meta-tag">📅 2026-06-07</span>
+      <span class="meta-tag">🟡 讨论稿</span>
+      <span class="meta-tag">📄 ADR 0017 提议中</span>
+      <span class="meta-tag">📝 6 个未决问题</span>
+    </div>
+  </div>
+
+  <!-- 卡 1: 用户的想法 -->
+  <div class="card">
+    <span class="card-tag">💭 用户的想法</span>
+    <h2>你的原始想法是什么?</h2>
+    <p>每个子 agent 在自己的项目里操作,使用 <em>harness</em> 管理,5 阶段会生成"4 件套",feature 更颗粒化。</p>
+    <p><strong>但你识别了一个关键卡点 ⚠️</strong></p>
+
+    <div class="blocker">
+      <div class="blocker-title">🔥 卡点 · 研究阶段需要大量资料</div>
+      <ul class="blocker-list">
+        <li>子 agent 启动就要读 <strong>knowlage/ 87 个 wiki 页</strong> → Context 200K+ tokens</li>
+        <li>读完发现 <strong>80% 不相关</strong> → 浪费 token + 误导决策</li>
+        <li>研究阶段花 <strong>30-60 分钟</strong> → 还没动手</li>
+        <li>多 agent 同时启动 → <strong>token 账单爆炸</strong></li>
+      </ul>
+    </div>
+
+    <p style="margin-top:15px;">
+      <span class="hl">✅ 教练判断:你的思路 = 一流团队的"分形 Agent 架构"。卡点也找得非常准。</span>
+    </p>
+  </div>
+
+  <!-- 卡 2: 4 解药 -->
+  <div class="card">
+    <span class="card-tag">💊 4 个解药</span>
+    <h2>教练给你 4 个解药(组合用)</h2>
+
+    <div class="remedies">
+      <div class="remedy gold">
+        <div class="remedy-rank">🥇</div>
+        <div class="remedy-name">解药 1 · 预消化便当法</div>
+        <div class="remedy-core">主控把"研究阶段"提前做完,给子 agent 一个便当盒。</div>
+        <div class="remedy-tag">必做</div>
+      </div>
+
+      <div class="remedy silver">
+        <div class="remedy-rank">🥈</div>
+        <div class="remedy-name">解药 2 · L3-v4-Lite</div>
+        <div class="remedy-core">子 agent 砍掉"研究"阶段,只剩 4 阶段(规划/构建/复盘/调试)。</div>
+        <div class="remedy-tag">必做</div>
+      </div>
+
+      <div class="remedy bronze">
+        <div class="remedy-rank">🥉</div>
+        <div class="remedy-name">解药 3 · 索引+检索</div>
+        <div class="remedy-core">给 knowlage/ 写 INDEX.md,子 agent 按需检索不全读。</div>
+        <div class="remedy-tag">必做</div>
+      </div>
+
+      <div class="remedy honor">
+        <div class="remedy-rank">🏅</div>
+        <div class="remedy-name">解药 4 · 二级 Agent</div>
+        <div class="remedy-core">把"研究"独立成短命子 agent,消化完就退场,释放 context。</div>
+        <div class="remedy-tag">按需</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡 3: 便当 vs 菜市场 -->
+  <div class="card">
+    <span class="card-tag">🍱 对比</span>
+    <h2>便当盒 vs 菜市场 · 一图看懂</h2>
+
+    <div class="compare-box">
+      <div class="compare-side bad">
+        <h4>❌ 传统方式 · 让子 agent 自己去菜市场</h4>
+        <div class="flow">
+          子 agent ──► knowlage/ (87 页)<br>
+          ──► 自己消化<br>
+          ❌ 慢 / 贵 / 易出错
+        </div>
+        <p style="font-size:0.9em; color:#666; margin-top:8px;">
+          每个 agent 都要从头消化一遍 = 重复浪费
+        </p>
+      </div>
+
+      <div class="compare-side good">
+        <h4>✅ 便当方式 · 主控提前消化好</h4>
+        <div class="flow">
+          主控 ──► 已消化好的 brief.md (5KB)<br>
+          ──► 子 agent 直接读<br>
+          ✅ 快 / 便宜 / 准确
+        </div>
+        <p style="font-size:0.9em; color:#666; margin-top:8px;">
+          主控写一次,所有 agent 受益 = 复用最大化
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡 4: 便当结构 -->
+  <div class="card">
+    <span class="card-tag">📦 便当长啥样</span>
+    <h2>每个 brief 便当的标准结构</h2>
+
+    <p>主控为每个任务产出 3 类内容,装在一个 markdown 文件里:</p>
+
+    <div class="bento">
+      <div class="bento-title">📋 master/briefs/S0-XX-xxx.md</div>
+      <div class="bento-item"><span class="bento-icon">🎯</span><strong>任务</strong> · 5 行说清这个任务做啥</div>
+      <div class="bento-item"><span class="bento-icon">📜</span><strong>必读契约</strong> · 精选 &lt; 10KB(不让 agent 读全部)</div>
+      <div class="bento-item"><span class="bento-icon">🔧</span><strong>技术约束</strong> · 明确边界(用什么不用什么)</div>
+      <div class="bento-item"><span class="bento-icon">✅</span><strong>验收命令</strong> · 可直接执行的 curl/test</div>
+      <div class="bento-item"><span class="bento-icon">🚫</span><strong>不要做</strong> · 反向约束,防止自由发挥</div>
+      <div class="bento-item"><span class="bento-icon">📚</span><strong>想深挖再看</strong> · 链接列表,不强制读</div>
+    </div>
+  </div>
+
+  <!-- 卡 5: 效果对比 -->
+  <div class="card">
+    <span class="card-tag">📊 数字说话</span>
+    <h2>预估效果对比</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>指标</th>
+          <th>原想法 (自己消化)</th>
+          <th>加 4 解药 (预消化)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>子 agent 启动时间</td><td class="num-bad">30-60 分钟</td><td class="num-good">2-5 分钟</td></tr>
+        <tr><td>Context 占用</td><td class="num-bad">200K+ tokens</td><td class="num-good">15-30K tokens</td></tr>
+        <tr><td>Token 成本</td><td class="num-bad">高</td><td class="num-good">降 80-90%</td></tr>
+        <tr><td>出错率</td><td class="num-bad">中(自己消化易偏)</td><td class="num-good">低(主控已校准)</td></tr>
+        <tr><td>主控工作量</td><td class="num-good">低</td><td class="num-bad">中(前期投入)</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:12px; color:#666; font-size:0.92em;">
+      💡 <strong>主控前期投入 1 周写 brief,后期省下来的 token + 时间远超投入。</strong>
+    </p>
+  </div>
+
+  <!-- 卡 6: 组合拳 -->
+  <div class="card">
+    <span class="card-tag">🥊 最终建议</span>
+    <h2>教练的组合拳</h2>
+
+    <p><strong>别选一个,组合用!按这个优先级:</strong></p>
+
+    <div class="combo">
+      <h3>🎯 组合拳顺序</h3>
+      <div class="combo-flow">
+        🥇 <strong>解药 1 (预消化)</strong> ──► 必做,主控产出 briefs/<br>
+        ➕<br>
+        🥈 <strong>解药 2 (Lite 版)</strong> ──► 子项目 harness 配置改<br>
+        ➕<br>
+        🥉 <strong>解药 3 (索引)</strong> ──► knowlage/INDEX.md 写一次<br>
+        ➕<br>
+        🏅 <strong>解药 4 (二级)</strong> ──► 必要时才用
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡 7: 铁律 -->
+  <div class="iron-rule">
+    <h3>📜 教练给你立 1 条铁律</h3>
+    <p>🎩 <strong>主控的核心价值 = 把知识库压缩成 brief。</strong></p>
+    <p>🤖 <strong>子 agent 的核心价值 = 把 brief 变成代码。</strong></p>
+    <p style="margin-top:12px; font-size:0.95em; opacity:0.95;">
+      ✨ 各司其职 · 互不越位 · 才能并行飞奔
+    </p>
+  </div>
+
+  <!-- 卡 8: 未决问题 -->
+  <div class="card">
+    <span class="card-tag">❓ 未决</span>
+    <h2>定稿前必须回答的 6 个问题</h2>
+
+    <ul class="question-list">
+      <li><span class="q-id">Q1</span><strong>brief 模板</strong>字段是否完整?</li>
+      <li><span class="q-id">Q2</span>brief 一次性写 <strong>37 个</strong>,还是开工前现写?</li>
+      <li><span class="q-id">Q3</span>brief 写错怎么办?<strong>子 agent 能反向修正吗</strong>?</li>
+      <li><span class="q-id">Q4</span>L3-v4-Lite 的"<strong>调试</strong>"阶段如何回流到主控?</li>
+      <li><span class="q-id">Q5</span><strong>knowlage/INDEX.md</strong> 谁维护?谁判断"权威"?</li>
+      <li><span class="q-id">Q6</span>二级 agent 用 <strong>isolation</strong> 还是直接 spawn?</li>
+    </ul>
+  </div>
+
+  <!-- 卡 9: 试点路径 -->
+  <div class="card">
+    <span class="card-tag">🚀 试点路径</span>
+    <h2>定稿后的落地步骤</h2>
+
+    <ol style="margin-left:22px; color:#444;">
+      <li>主控写 <code>master/briefs/README.md</code> + <code>_template.md</code></li>
+      <li>主控写关键路径 7 个 brief(S0-04/15/16/17/18/22/29)</li>
+      <li>更新 <code>harness.config.json</code> 增加 <code>l3-v4-lite</code> 模式定义</li>
+      <li>派第一个试点 agent(infra-agent 做 S0-15 Docker)</li>
+      <li>根据试点反馈调整 brief 模板</li>
+      <li>转 ADR 0017 ACCEPTED 状态,正式实施</li>
+    </ol>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>🎤 你下一步想做啥?</h2>
+    <p>4 个候选动作,挑一个我立刻动手:</p>
+    <div class="cta-opts">
+      <div class="cta-opt">
+        <strong>A. brief 模板</strong>
+        <small>设计可复用骨架,适配 37 个任务</small>
+      </div>
+      <div class="cta-opt">
+        <strong>B. knowlage INDEX</strong>
+        <small>主控当索引员,写一次受益终身</small>
+      </div>
+      <div class="cta-opt">
+        <strong>C. L3-v4-Lite</strong>
+        <small>写子项目 harness.config.json</small>
+      </div>
+      <div class="cta-opt">
+        <strong>D. S0-18 示范</strong>
+        <small>写 auth brief 示范,看完会自己写</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🍱 ADR 0017 提议中 · 讨论稿 v0.1 · 2026-06-07<br>
+    <em>等待用户对 Q1-Q6 给方向后转 ACCEPTED</em>
+  </div>
+
+</div>
+</body>
+</html>

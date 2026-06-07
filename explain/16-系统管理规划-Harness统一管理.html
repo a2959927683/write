@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Harness 管理系统 · 简单版(小白能秒懂)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFF8E7 0%, #FFE4B5 50%, #FFCCBC 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.95;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 35px 25px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+    border: 4px dashed #FF6B6B;
+  }
+  .hero h1 {
+    font-size: 2.4em;
+    color: #D84315;
+    text-shadow: 3px 3px 0 #FFE082;
+    margin-bottom: 10px;
+  }
+  .hero .sub { color: #5D4037; font-size: 1.1em; }
+  .badges {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-top: 20px;
+  }
+  .badge {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFA726 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  /* 章节卡 */
+  .ch {
+    background: rgba(255,255,255,0.93);
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin: 25px 0;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+    position: relative;
+  }
+  .ch::before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: 25px;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 0.88em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .ch1::before { content: "🤔 问题"; background: linear-gradient(135deg, #FF6B6B, #C62828); }
+  .ch2::before { content: "💡 答案"; background: linear-gradient(135deg, #4FC3F7, #0277BD); }
+  .ch3::before { content: "🎬 怎么做"; background: linear-gradient(135deg, #66BB6A, #2E7D32); }
+  .ch4::before { content: "🗣️ 大白话版"; background: linear-gradient(135deg, #FFA726, #E65100); }
+  .ch5::before { content: "🎯 一句话总结"; background: linear-gradient(135deg, #AB47BC, #6A1B9A); }
+
+  .ch h2 {
+    color: #4A148C;
+    font-size: 1.55em;
+    margin: 10px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 3px dashed #FFB74D;
+  }
+  .ch p { font-size: 1.05em; margin: 10px 0; color: #444; }
+  .ch strong { color: #C62828; }
+  .ch em { color: #1565C0; font-style: normal; font-weight: bold; }
+
+  /* 比喻盒 */
+  .metaphor {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE082 100%);
+    border-left: 6px solid #FB8C00;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 15px 0;
+    font-size: 1.05em;
+  }
+  .metaphor-title {
+    color: #E65100;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+  }
+
+  /* 3 大块对比 */
+  .three-blocks {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .block {
+    border-radius: 14px;
+    padding: 20px 15px;
+    text-align: center;
+    color: white;
+  }
+  .block.b1 { background: linear-gradient(135deg, #66BB6A 0%, #1B5E20 100%); }
+  .block.b2 { background: linear-gradient(135deg, #42A5F5 0%, #0D47A1 100%); }
+  .block.b3 { background: linear-gradient(135deg, #AB47BC 0%, #4A148C 100%); }
+  .block-icon { font-size: 2.5em; margin-bottom: 8px; }
+  .block-name { font-weight: bold; font-size: 1.15em; margin-bottom: 6px; }
+  .block-size {
+    background: rgba(0,0,0,0.25);
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+  .block-desc { font-size: 0.88em; margin-top: 8px; opacity: 0.95; }
+
+  /* 大白话盒 */
+  .casual {
+    background: linear-gradient(135deg, #E1BEE7 0%, #CE93D8 100%);
+    border-radius: 18px;
+    padding: 25px;
+    margin: 18px 0;
+    color: #4A148C;
+  }
+  .casual-title {
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .casual p { font-size: 1.1em; margin: 10px 0; }
+  .casual strong { color: #C62828; }
+
+  /* 流程 */
+  .flow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .flow-step {
+    background: white;
+    padding: 10px 18px;
+    border-radius: 25px;
+    border: 3px solid;
+    font-weight: bold;
+  }
+  .flow-step.f1 { border-color: #FFB300; color: #E65100; }
+  .flow-step.f2 { border-color: #66BB6A; color: #1B5E20; }
+  .flow-step.f3 { border-color: #FFA726; color: #E65100; }
+  .flow-step.f4 { border-color: #FF6F00; color: #BF360C; }
+  .flow-step.f5 { border-color: #43A047; color: #1B5E20; }
+  .flow-arrow { color: #6A1B9A; font-size: 1.6em; font-weight: bold; }
+
+  /* 时间线 */
+  .timeline {
+    margin: 20px 0;
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .tl-item {
+    background: white;
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin: 8px 0;
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    border-left: 5px solid;
+  }
+  .tl-item.t1 { border-color: #FFB300; }
+  .tl-item.t2 { border-color: #66BB6A; }
+  .tl-item.t3 { border-color: #42A5F5; }
+  .tl-item.t4 { border-color: #AB47BC; }
+  .tl-item-t { font-weight: bold; color: #4A148C; }
+  .tl-item-d { font-size: 0.92em; color: #666; }
+  .tl-item-w {
+    background: rgba(255,213,79,0.3);
+    color: #5D4037;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+
+  /* 总结盒 */
+  .summary {
+    background: linear-gradient(135deg, #66BB6A 0%, #4FC3F7 50%, #AB47BC 100%);
+    color: white;
+    border-radius: 22px;
+    padding: 35px 30px;
+    text-align: center;
+    margin: 30px 0;
+    box-shadow: 0 15px 40px rgba(102,187,106,0.3);
+  }
+  .summary h2 {
+    font-size: 1.6em;
+    margin-bottom: 18px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    border: none !important;
+    color: white !important;
+  }
+  .summary p {
+    font-size: 1.12em;
+    line-height: 2;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+  }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #5D4037;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🎯 Harness 管理系统</h1>
+    <p class="sub">用最简单的话,讲清教练想做的事</p>
+    <div class="badges">
+      <span class="badge">5 分钟读完</span>
+      <span class="badge">小白能懂</span>
+      <span class="badge">1.5 小时落地</span>
+    </div>
+  </div>
+
+  <!-- 第 1 章 · 问题 -->
+  <div class="ch ch1">
+    <h2>🤔 我们现在的问题</h2>
+
+    <p>项目里有 <strong>76 个文档</strong> 📚, 还有 <strong>9 个 Harness 脚本</strong> + <strong>8 个 Agent</strong>。</p>
+
+    <p>问题是: <span class="hl">怎么让它们乖乖听话,别乱?</span></p>
+
+    <div class="metaphor">
+      <div class="metaphor-title">🏢 比喻 · 一家大公司</div>
+      <p>你有 100 个员工, 1000 份文件, 20 套系统...</p>
+      <p>如果不统一管理, 就是: <strong>张三抄错文档, 李四改坏系统, 王五啥也不知道</strong>。</p>
+      <p>你需要一个 <strong>"管理系统"</strong> 把它们串起来。</p>
+    </div>
+
+    <p>对咱们项目, 那个 "管理系统" 就是 <strong>Harness</strong> ⚙️。</p>
+  </div>
+
+  <!-- 第 2 章 · 答案 -->
+  <div class="ch ch2">
+    <h2>💡 教练的答案(简单版)</h2>
+
+    <p>只做 <strong>1 件事</strong>:</p>
+
+    <p style="font-size: 1.2em; text-align: center; padding: 15px; background: #FFF8E1; border-radius: 12px;">
+      👉 <strong>让 Harness 一个管所有</strong>
+    </p>
+
+    <h3>3 大块怎么分?</h3>
+
+    <div class="three-blocks">
+      <div class="block b1">
+        <div class="block-icon">🟢</div>
+        <div class="block-name">Harness 直接管</div>
+        <div class="block-size">~85%</div>
+        <div class="block-desc">Harness 现成的 9 脚本 + 8 Agent<br>主控 0 工作量</div>
+      </div>
+
+      <div class="block b2">
+        <div class="block-icon">🟡</div>
+        <div class="block-name">加点"调料"</div>
+        <div class="block-size">~10%</div>
+        <div class="block-desc">Harness 没的, 我们写点 glue code<br>主控写 ~100 行</div>
+      </div>
+
+      <div class="block b3">
+        <div class="block-icon">🔴</div>
+        <div class="block-name">主控亲自干</div>
+        <div class="block-size">~5%</div>
+        <div class="block-desc">决策/沟通/思考<br>Harness 干不了</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第 3 章 · 怎么做 -->
+  <div class="ch ch3">
+    <h2>🎬 怎么做?5 步搞定</h2>
+
+    <div class="flow">
+      <div class="flow-step f1">改 config</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step f2">写 wrapper</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step f3">改 check</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step f4">加说明</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step f5">跑一次</div>
+    </div>
+
+    <h3>📅 时间线</h3>
+
+    <div class="timeline">
+      <div class="tl-item t1">
+        <div class="tl-item-t">第 1 步</div>
+        <div class="tl-item-d">改 <code>harness.config.json</code>, 加 1 个新字段 <code>document_registry</code>, 告诉 Harness "我们有 76 个文档, 按 4 类分"</div>
+        <div class="tl-item-w">20 分钟</div>
+      </div>
+
+      <div class="tl-item t2">
+        <div class="tl-item-t">第 2 步</div>
+        <div class="tl-item-d">写 <code>scan-docs.mjs</code> 脚本, 调 Harness 的 <code>doc-gardener</code> Agent 扫文档, 我们只是"翻译配置给它"</div>
+        <div class="tl-item-w">30 分钟</div>
+      </div>
+
+      <div class="tl-item t3">
+        <div class="tl-item-t">第 3 步</div>
+        <div class="tl-item-d">改 <code>check-freshness.mjs</code>, 让它按 4 类分别检查</div>
+        <div class="tl-item-w">30 分钟</div>
+      </div>
+
+      <div class="tl-item t4">
+        <div class="tl-item-t">第 4 步</div>
+        <div class="tl-item-d">在主控 CLAUDE.md 加 10 行, 指向 config</div>
+        <div class="tl-item-w">5 分钟</div>
+      </div>
+    </div>
+
+    <p style="text-align: center; font-size: 1.15em; color: #C62828; font-weight: bold; margin-top: 15px;">
+      ⏱️ 合计: <strong>1.5 小时</strong> 全部搞定!
+    </p>
+  </div>
+
+  <!-- 第 4 章 · 大白话 -->
+  <div class="casual">
+    <div class="casual-title">🗣️ 大白话版</div>
+
+    <p>教练做的事 = <strong>"装修房子"</strong> 🏠</p>
+
+    <p>房子框架(Harness 9 脚本 + 8 Agent)是<strong>现成的精装房</strong>。我们只是:</p>
+    <p>· 🎨 <strong>刷个墙</strong>(改 config 加字段)</p>
+    <p>· 💡 <strong>装个开关</strong>(写 wrapper 脚本)</p>
+    <p>· 🛋️ <strong>摆个家具</strong>(改 check 脚本)</p>
+
+    <p><strong>不是拆房子重建,是软装。</strong> ✨</p>
+  </div>
+
+  <!-- 第 5 章 · 一句话 -->
+  <div class="summary">
+    <h2>🎯 一句话总结</h2>
+    <p>
+      🏗️ <strong>Harness 是 85% 的基础设施</strong>(现成,别造轮子)<br>
+      ✏️ <strong>主控写 10% 的 glue code</strong>(喂配置给 Harness)<br>
+      🧠 <strong>主控亲自做 5% 的决策</strong>(Harness 干不了)
+    </p>
+    <p style="margin-top: 20px; font-size: 1.3em;">
+      <strong>地基用现成的,墙纸自己选。</strong> ✨
+    </p>
+  </div>
+
+  <div class="footer">
+    🎯 Harness 管理系统 · 简单版 · 2026-06-07<br>
+    <em>5 分钟读懂 · 1.5 小时落地</em>
+  </div>
+
+</div>
+</body>
+</html>

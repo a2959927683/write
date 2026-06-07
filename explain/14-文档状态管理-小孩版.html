@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 文档状态管理 · 8 岁小孩也能听懂</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFEEAA 0%, #FFD3E0 35%, #C5E1A5 70%, #B3E5FC 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.85;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1050px; margin: 0 auto; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 35px 25px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 25px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+    border: 4px dashed #FF6B9D;
+  }
+  .hero h1 {
+    font-size: 2.5em;
+    color: #D84315;
+    text-shadow: 3px 3px 0 #FFE082;
+    margin-bottom: 10px;
+  }
+  .hero .sub { color: #6B5B95; font-size: 1.1em; }
+  .badges {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-top: 20px;
+  }
+  .badge {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FFA726 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  /* 章节卡片 */
+  .chapter {
+    background: rgba(255,255,255,0.93);
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin: 25px 0;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+    position: relative;
+  }
+  .chapter::before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: 25px;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 0.88em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .ch1::before { content: "📖 故事 1"; background: linear-gradient(135deg, #FF6B9D, #FFA726); }
+  .ch2::before { content: "🏷️ 4 种标签"; background: linear-gradient(135deg, #4FC3F7, #00BCD4); }
+  .ch3::before { content: "🎬 5 个状态机"; background: linear-gradient(135deg, #BA68C8, #8E24AA); }
+  .ch4::before { content: "📊 76 文档分类"; background: linear-gradient(135deg, #66BB6A, #43A047); }
+  .ch5::before { content: "🛠️ 怎么干"; background: linear-gradient(135deg, #FFB300, #FF6F00); }
+  .ch6::before { content: "🎯 一句话总结"; background: linear-gradient(135deg, #FF5252, #C62828); }
+
+  .chapter h2 {
+    color: #4A148C;
+    font-size: 1.6em;
+    margin: 10px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 3px dashed #FFB74D;
+  }
+  .chapter p { font-size: 1.05em; margin: 10px 0; color: #444; }
+  .chapter strong { color: #BF360C; }
+  .chapter em { color: #5E35B1; font-style: normal; font-weight: bold; }
+
+  /* 故事盒 */
+  .story-box {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE082 100%);
+    border-left: 6px solid #FF6F00;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 15px 0;
+    font-size: 1.05em;
+  }
+  .story-box strong { color: #BF360C; }
+
+  /* 4 标签卡 */
+  .tags-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .tag-card {
+    border-radius: 16px;
+    padding: 22px 18px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  .tag-card:hover { transform: translateY(-5px) rotate(-1deg); }
+  .tag-card.t1 { background: linear-gradient(135deg, #FF5252 0%, #C62828 100%); }
+  .tag-card.t2 { background: linear-gradient(135deg, #FFB300 0%, #FF6F00 100%); }
+  .tag-card.t3 { background: linear-gradient(135deg, #66BB6A 0%, #2E7D32 100%); }
+  .tag-card.t4 { background: linear-gradient(135deg, #90A4AE 0%, #455A64 100%); }
+  .tag-icon { font-size: 2.5em; }
+  .tag-name { font-weight: bold; font-size: 1.15em; margin: 8px 0 5px; }
+  .tag-meaning { font-size: 0.92em; opacity: 0.95; }
+  .tag-count {
+    background: rgba(255,255,255,0.3);
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  .tag-example {
+    margin-top: 8px;
+    font-size: 0.82em;
+    opacity: 0.9;
+    font-style: italic;
+  }
+
+  /* 状态机图 */
+  .state-machine {
+    background: rgba(255,255,255,0.7);
+    border-radius: 15px;
+    padding: 22px;
+    margin: 15px 0;
+    border: 2px dashed #B39DDB;
+  }
+  .sm-title {
+    text-align: center;
+    color: #4527A0;
+    font-weight: bold;
+    font-size: 1.15em;
+    margin-bottom: 14px;
+  }
+  .sm-flow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sm-state {
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 0.95em;
+    border: 3px solid;
+    background: white;
+    text-align: center;
+  }
+  .sm-state.start { border-color: #FFB300; color: #E65100; }
+  .sm-state.active { border-color: #FF6B9D; color: #C2185B; }
+  .sm-state.done { border-color: #43A047; color: #1B5E20; }
+  .sm-state.dead { border-color: #757575; color: #424242; opacity: 0.7; text-decoration: line-through; }
+  .sm-arrow {
+    color: #6A1B9A;
+    font-size: 1.6em;
+    font-weight: bold;
+  }
+  .sm-note {
+    background: rgba(186, 104, 200, 0.1);
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: #4A148C;
+    font-size: 0.92em;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* 102 文档大表 */
+  .doc-summary {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    border-radius: 15px;
+    padding: 22px;
+    margin: 15px 0;
+  }
+  .doc-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 80px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    margin: 8px 0;
+    border-left: 6px solid;
+  }
+  .doc-row.t1 { border-color: #FF5252; }
+  .doc-row.t2 { border-color: #FFB300; }
+  .doc-row.t3 { border-color: #66BB6A; }
+  .doc-row.t4 { border-color: #90A4AE; }
+  .doc-icon { font-size: 2em; text-align: center; }
+  .doc-type {
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+  }
+  .doc-row.t1 .doc-type { background: #FF5252; }
+  .doc-row.t2 .doc-type { background: #FFB300; color: #5D4037; }
+  .doc-row.t3 .doc-type { background: #66BB6A; }
+  .doc-row.t4 .doc-type { background: #90A4AE; }
+  .doc-list { color: #555; font-size: 0.92em; }
+
+  /* 怎么干 步骤 */
+  .step-list {
+    list-style: none;
+    counter-reset: step;
+    margin: 18px 0;
+  }
+  .step-list li {
+    background: linear-gradient(90deg, #FFF59D 0%, #FFF8E1 100%);
+    border-left: 6px solid #FFB300;
+    border-radius: 10px;
+    padding: 14px 18px 14px 60px;
+    margin: 10px 0;
+    position: relative;
+    counter-increment: step;
+    font-size: 1.02em;
+  }
+  .step-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #FF6F00 0%, #E65100 100%);
+    color: white;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-weight: bold;
+  }
+  .step-list strong { color: #BF360C; }
+  .step-list code {
+    background: #263238;
+    color: #FFD54F;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.88em;
+  }
+
+  /* 文档头模板 */
+  .template-box {
+    background: #263238;
+    color: #B0BEC5;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+  .template-box .cmt { color: #607D8B; }
+  .template-box .key { color: #FFD54F; font-weight: bold; }
+  .template-box .val { color: #4FC3F7; }
+  .template-box .status-tag { color: #66BB6A; font-weight: bold; }
+
+  /* 一句话总结 */
+  .summary-box {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FFA726 50%, #FFD54F 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin: 30px 0;
+    box-shadow: 0 15px 40px rgba(255,107,157,0.3);
+  }
+  .summary-box h3 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+  }
+  .summary-box p {
+    font-size: 1.1em;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    line-height: 1.9;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #5D4037;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 比喻盒 */
+  .metaphor {
+    background: rgba(255, 224, 178, 0.5);
+    border: 2px dashed #FB8C00;
+    border-radius: 14px;
+    padding: 18px;
+    margin: 15px 0;
+  }
+  .metaphor-title {
+    color: #E65100;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+  }
+
+  /* 高亮 */
+  .hl { background: linear-gradient(120deg, transparent, #FFF59D 15%, #FFF59D 85%, transparent); padding: 0 4px; font-weight: bold; }
+
+  /* 子状态机网格 */
+  .sm-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin: 15px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>📚 文档状态管理</h1>
+    <p class="sub">102 个文档 · 4 种标签 · 5 个状态机 · 一张图全搞懂</p>
+    <div class="badges">
+      <span class="badge">🔥 49 强管理</span>
+      <span class="badge">🟡 5 轻管理</span>
+      <span class="badge">🟢 20 版本</span>
+      <span class="badge">⚪ 28 快照</span>
+    </div>
+  </div>
+
+  <!-- ===== 故事 1 ===== -->
+  <div class="chapter ch1">
+    <h2>📖 先听个故事:为啥需要"状态管理"?</h2>
+
+    <p>想象一下,你的 <strong>书包</strong> 里有 100 张纸条 📝:</p>
+
+    <div class="story-box">
+      <strong>😵 没分类的混乱:</strong>
+      <p>· 你妈妈写的"明天带水"(还没看)📩</p>
+      <p>· 老师批的作业(已经过去 3 个月)📜</p>
+      <p>· 你画的小漫画(纯娱乐)🎨</p>
+      <p>· 同学借你的钱条(欠条!很重要!)💰</p>
+    </div>
+
+    <p style="margin-top:15px;">如果<strong>不分类</strong>, 你会:</p>
+    <p>· 😱 翻 100 张才找到欠条</p>
+    <p>· 😭 把妈妈的纸条扔了</p>
+    <p>· 🤦 把作业当宝贝藏起来</p>
+
+    <div class="metaphor">
+      <div class="metaphor-title">💡 解决办法 · 贴标签!</div>
+      <p>· 🔴 红标 · <strong>非常重要</strong>(欠条) — 要管!</p>
+      <p>· 🟡 黄标 · <strong>定期看</strong>(每天日记) — 半自动</p>
+      <p>· 🟢 绿标 · <strong>记版本</strong>(说明书 v1.0) — 改的时候记</p>
+      <p>· ⚪ 白标 · <strong>看完就扔</strong>(小漫画) — 不用管</p>
+    </div>
+
+    <p style="margin-top:15px;">
+      <span class="hl">我们的项目也一样!</span> 102 个文档,得分类管理,不然主控会疯掉 🤯
+    </p>
+  </div>
+
+  <!-- ===== 故事 2 · 4 种标签 ===== -->
+  <div class="chapter ch2">
+    <h2>🏷️ 4 种文档标签 · 一眼分清</h2>
+
+    <p>主控给每个文档贴 <strong>1 个标签</strong>, 4 种之一:</p>
+
+    <div class="tags-grid">
+      <div class="tag-card t1">
+        <div class="tag-icon">🔥</div>
+        <div class="tag-name">STATEFUL</div>
+        <div class="tag-meaning">强状态管理</div>
+        <div class="tag-count">49 个</div>
+        <div class="tag-example">例:ADR / Sprint / 任务清单</div>
+      </div>
+
+      <div class="tag-card t2">
+        <div class="tag-icon">🟡</div>
+        <div class="tag-name">APPEND_ONLY</div>
+        <div class="tag-meaning">仅追加(只写不删)</div>
+        <div class="tag-count">5 个</div>
+        <div class="tag-example">例:progress.txt</div>
+      </div>
+
+      <div class="tag-card t3">
+        <div class="tag-icon">🟢</div>
+        <div class="tag-name">VERSIONED</div>
+        <div class="tag-meaning">版本号管理</div>
+        <div class="tag-count">20 个</div>
+        <div class="tag-example">例:API 契约 v1.0.0</div>
+      </div>
+
+      <div class="tag-card t4">
+        <div class="tag-icon">⚪</div>
+        <div class="tag-name">SNAPSHOT</div>
+        <div class="tag-meaning">快照(改即覆盖)</div>
+        <div class="tag-count">28 个</div>
+        <div class="tag-example">例:README / 颗粒文档 / HTML</div>
+      </div>
+    </div>
+
+    <div class="metaphor">
+      <div class="metaphor-title">🎯 怎么区分?</div>
+      <p>· <strong>🔥 STATEFUL</strong> = 这文档<strong>有 "活的"</strong>(状态在变化, 比如决策在讨论中→已采纳)</p>
+      <p>· <strong>🟡 APPEND_ONLY</strong> = 这文档<strong>是日记</strong>(只追加, 不删除历史)</p>
+      <p>· <strong>🟢 VERSIONED</strong> = 这文档<strong>是合同</strong>(改一次就要标 v1.1, 不能瞎改)</p>
+      <p>· <strong>⚪ SNAPSHOT</strong> = 这文档<strong>是照片</strong>(过时就重拍, 不用管历史)</p>
+    </div>
+  </div>
+
+  <!-- ===== 故事 3 · 5 个状态机 ===== -->
+  <div class="chapter ch3">
+    <h2>🎬 5 个状态机 · 文档怎么"生老病死"?</h2>
+
+    <p>4 种标签里, <strong>🔥 STATEFUL</strong> 文档最复杂, 它们有 <strong>"状态机"</strong>(就是生命周期)。</p>
+
+    <p>主控管 <strong>5 种状态机</strong>:</p>
+
+    <div class="sm-grid">
+
+      <!-- 状态机 1 · ADR -->
+      <div class="state-machine">
+        <div class="sm-title">📜 状态机 1 · ADR (架构决策)</div>
+        <div class="sm-flow">
+          <div class="sm-state start">PROPOSED<br><small>提议中</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state active">ACCEPTED<br><small>已采纳</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state done">DEPRECATED<br><small>已弃用</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state dead">SUPERSEDED<br><small>被替代</small></div>
+        </div>
+        <div class="sm-note">
+          💡 比喻:像"国家法律"。提议 → 通过 → 过时 → 被新法替代
+        </div>
+      </div>
+
+      <!-- 状态机 2 · 讨论稿 -->
+      <div class="state-machine">
+        <div class="sm-title">💬 状态机 2 · 讨论稿</div>
+        <div class="sm-flow">
+          <div class="sm-state start">OPEN<br><small>开放</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state active">DISCUSSING<br><small>讨论中</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state done">RESOLVED<br><small>已解决</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state dead">ABANDONED<br><small>已放弃</small></div>
+        </div>
+        <div class="sm-note">
+          💡 比喻:像"班级讨论会"。开会 → 讨论 → 拍板 → 不了了之
+        </div>
+      </div>
+
+      <!-- 状态机 3 · Sprint -->
+      <div class="state-machine">
+        <div class="sm-title">🏁 状态机 3 · Sprint 文档</div>
+        <div class="sm-flow">
+          <div class="sm-state start">PLACEHOLDER<br><small>占位</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state start">PLANNING<br><small>规划中</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state active">ACTIVE<br><small>进行中</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state done">COMPLETED<br><small>已完成</small></div>
+        </div>
+        <div class="sm-note">
+          💡 比喻:像"游戏关卡"。锁定 → 解锁 → 打怪 → 通关
+        </div>
+      </div>
+
+      <!-- 状态机 4 · feature 任务 -->
+      <div class="state-machine">
+        <div class="sm-title">✅ 状态机 4 · feature 任务</div>
+        <div class="sm-flow">
+          <div class="sm-state start">pending<br><small>待办</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state active">active<br><small>进行中</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state done">complete<br><small>完成</small></div>
+          <div class="sm-arrow">⤴</div>
+          <div class="sm-state dead">blocked<br><small>卡住</small></div>
+        </div>
+        <div class="sm-note">
+          💡 比喻:像"作业本"。每个题:待做 → 在做 → 完成 / 卡住
+        </div>
+      </div>
+
+      <!-- 状态机 5 · brief 便当 -->
+      <div class="state-machine">
+        <div class="sm-title">🍱 状态机 5 · brief 便当(未来要写)</div>
+        <div class="sm-flow">
+          <div class="sm-state start">DRAFT<br><small>草稿</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state start">READY<br><small>就绪</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state active">IN_PROGRESS<br><small>子 agent 在干</small></div>
+          <div class="sm-arrow">→</div>
+          <div class="sm-state done">DONE<br><small>完成</small></div>
+          <div class="sm-arrow">⤴</div>
+          <div class="sm-state dead">DEPRECATED<br><small>过时</small></div>
+        </div>
+        <div class="sm-note">
+          💡 比喻:像"妈妈做的便当"。准备 → 装好 → 你在吃 → 吃完 / 馊了
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== 故事 4 · 76 文档分类 ===== -->
+  <div class="chapter ch4">
+    <h2>📊 76 个文档全分类(一目了然)</h2>
+
+    <p>我们项目里 76 个文档(再加未来要新增的 26 个 = 102), 按 4 个标签分:</p>
+
+    <div class="doc-summary">
+
+      <div class="doc-row t1">
+        <div class="doc-icon">🔥</div>
+        <div class="doc-list">
+          <strong>STATEFUL · 强管理</strong><br>
+          ADR(18)+ 讨论稿(2)+ Sprint(4)+ feature_list(1)+ brief 未来(24)
+        </div>
+        <div class="doc-type">49 个</div>
+        <div class="doc-list">⚠️ 必须管!状态变化要追踪</div>
+      </div>
+
+      <div class="doc-row t2">
+        <div class="doc-icon">🟡</div>
+        <div class="doc-list">
+          <strong>APPEND_ONLY · 轻管理</strong><br>
+          progress.txt + rule-tracking + metrics + handoff
+        </div>
+        <div class="doc-type">5 个</div>
+        <div class="doc-list">📝 只追加,不删历史</div>
+      </div>
+
+      <div class="doc-row t3">
+        <div class="doc-icon">🟢</div>
+        <div class="doc-list">
+          <strong>VERSIONED · 版本管理</strong><br>
+          OpenAPI(3)+ JSON Schema(14)+ 事件(1)+ providers(1)+ CHANGELOG(1)
+        </div>
+        <div class="doc-type">20 个</div>
+        <div class="doc-list">📜 SemVer · v1.0.0 → v1.1.0</div>
+      </div>
+
+      <div class="doc-row t4">
+        <div class="doc-icon">⚪</div>
+        <div class="doc-list">
+          <strong>SNAPSHOT · 快照</strong><br>
+          README + CLAUDE.md + 颗粒文档(9)+ HTML(14)+ 其他
+        </div>
+        <div class="doc-type">28 个</div>
+        <div class="doc-list">✏️ 改即覆盖,日期标记够</div>
+      </div>
+
+    </div>
+
+    <div class="metaphor" style="margin-top:18px;">
+      <div class="metaphor-title">🎯 一眼看懂主控的工作量</div>
+      <p>·  ⚠️ 主控只需<strong>认真管 49 个 STATEFUL 文档</strong>(状态机)</p>
+      <p>·  📝 5 个 APPEND_ONLY 半自动追加</p>
+      <p>·  📜 20 个契约改的时候按 SemVer 升版本</p>
+      <p>·  ✏️ 28 个快照随便改(只看日期)</p>
+      <p style="margin-top:10px;">
+        <span class="hl">主控总工作量 ≈ 管 49 个状态变化</span> · 不是 102 个 · 轻松了 50%!
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== 故事 5 · 怎么干 ===== -->
+  <div class="chapter ch5">
+    <h2>🛠️ 主控具体怎么管?6 步走</h2>
+
+    <p>主控每天/每周做这 6 件事, 文档状态就管好了:</p>
+
+    <ol class="step-list">
+      <li><strong>给每个文档贴标签</strong> · 头部加 <code>status:</code> 字段, 标 <code>🔥 STATEFUL</code> 等</li>
+      <li><strong>STATEFUL 文档加状态字段</strong> · 比如 ADR 头部写 <code>状态: ✅ ACCEPTED</code></li>
+      <li><strong>状态变化时改字段</strong> · 比如 ADR 0017 从 <code>PROPOSED</code> 改 <code>ACCEPTED</code> 那次</li>
+      <li><strong>APPEND_ONLY 文档只追加</strong> · progress.txt 永远在顶部加新段, 不删旧的</li>
+      <li><strong>VERSIONED 文档改时升版本</strong> · 改 <code>v1.0.0</code> → <code>v1.1.0</code>, 同步写 CHANGELOG</li>
+      <li><strong>SNAPSHOT 文档每月清一次过时的</strong> · 看"最后更新"日期, 老于 3 个月就 review</li>
+    </ol>
+
+    <p style="margin-top:18px;"><strong>📌 文档头部统一模板(以 ADR 为例):</strong></p>
+
+    <div class="template-box">
+<span class="cmt"># ADR 0017 · 子 Agent 预消化便当法</span>
+
+<span class="cmt">## 状态</span>
+
+<span class="status-tag">✅ ACCEPTED · 已采纳</span> (2026-06-07)
+&gt; <span class="key">tag</span>: <span class="val">🔥 STATEFUL</span>
+&gt; <span class="key">提议日期</span>: 2026-06-07
+&gt; <span class="key">拍板日期</span>: 2026-06-07
+&gt; <span class="key">关联讨论</span>: docs/discussions/xxx.md (RESOLVED)
+    </div>
+
+    <p style="margin-top:18px;"><strong>📌 progress.txt 模板(APPEND_ONLY):</strong></p>
+
+    <div class="template-box">
+<span class="cmt"># Master Project · Sprint Progress Log</span>
+&gt; <span class="key">tag</span>: <span class="val">🟡 APPEND_ONLY</span>
+&gt; 主控进度日志 (按时间倒序追加, 不删除历史)
+
+---
+
+<span class="cmt">## [2026-06-08] xxx</span>
+今天做了 xxx
+...
+
+<span class="cmt">## [2026-06-07] xxx</span>
+昨天做了 xxx
+...
+    </div>
+  </div>
+
+  <!-- ===== 故事 6 · 一句话总结 ===== -->
+  <div class="summary-box">
+    <h3>🎯 一句话总结整套状态管理</h3>
+    <p>
+      🏷️ <strong>每个文档贴 1 张标签</strong>(4 选 1)<br>
+      🎬 <strong>🔥 STATEFUL 文档跑 5 种状态机</strong>(每种文档对应一种)<br>
+      📝 <strong>🟡 APPEND_ONLY 文档只追加不删</strong><br>
+      📜 <strong>🟢 VERSIONED 文档按 SemVer 升版本</strong><br>
+      ✏️ <strong>⚪ SNAPSHOT 文档改即覆盖</strong><br>
+      <br>
+      ✨ <strong>主控真正要管的只有 49 个 STATEFUL 文档!</strong> ✨
+    </p>
+  </div>
+
+  <div class="footer">
+    📚 文档状态管理 · 教练版 · 2026-06-07<br>
+    <em>4 标签 + 5 状态机 + 6 步操作 + 102 文档全分类</em><br>
+    <br>
+    👀 想看 Harness 管理方案?请看 <strong>15-Harness管理方案-小孩版.html</strong>
+  </div>
+
+</div>
+</body>
+</html>

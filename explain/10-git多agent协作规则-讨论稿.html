@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔀 多 Agent Git 协作规则 · 讨论稿(5 个核心问题待定)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #E0F7FA 0%, #B2DFDB 35%, #C5E1A5 70%, #FFF59D 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #2C3E50;
+    line-height: 1.85;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1050px; margin: 0 auto; }
+
+  /* 状态条 */
+  .status-bar {
+    background: linear-gradient(90deg, #FB8C00 0%, #F4511E 100%);
+    color: white;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 25px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    box-shadow: 0 6px 18px rgba(244,81,30,0.35);
+  }
+  .status-bar .dot {
+    display: inline-block;
+    width: 12px; height: 12px;
+    background: #FFEB3B;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 30px 25px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-size: 2.3em;
+    color: #00695C;
+    text-shadow: 2px 2px 0 #B2DFDB;
+    margin-bottom: 10px;
+  }
+  .hero .sub { color: #455A64; font-size: 1.08em; }
+  .hero .meta {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    background: linear-gradient(135deg, #26A69A 0%, #00897B 100%);
+    color: white;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+
+  /* 卡片 */
+  .card {
+    background: rgba(255,255,255,0.92);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin: 25px 0;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .card h2 {
+    color: #00695C;
+    font-size: 1.55em;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 3px dashed #4DB6AC;
+  }
+  .card h3 {
+    color: #BF360C;
+    font-size: 1.15em;
+    margin: 15px 0 10px;
+  }
+  .card p { margin: 10px 0; color: #37474F; font-size: 1.02em; }
+  .card strong { color: #BF360C; }
+  .card em { color: #00695C; font-style: normal; font-weight: bold; }
+  .card-tag {
+    position: absolute;
+    top: -12px;
+    left: 25px;
+    background: linear-gradient(135deg, #26A69A 0%, #00897B 100%);
+    color: white;
+    padding: 5px 16px;
+    border-radius: 14px;
+    font-size: 0.85em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,137,123,0.3);
+  }
+
+  /* 共识盒 */
+  .consensus {
+    background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
+    border-left: 6px solid #2E7D32;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 15px 0;
+  }
+  .consensus-title {
+    color: #1B5E20;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+  }
+  .consensus-code {
+    background: rgba(255,255,255,0.7);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #1B5E20;
+    margin-top: 8px;
+  }
+
+  /* 问题卡 */
+  .questions {
+    display: grid;
+    gap: 15px;
+  }
+  .q-card {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    border: 2px solid #FB8C00;
+    border-radius: 15px;
+    padding: 20px 22px;
+    position: relative;
+  }
+  .q-card.deps {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+    border-color: #E53935;
+  }
+  .q-id-badge {
+    position: absolute;
+    top: -14px;
+    left: 18px;
+    background: linear-gradient(135deg, #FB8C00 0%, #E65100 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 0.9em;
+    box-shadow: 0 4px 10px rgba(230,81,0,0.3);
+  }
+  .q-card.deps .q-id-badge {
+    background: linear-gradient(135deg, #E53935 0%, #B71C1C 100%);
+  }
+  .q-question {
+    color: #BF360C;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin: 8px 0;
+  }
+  .q-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .q-option {
+    background: white;
+    border: 1px solid #FFB74D;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.88em;
+    color: #5D4037;
+    transition: all 0.2s;
+  }
+  .q-option:hover {
+    background: #FFE0B2;
+    transform: translateY(-2px);
+  }
+  .q-option strong { color: #BF360C; display: block; margin-bottom: 3px; }
+  .q-note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.5);
+    border-left: 3px solid #FB8C00;
+    font-size: 0.88em;
+    color: #5D4037;
+    border-radius: 4px;
+  }
+
+  /* 依赖图 */
+  .deps-diagram {
+    background: #263238;
+    color: #B0BEC5;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    margin: 15px 0;
+    line-height: 1.9;
+  }
+  .deps-diagram .node {
+    display: inline-block;
+    background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin: 4px;
+    font-weight: bold;
+  }
+  .deps-diagram .node.key {
+    background: linear-gradient(135deg, #FFD600 0%, #FF6F00 100%);
+    color: #333;
+    box-shadow: 0 0 15px rgba(255,214,0,0.6);
+  }
+  .deps-diagram .arrow {
+    color: #FFD93D;
+    font-size: 1.4em;
+  }
+
+  /* 备选卡 */
+  .alts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 15px;
+    margin: 18px 0;
+  }
+  .alt {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    border: 3px solid;
+    transition: transform 0.2s;
+  }
+  .alt:hover { transform: translateY(-3px); }
+  .alt.a { border-color: #00BCD4; }
+  .alt.b { border-color: #FFB300; }
+  .alt.c { border-color: #66BB6A; }
+  .alt.d { border-color: #E53935; background: #FFEBEE; }
+  .alt-title { font-weight: bold; font-size: 1.05em; margin-bottom: 8px; }
+  .alt.a .alt-title { color: #00838F; }
+  .alt.b .alt-title { color: #E65100; }
+  .alt.c .alt-title { color: #2E7D32; }
+  .alt.d .alt-title { color: #C62828; }
+  .alt-pros { color: #2E7D32; font-size: 0.9em; margin: 5px 0; }
+  .alt-cons { color: #C62828; font-size: 0.9em; margin: 5px 0; }
+
+  /* 延伸问题 */
+  .extends {
+    background: linear-gradient(135deg, #E1BEE7 0%, #CE93D8 100%);
+    border-radius: 14px;
+    padding: 20px;
+    margin: 15px 0;
+  }
+  .extends h3 { color: #4A148C; margin-bottom: 12px; }
+  .extend-item {
+    background: white;
+    padding: 10px 14px;
+    border-left: 4px solid #8E24AA;
+    border-radius: 6px;
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: #4A148C;
+  }
+  .extend-id {
+    background: #8E24AA;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-right: 8px;
+    font-size: 0.85em;
+  }
+
+  /* 影响范围 */
+  .impact {
+    background: #FFF9C4;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+  }
+  .impact-item {
+    background: white;
+    padding: 8px 14px;
+    border-left: 4px solid #FBC02D;
+    border-radius: 6px;
+    margin: 8px 0;
+    font-family: monospace;
+    font-size: 0.92em;
+    color: #5D4037;
+  }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #00BCD4 0%, #00897B 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin: 35px 0 20px;
+    box-shadow: 0 12px 35px rgba(0,137,123,0.3);
+  }
+  .cta-box h2 { font-size: 1.55em; margin-bottom: 15px; }
+  .cta-tip {
+    background: rgba(255,255,255,0.2);
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin: 15px auto;
+    max-width: 600px;
+    backdrop-filter: blur(5px);
+    font-size: 1.05em;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #455A64;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 高亮 */
+  .hl { background: linear-gradient(120deg, transparent 0%, #FFEB3B 15%, #FFEB3B 85%, transparent 100%); padding: 0 4px; font-weight: bold; }
+  .danger { color: #C62828; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 状态条 -->
+  <div class="status-bar">
+    <span class="dot"></span>
+    讨论中 · 5 个核心问题全部待定 · 等待用户给方向后转 ADR 0018 ACCEPTED
+  </div>
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🔀 多 Agent Git 协作规则 · 讨论稿</h1>
+    <p class="sub">5 个核心问题 + 3 个延伸问题 · 全部待定 · 教练抛出来让你思考</p>
+    <div class="meta">
+      <span class="meta-tag">📅 2026-06-07</span>
+      <span class="meta-tag">🟡 讨论稿</span>
+      <span class="meta-tag">📄 ADR 0018 提议中</span>
+      <span class="meta-tag">✅ 1 共识 / ❓ 8 待定</span>
+    </div>
+  </div>
+
+  <!-- 卡 1: 背景 -->
+  <div class="card">
+    <span class="card-tag">📖 背景</span>
+    <h2>为啥需要 git 规则?</h2>
+    <p>主控将派多个子 agent 并行干活:</p>
+    <ul style="margin-left:22px; color:#37474F;">
+      <li>🎨 frontend-agent(Vue 3)</li>
+      <li>⚙️ backend-agent(NestJS)</li>
+      <li>🧙 ai-orchestrator-agent(Python)</li>
+      <li>🗺️ knowledge-graph-agent</li>
+      <li>🔧 infra-agent(Docker)</li>
+    </ul>
+
+    <p style="margin-top:12px;">
+      <span class="danger">⚠️ 5 个 agent 同时改代码,如果没规则 = 必爆炸。</span>
+    </p>
+  </div>
+
+  <!-- 卡 2: 已达成共识 -->
+  <div class="card">
+    <span class="card-tag">✅ 已达成共识</span>
+    <h2>目前唯一定下的事</h2>
+
+    <div class="consensus">
+      <div class="consensus-title">🎯 A1 · 用 git worktree 隔离工作目录</div>
+      <p style="color:#1B5E20; font-size:0.95em;">每个子 agent 在独立 worktree 干活,避免互改对方代码。</p>
+      <div class="consensus-code">
+        git worktree add ../wt-backend  backend-dev<br>
+        git worktree add ../wt-frontend frontend-dev<br>
+        git worktree add ../wt-ai       ai-dev
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡 3: 5 个核心问题 -->
+  <div class="card">
+    <span class="card-tag">❓ 核心问题</span>
+    <h2>5 个核心问题(全部待定)</h2>
+
+    <div class="questions">
+
+      <!-- Q1 -->
+      <div class="q-card">
+        <span class="q-id-badge">Q1 · 分支策略</span>
+        <p class="q-question">每个子 agent 用独立分支?还是独立 worktree?</p>
+        <div class="q-options">
+          <div class="q-option"><strong>A. 一 agent 一分支</strong>backend-dev, frontend-dev</div>
+          <div class="q-option"><strong>B. 一任务一分支</strong>feature/S0-18-auth</div>
+          <div class="q-option"><strong>C. 主线+worktree</strong>都基于 main,内部 commit</div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="q-card">
+        <span class="q-id-badge">Q2 · commit 规范</span>
+        <p class="q-question">commit 消息写什么风格?谁先 commit?</p>
+        <div class="q-options">
+          <div class="q-option"><strong>A. Conventional 英文</strong>feat(auth): implement login</div>
+          <div class="q-option"><strong>B. Conventional 中文</strong>feat(auth): 实现登录端点</div>
+          <div class="q-option"><strong>C. 任务 ID 前缀</strong>[S0-18] auth login endpoint</div>
+          <div class="q-option"><strong>D. 子 agent 自由</strong>写清楚就行</div>
+        </div>
+        <div class="q-note">
+          🤔 <strong>关联问题:</strong> commit 是否要带 Co-Authored-By: Claude 或 agent 标识?
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="q-card">
+        <span class="q-id-badge">Q3 · 合并节奏</span>
+        <p class="q-question">子 agent 完工立即合主控?还是攒一批合?</p>
+        <div class="q-options">
+          <div class="q-option"><strong>A. 完一个合一个</strong>简单,合并频繁</div>
+          <div class="q-option"><strong>B. Sprint 末批量合</strong>中间互相看不到</div>
+          <div class="q-option"><strong>C. 长开 PR + review</strong>走 PR 走流程</div>
+          <div class="q-option"><strong>D. 主控仲裁后合</strong>主控审才能合</div>
+        </div>
+        <div class="q-note">
+          🤔 <strong>关联问题:</strong> 是否需要 CI 跑契约 lint?lint 不过禁止合?
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="q-card">
+        <span class="q-id-badge">Q4 · 冲突解决</span>
+        <p class="q-question">两个 agent 改同一文件怎么办?</p>
+        <div class="q-options">
+          <div class="q-option"><strong>A. 主控仲裁</strong>自动 detect,主控判</div>
+          <div class="q-option"><strong>B. 后到让先到</strong>时间戳优先</div>
+          <div class="q-option"><strong>C. 强制隔离边界</strong>CLAUDE.md 写死</div>
+          <div class="q-option"><strong>D. 三方合并工具</strong>git merge 自动</div>
+        </div>
+        <div class="q-note">
+          ⚠️ <strong>特别敏感:</strong> contracts/ 谁改谁错(除非主控显式批准)
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="q-card deps">
+        <span class="q-id-badge">Q5 · 契约保护</span>
+        <p class="q-question">contracts/ 是禁区,要不要 pre-commit hook 阻止?</p>
+        <div class="q-options">
+          <div class="q-option"><strong>A. pre-commit hook</strong>改了直接拒 commit</div>
+          <div class="q-option"><strong>B. CI 检测</strong>改了报警,主控决定</div>
+          <div class="q-option"><strong>C. CLAUDE.md 约定</strong>仅靠 agent 自觉</div>
+          <div class="q-option"><strong>D. 文件权限</strong>操作系统级只读</div>
+        </div>
+        <div class="q-note">
+          🔥 <strong>这是最关键的一题:</strong> contracts/ 一旦被乱改,所有 agent 都被带偏!
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 卡 4: 依赖图 -->
+  <div class="card">
+    <span class="card-tag">🔗 决策依赖</span>
+    <h2>5 个问题的依赖关系</h2>
+
+    <p><strong>不是平行 5 题,有先后顺序!</strong></p>
+
+    <div class="deps-diagram">
+      <div class="node key">Q1 分支策略</div>
+      <span class="arrow">──►</span>
+      <div class="node">Q3 合并节奏</div>
+      <br>
+      <span class="arrow">↓</span>
+      <br>
+      <div class="node">Q2 commit</div>
+      <span class="arrow">──►</span>
+      <div class="node">Q4 冲突</div>
+      <br>
+      <span class="arrow">↓</span>
+      <br>
+      <div class="node key">Q5 契约保护</div>
+    </div>
+
+    <p style="margin-top:15px;">
+      <span class="hl">💡 教练建议:先定 Q1 + Q5 这 2 题,其他 3 题自然清晰。</span>
+    </p>
+  </div>
+
+  <!-- 卡 5: 4 套常见组合 -->
+  <div class="card">
+    <span class="card-tag">💼 备选方案</span>
+    <h2>业界 4 套常见组合(供参考)</h2>
+
+    <div class="alts">
+      <div class="alt a">
+        <div class="alt-title">A · GitHub Flow 严格版</div>
+        <p style="font-size:0.9em;">一 agent 一分支 + PR + CI lint + 主控批准合</p>
+        <div class="alt-pros">✅ 流程严格,不易出错</div>
+        <div class="alt-cons">❌ 流程重,多 agent 速度受限</div>
+      </div>
+
+      <div class="alt b">
+        <div class="alt-title">B · Trunk-Based + Worktree</div>
+        <p style="font-size:0.9em;">都基于 main,worktree 隔离,本地频繁 commit,定期 rebase</p>
+        <div class="alt-pros">✅ 速度快,小团队友好</div>
+        <div class="alt-cons">❌ 冲突频繁需自动化</div>
+      </div>
+
+      <div class="alt c">
+        <div class="alt-title">C · 分形 (主控 main + 子项目 dev)</div>
+        <p style="font-size:0.9em;">主控管 main,每子项目有 xxx-dev 长开分支</p>
+        <div class="alt-pros">✅ 子项目自治,主线稳定</div>
+        <div class="alt-cons">❌ 同步成本中等</div>
+      </div>
+
+      <div class="alt d">
+        <div class="alt-title">D · 全混乱 (无规则)</div>
+        <p style="font-size:0.9em;">子 agent 自由发挥,啥规则没有</p>
+        <div class="alt-cons">❌ 必爆炸,不可接受!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡 6: 3 个延伸问题 -->
+  <div class="card">
+    <span class="card-tag">💭 延伸</span>
+    <h2>教练额外抛的 3 个延伸问题</h2>
+
+    <div class="extends">
+      <h3>🤔 这 3 个也得想</h3>
+      <div class="extend-item"><span class="extend-id">E1</span>子 agent 干活时,要不要 <strong>push 到远程</strong>?还是只本地?</div>
+      <div class="extend-item"><span class="extend-id">E2</span><strong>tag 怎么打</strong>?Sprint 0 结束打 v0.1.0 吗?</div>
+      <div class="extend-item"><span class="extend-id">E3</span>子 agent 误删/误改文件,有 <strong>git reflog 兜底</strong>吗?</div>
+    </div>
+  </div>
+
+  <!-- 卡 7: 影响范围 -->
+  <div class="card">
+    <span class="card-tag">📍 影响范围</span>
+    <h2>定稿后需要更新的地方</h2>
+
+    <div class="impact">
+      <div class="impact-item">📋 master/CLAUDE.md(新增 git 规则段)</div>
+      <div class="impact-item">🪝 master/.git/hooks/(pre-commit hook?)</div>
+      <div class="impact-item">⚙️ master/.github/workflows/ci.yml(CI lint?)</div>
+      <div class="impact-item">📜 每个子项目 CLAUDE.md(告知 agent 边界)</div>
+      <div class="impact-item">🐍 master/scripts/contract-lint.py(校验 contracts/)</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>🎤 教练等你拍板</h2>
+    <div class="cta-tip">
+      💡 <strong>最快定稿路径:</strong><br>
+      ① 你回答 <strong>Q1 + Q5</strong>(只要 2 题)<br>
+      ② 教练给 Q2/Q3/Q4 草案<br>
+      ③ 你审定 → 转 ACCEPTED → 落地
+    </div>
+    <p style="margin-top:15px; font-size:1.05em;">
+      🎯 <strong>你也可以全部"待用户调研后再定"</strong>,先把试点跑起来,边干边定
+    </p>
+  </div>
+
+  <div class="footer">
+    🔀 ADR 0018 提议中 · 讨论稿 v0.1 · 2026-06-07<br>
+    <em>1 共识 / 5 核心问题待定 / 3 延伸问题待定</em>
+  </div>
+
+</div>
+</body>
+</html>

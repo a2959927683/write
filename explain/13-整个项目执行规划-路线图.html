@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🗺️ 整个项目执行规划 · 从今天到上线的完整路线图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #E0E7FF;
+    line-height: 1.85;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 40px 30px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-size: 2.6em;
+    background: linear-gradient(135deg, #00DBDE 0%, #FC00FF 50%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero .sub { color: #B0BEC5; font-size: 1.1em; }
+  .hero .badges {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-top: 20px;
+  }
+  .badge {
+    background: rgba(0,219,222,0.15);
+    border: 1px solid #00DBDE;
+    color: #00DBDE;
+    padding: 6px 14px; border-radius: 14px;
+    font-size: 0.85em; font-weight: bold;
+  }
+
+  /* 总览图 */
+  .roadmap {
+    background: rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 30px;
+    margin: 25px 0;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .roadmap-title {
+    text-align: center;
+    color: #00DBDE;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+  }
+  .roadmap-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    position: relative;
+  }
+  .roadmap-stage {
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border-top: 4px solid;
+    position: relative;
+  }
+  .roadmap-stage.s0 { border-color: #FFD700; }
+  .roadmap-stage.s1 { border-color: #00DBDE; }
+  .roadmap-stage.s2 { border-color: #FC00FF; }
+  .roadmap-stage.s3 { border-color: #66BB6A; }
+  .stage-num { font-size: 1.5em; font-weight: bold; }
+  .stage-num.s0 { color: #FFD700; }
+  .stage-num.s1 { color: #00DBDE; }
+  .stage-num.s2 { color: #FC00FF; }
+  .stage-num.s3 { color: #66BB6A; }
+  .stage-name { color: #E0E7FF; margin: 4px 0 6px; font-weight: bold; }
+  .stage-time { font-size: 0.85em; color: #90A4AE; }
+  .stage-goal { font-size: 0.85em; color: #B0BEC5; margin-top: 6px; }
+
+  /* Sprint 详细卡 */
+  .sprint-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 30px 35px;
+    margin: 28px 0;
+    border: 1px solid;
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .sprint-card.s0 { border-color: rgba(255,215,0,0.3); }
+  .sprint-card.s1 { border-color: rgba(0,219,222,0.3); }
+  .sprint-card.s2 { border-color: rgba(252,0,255,0.3); }
+  .sprint-card.s3 { border-color: rgba(102,187,106,0.3); }
+
+  .sprint-badge {
+    position: absolute;
+    top: -15px;
+    left: 25px;
+    padding: 7px 18px;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 0.95em;
+    color: white;
+  }
+  .sprint-badge.s0 { background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%); color: #1A1A2E; }
+  .sprint-badge.s1 { background: linear-gradient(135deg, #00DBDE 0%, #006064 100%); }
+  .sprint-badge.s2 { background: linear-gradient(135deg, #FC00FF 0%, #6A1B9A 100%); }
+  .sprint-badge.s3 { background: linear-gradient(135deg, #66BB6A 0%, #1B5E20 100%); }
+
+  .sprint-card h2 {
+    font-size: 1.6em;
+    margin: 10px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(255,255,255,0.1);
+  }
+  .sprint-card.s0 h2 { color: #FFD700; }
+  .sprint-card.s1 h2 { color: #00DBDE; }
+  .sprint-card.s2 h2 { color: #FC00FF; }
+  .sprint-card.s3 h2 { color: #66BB6A; }
+
+  .sprint-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+  }
+  .meta-item {
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .meta-label { font-size: 0.8em; color: #90A4AE; margin-bottom: 4px; }
+  .meta-value { font-size: 1.05em; font-weight: bold; color: #E0E7FF; }
+
+  /* 阶段任务列表 */
+  .phase-list {
+    margin: 18px 0;
+  }
+  .phase {
+    background: rgba(0,0,0,0.25);
+    border-left: 5px solid;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+  }
+  .phase.p1 { border-color: #FFD54F; }
+  .phase.p2 { border-color: #4FC3F7; }
+  .phase.p3 { border-color: #FC00FF; }
+  .phase.p4 { border-color: #66BB6A; }
+  .phase.p5 { border-color: #FF6B9D; }
+  .phase-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 1.05em;
+  }
+  .phase.p1 .phase-title { color: #FFD54F; }
+  .phase.p2 .phase-title { color: #4FC3F7; }
+  .phase.p3 .phase-title { color: #FC00FF; }
+  .phase.p4 .phase-title { color: #66BB6A; }
+  .phase.p5 .phase-title { color: #FF6B9D; }
+  .phase-tasks { color: #B0BEC5; font-size: 0.92em; }
+  .phase-tasks code {
+    background: rgba(0,219,222,0.15);
+    color: #00DBDE;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    margin-right: 5px;
+  }
+
+  /* 团队分工 */
+  .team {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+  }
+  .role {
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .role-icon { font-size: 2em; margin-bottom: 5px; }
+  .role-name { color: #00DBDE; font-weight: bold; margin-bottom: 5px; }
+  .role-load { font-size: 0.85em; color: #B0BEC5; }
+
+  /* 验收主链 */
+  .acceptance {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(252,0,255,0.05));
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 15px 0;
+  }
+  .acceptance h3 {
+    color: #FFD700;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .acceptance-flow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+  .accept-step {
+    background: rgba(0,0,0,0.4);
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 0.95em;
+    border: 1px solid rgba(255,215,0,0.3);
+  }
+  .accept-arrow {
+    color: #FFD700;
+    font-size: 1.4em;
+  }
+
+  /* 时间轴 (Gantt 风格) */
+  .gantt {
+    background: rgba(0,0,0,0.3);
+    border-radius: 14px;
+    padding: 25px;
+    margin: 25px 0;
+    overflow-x: auto;
+  }
+  .gantt-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 10px;
+    margin: 8px 0;
+    align-items: center;
+  }
+  .gantt-label {
+    color: #B0BEC5;
+    font-size: 0.9em;
+    text-align: right;
+    padding-right: 10px;
+  }
+  .gantt-bar {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    height: 35px;
+    position: relative;
+  }
+  .gantt-fill {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85em;
+    padding: 0 10px;
+  }
+  .gantt-fill.s0 {
+    background: linear-gradient(90deg, #FFD700, #FFA000);
+    color: #1A1A2E;
+  }
+  .gantt-fill.s1 { background: linear-gradient(90deg, #00DBDE, #006064); }
+  .gantt-fill.s2 { background: linear-gradient(90deg, #FC00FF, #6A1B9A); }
+  .gantt-fill.s3 { background: linear-gradient(90deg, #66BB6A, #1B5E20); }
+  .gantt-axis {
+    display: grid;
+    grid-template-columns: 100px repeat(6, 1fr);
+    gap: 0;
+    margin-bottom: 15px;
+    color: #90A4AE;
+    font-size: 0.85em;
+    text-align: center;
+  }
+  .gantt-axis .label { text-align: right; padding-right: 10px; }
+  .gantt-axis .month {
+    border-left: 1px dashed rgba(255,255,255,0.1);
+    padding: 5px 0;
+  }
+
+  /* 里程碑 */
+  .milestones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .milestone {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 20px;
+    border-top: 4px solid;
+    text-align: center;
+  }
+  .milestone.m1 { border-color: #FFD700; }
+  .milestone.m2 { border-color: #00DBDE; }
+  .milestone.m3 { border-color: #FC00FF; }
+  .milestone.m4 { border-color: #66BB6A; }
+  .milestone.m5 { border-color: #FF6B9D; }
+  .ms-flag { font-size: 2em; }
+  .ms-name {
+    font-weight: bold;
+    margin: 6px 0;
+    font-size: 1.05em;
+  }
+  .milestone.m1 .ms-name { color: #FFD700; }
+  .milestone.m2 .ms-name { color: #00DBDE; }
+  .milestone.m3 .ms-name { color: #FC00FF; }
+  .milestone.m4 .ms-name { color: #66BB6A; }
+  .milestone.m5 .ms-name { color: #FF6B9D; }
+  .ms-date { font-size: 0.85em; color: #90A4AE; margin-bottom: 6px; }
+  .ms-goal { font-size: 0.9em; color: #B0BEC5; }
+
+  /* 关键决策矩阵 */
+  .decision-matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 15px 0;
+  }
+  .decision-matrix th {
+    background: linear-gradient(135deg, #6A1B9A 0%, #4A148C 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+  .decision-matrix td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #CFD8DC;
+    font-size: 0.9em;
+  }
+  .decision-matrix tr:hover td { background: rgba(255,255,255,0.04); }
+  .ok { color: #66BB6A; font-weight: bold; }
+  .pending { color: #FFD54F; font-weight: bold; }
+  .blocked { color: #EF5350; font-weight: bold; }
+
+  /* 风险登记 */
+  .risks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+  }
+  .risk {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 5px solid;
+  }
+  .risk.high { border-color: #EF5350; background: rgba(239,83,80,0.08); }
+  .risk.mid { border-color: #FFB300; background: rgba(255,179,0,0.08); }
+  .risk.low { border-color: #66BB6A; background: rgba(102,187,106,0.08); }
+  .risk-level {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: white;
+  }
+  .risk.high .risk-level { background: #EF5350; }
+  .risk.mid .risk-level { background: #FFB300; color: #1A1A2E; }
+  .risk.low .risk-level { background: #66BB6A; }
+  .risk-name { color: #E0E7FF; font-weight: bold; margin-bottom: 6px; }
+  .risk-mitigate { color: #90A4AE; font-size: 0.88em; }
+  .risk-mitigate strong { color: #00DBDE; }
+
+  /* 当前位置 */
+  .current-position {
+    background: linear-gradient(135deg, #FFD700 0%, #FF6B9D 100%);
+    color: #1A1A2E;
+    border-radius: 18px;
+    padding: 25px;
+    margin: 25px 0;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(255,107,157,0.3);
+  }
+  .current-position h3 {
+    font-size: 1.4em;
+    margin-bottom: 12px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+  }
+  .position-meter {
+    background: rgba(255,255,255,0.4);
+    border-radius: 20px;
+    height: 40px;
+    margin: 15px auto;
+    max-width: 700px;
+    position: relative;
+    overflow: hidden;
+  }
+  .position-fill {
+    background: linear-gradient(90deg, #66BB6A, #00C9A7);
+    height: 100%;
+    width: 6%;  /* Sprint 0 24% × 25% = 6% 全程 */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    color: white;
+    font-weight: bold;
+    transition: width 1.5s;
+  }
+  .pos-stamps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    max-width: 700px;
+    margin: 5px auto;
+  }
+  .pos-stamp {
+    text-align: center;
+    font-size: 0.85em;
+    color: rgba(26,26,46,0.7);
+  }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #00DBDE 0%, #FC00FF 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin: 35px 0 20px;
+    box-shadow: 0 15px 40px rgba(252,0,255,0.3);
+  }
+  .cta-box h2 { font-size: 1.6em; margin-bottom: 15px; }
+  .cta-tips {
+    background: rgba(255,255,255,0.2);
+    padding: 14px;
+    border-radius: 12px;
+    max-width: 700px;
+    margin: 15px auto;
+    backdrop-filter: blur(5px);
+  }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #607D8B;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 高亮 */
+  .hl-y { color: #FFD700; font-weight: bold; }
+  .hl-c { color: #00DBDE; font-weight: bold; }
+  .hl-g { color: #66BB6A; font-weight: bold; }
+  .hl-p { color: #FC00FF; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🗺️ 整个项目执行规划</h1>
+    <p class="sub">从 2026-06 开工 · 到 2026-12 正式上线 · 半年路线图</p>
+    <div class="badges">
+      <span class="badge">📅 4 个 Sprint</span>
+      <span class="badge">⏱️ 28-36 人月</span>
+      <span class="badge">👥 5 人核心团队</span>
+      <span class="badge">🎯 5 个里程碑</span>
+    </div>
+  </div>
+
+  <!-- 4 Sprint 总览 -->
+  <div class="roadmap">
+    <h2 class="roadmap-title">🎯 4 个 Sprint 一图看懂</h2>
+    <div class="roadmap-flow">
+      <div class="roadmap-stage s0">
+        <div class="stage-num s0">Sprint 0</div>
+        <div class="stage-name">跑通主链</div>
+        <div class="stage-time">2026-06 · 4-6 周</div>
+        <div class="stage-goal">登录→写字→AI 续写</div>
+      </div>
+      <div class="roadmap-stage s1">
+        <div class="stage-num s1">Sprint 1</div>
+        <div class="stage-name">17 模块完整</div>
+        <div class="stage-time">2026-07~08 · 8 周</div>
+        <div class="stage-goal">17 乐高全部能用</div>
+      </div>
+      <div class="roadmap-stage s2">
+        <div class="stage-num s2">Sprint 2</div>
+        <div class="stage-name">高级功能</div>
+        <div class="stage-time">2026-09~10 · 6 周</div>
+        <div class="stage-goal">从能用到好用</div>
+      </div>
+      <div class="roadmap-stage s3">
+        <div class="stage-num s3">Sprint 3+</div>
+        <div class="stage-name">生产上线</div>
+        <div class="stage-time">2026-11~12 · 持续</div>
+        <div class="stage-goal">真正卖给用户</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 时间轴 -->
+  <div class="roadmap">
+    <h2 class="roadmap-title">📅 时间轴 · Gantt 视图</h2>
+    <div class="gantt">
+      <div class="gantt-axis">
+        <div class="label">月份</div>
+        <div class="month">6月</div>
+        <div class="month">7月</div>
+        <div class="month">8月</div>
+        <div class="month">9月</div>
+        <div class="month">10月</div>
+        <div class="month">11-12月</div>
+      </div>
+
+      <div class="gantt-row">
+        <div class="gantt-label">Sprint 0</div>
+        <div class="gantt-bar">
+          <div class="gantt-fill s0" style="left:0; width:18%;">跑通主链 (4-6 周)</div>
+        </div>
+      </div>
+
+      <div class="gantt-row">
+        <div class="gantt-label">Sprint 1</div>
+        <div class="gantt-bar">
+          <div class="gantt-fill s1" style="left:18%; width:33%;">17 模块完整 (8 周)</div>
+        </div>
+      </div>
+
+      <div class="gantt-row">
+        <div class="gantt-label">Sprint 2</div>
+        <div class="gantt-bar">
+          <div class="gantt-fill s2" style="left:51%; width:25%;">高级功能 (6 周)</div>
+        </div>
+      </div>
+
+      <div class="gantt-row">
+        <div class="gantt-label">Sprint 3+</div>
+        <div class="gantt-bar">
+          <div class="gantt-fill s3" style="left:76%; width:24%;">生产上线 (持续)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 当前位置 -->
+  <div class="current-position">
+    <h3>📍 当前位置 · Sprint 0 第 1 周 (主控阶段)</h3>
+    <div class="position-meter">
+      <div class="position-fill">6%</div>
+    </div>
+    <div class="pos-stamps">
+      <div class="pos-stamp">📍 Sprint 0 (现在)</div>
+      <div class="pos-stamp">Sprint 1</div>
+      <div class="pos-stamp">Sprint 2</div>
+      <div class="pos-stamp">Sprint 3+</div>
+    </div>
+    <p style="margin-top:10px;">主控自身已完成 24%(9/37 任务), 下一步等子 agent 启动</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== Sprint 0 详细 ===== -->
+  <!-- ============================================ -->
+  <div class="sprint-card s0">
+    <span class="sprint-badge s0">🏁 Sprint 0</span>
+    <h2>跑通主链 · 现在 · 4-6 周</h2>
+
+    <div class="sprint-meta">
+      <div class="meta-item">
+        <div class="meta-label">目标</div>
+        <div class="meta-value">登录→编辑→AI</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">任务数</div>
+        <div class="meta-value">37 个</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">人月</div>
+        <div class="meta-value">6-8</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">进度</div>
+        <div class="meta-value">9/37 (24%)</div>
+      </div>
+    </div>
+
+    <h3 style="color:#FFD700; margin:18px 0 12px;">📋 5 阶段执行流程</h3>
+    <div class="phase-list">
+      <div class="phase p1">
+        <div class="phase-title">阶段 1 · 主控画图纸 (已完成 82%)</div>
+        <div class="phase-tasks">
+          <code>S0-01</code><code>S0-02</code><code>S0-05</code><code>S0-07</code><code>S0-08</code><code>S0-11</code><code>S0-12</code><code>S0-13</code> 已 ✅<br>
+          <code>S0-09</code><code>S0-10</code><code>S0-14</code> 待写
+        </div>
+      </div>
+      <div class="phase p2">
+        <div class="phase-title">阶段 2 · 搭建工地 (0%)</div>
+        <div class="phase-tasks">
+          <code>S0-04</code> init.sh · <code>S0-15</code> docker-compose<br>
+          ⚡ 关键: 一行 ./init.sh dev 启动全栈
+        </div>
+      </div>
+      <div class="phase p3">
+        <div class="phase-title">阶段 3 · 后端打地基 (0%)</div>
+        <div class="phase-tasks">
+          <code>S0-16</code> NestJS · <code>S0-17</code> Prisma · <code>S0-18</code> auth · <code>S0-19</code> project · <code>S0-20</code> chapter · <code>S0-21</code> outline
+        </div>
+      </div>
+      <div class="phase p4">
+        <div class="phase-title">阶段 4 · 前端+AI 并行 (0%)</div>
+        <div class="phase-tasks">
+          前端: <code>S0-22~28</code> 7 个 (Vue3 骨架/登录/列表/三栏/TipTap/大纲树/AI 面板)<br>
+          AI: <code>S0-29</code> SSE · <code>S0-30</code> 接 DeepSeek
+        </div>
+      </div>
+      <div class="phase p5">
+        <div class="phase-title">阶段 5 · 验收 (0%)</div>
+        <div class="phase-tasks">
+          <code>S0-31</code> E2E · <code>S0-32</code> 集成 · <code>S0-33</code> 监控 · <code>S0-37</code> CI
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:#FFD700; margin:18px 0 12px;">👥 团队配置</h3>
+    <div class="team">
+      <div class="role"><div class="role-icon">🎩</div><div class="role-name">主控</div><div class="role-load">1 人 全程</div></div>
+      <div class="role"><div class="role-icon">⚙️</div><div class="role-name">后端</div><div class="role-load">1 人 4 周</div></div>
+      <div class="role"><div class="role-icon">🎨</div><div class="role-name">前端</div><div class="role-load">2 人 3 周</div></div>
+      <div class="role"><div class="role-icon">🧙</div><div class="role-name">AI 工程师</div><div class="role-load">1 人 2 周</div></div>
+      <div class="role"><div class="role-icon">🔧</div><div class="role-name">运维</div><div class="role-load">1 人 1 周</div></div>
+    </div>
+
+    <div class="acceptance">
+      <h3>✅ Sprint 0 验收主链(7 步跑通)</h3>
+      <div class="acceptance-flow">
+        <div class="accept-step">注册</div>
+        <div class="accept-arrow">→</div>
+        <div class="accept-step">登录</div>
+        <div class="accept-arrow">→</div>
+        <div class="accept-step">创建项目</div>
+        <div class="accept-arrow">→</div>
+        <div class="accept-step">写 100 字</div>
+        <div class="accept-arrow">→</div>
+        <div class="accept-step">AI 续写</div>
+        <div class="accept-arrow">→</div>
+        <div class="accept-step">SSE 流式</div>
+        <div class="accept-arrow">→</div>
+        <div class="accept-step">采纳保存</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== Sprint 1 详细 ===== -->
+  <!-- ============================================ -->
+  <div class="sprint-card s1">
+    <span class="sprint-badge s1">🧱 Sprint 1</span>
+    <h2>17 模块完整 · 2026-07~08 · 8 周</h2>
+
+    <div class="sprint-meta">
+      <div class="meta-item">
+        <div class="meta-label">目标</div>
+        <div class="meta-value">17 乐高全可用</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">任务数</div>
+        <div class="meta-value">~80 个</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">人月</div>
+        <div class="meta-value">12-15</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">新增团队</div>
+        <div class="meta-value">+1 图谱工程师</div>
+      </div>
+    </div>
+
+    <h3 style="color:#00DBDE; margin:18px 0 12px;">🎯 4 大核心交付物</h3>
+    <div class="phase-list">
+      <div class="phase p1">
+        <div class="phase-title">① 17 World Tab 后端 (60+ 端点)</div>
+        <div class="phase-tasks">每个模块走 CRUD + /context + /generations 统一范式</div>
+      </div>
+      <div class="phase p2">
+        <div class="phase-title">② 17 World Tab 前端组件</div>
+        <div class="phase-tasks">共用 ModuleDrawer 容器,17 个 Editor.vue</div>
+      </div>
+      <div class="phase p3">
+        <div class="phase-title">③ 3 阶段蒸馏管线 (BullMQ)</div>
+        <div class="phase-tasks">Generator → Extractor → Checker · 章节完成自动触发</div>
+      </div>
+      <div class="phase p4">
+        <div class="phase-title">④ 知识图谱启动 + 第 2-5 个 AI 厂商</div>
+        <div class="phase-tasks">伏笔追踪 + 一致性校验 · Claude/GPT/智谱接入</div>
+      </div>
+    </div>
+
+    <div class="acceptance">
+      <h3 style="color:#00DBDE;">✅ Sprint 1 验收</h3>
+      <p style="text-align:center; color:#B0BEC5;">
+        用户能创建一个项目,把 17 模块都填上(角色/世界观/伏笔/...),AI 能基于这些写出一致的章节
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== Sprint 2 详细 ===== -->
+  <!-- ============================================ -->
+  <div class="sprint-card s2">
+    <span class="sprint-badge s2">✨ Sprint 2</span>
+    <h2>高级功能 · 2026-09~10 · 6 周</h2>
+
+    <div class="sprint-meta">
+      <div class="meta-item">
+        <div class="meta-label">目标</div>
+        <div class="meta-value">从能用到好用</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">任务数</div>
+        <div class="meta-value">~50 个</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">人月</div>
+        <div class="meta-value">8-10</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">新增团队</div>
+        <div class="meta-value">+1 运维</div>
+      </div>
+    </div>
+
+    <h3 style="color:#FC00FF; margin:18px 0 12px;">🎯 6 大重点</h3>
+    <div class="phase-list">
+      <div class="phase p1">
+        <div class="phase-title">① 11 步探讨式创建向导</div>
+        <div class="phase-tasks">引导用户一步步建项目,AI 全程辅助</div>
+      </div>
+      <div class="phase p2">
+        <div class="phase-title">② 5 层一致性校验全开</div>
+        <div class="phase-tasks">L1-L5 全跑 · Cron 任务定期扫</div>
+      </div>
+      <div class="phase p3">
+        <div class="phase-title">③ 规则广场 + 文笔广场 (社区)</div>
+        <div class="phase-tasks">用户分享规则 · 点赞收藏</div>
+      </div>
+      <div class="phase p4">
+        <div class="phase-title">④ 三重冗余字段废弃迁移</div>
+        <div class="phase-tasks">内容/正文/content 三选一</div>
+      </div>
+      <div class="phase p5">
+        <div class="phase-title">⑤ 接满 12 个 AI 厂商</div>
+        <div class="phase-tasks">通义/文心/Kimi/豆包/讯飞/混元/本地 全接入</div>
+      </div>
+      <div class="phase p1">
+        <div class="phase-title">⑥ 团队版 (多人协作)</div>
+        <div class="phase-tasks">同一项目多人编辑 · 权限分级</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== Sprint 3+ 详细 ===== -->
+  <!-- ============================================ -->
+  <div class="sprint-card s3">
+    <span class="sprint-badge s3">🚀 Sprint 3+</span>
+    <h2>生产上线 · 2026-11 起 · 持续</h2>
+
+    <div class="sprint-meta">
+      <div class="meta-item">
+        <div class="meta-label">目标</div>
+        <div class="meta-value">真正卖给用户</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">模式</div>
+        <div class="meta-value">持续迭代</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">人员</div>
+        <div class="meta-value">5 人核心</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">收入</div>
+        <div class="meta-value">Free + Pro</div>
+      </div>
+    </div>
+
+    <h3 style="color:#66BB6A; margin:18px 0 12px;">🎯 5 大上线动作</h3>
+    <div class="phase-list">
+      <div class="phase p1">
+        <div class="phase-title">① Docker Compose → K8s 迁移</div>
+        <div class="phase-tasks">infra/k8s/ manifests · Helm chart</div>
+      </div>
+      <div class="phase p2">
+        <div class="phase-title">② 监控告警全开</div>
+        <div class="phase-tasks">Prometheus + Grafana + Alertmanager · AI 失败率 > 5% 告警</div>
+      </div>
+      <div class="phase p3">
+        <div class="phase-title">③ 支付集成</div>
+        <div class="phase-tasks">Stripe/微信/支付宝 · Free→Pro 升级流程</div>
+      </div>
+      <div class="phase p4">
+        <div class="phase-title">④ 移动端 (P3)</div>
+        <div class="phase-tasks">浮动 AI 按钮 + 底部抽屉 · 响应式重构</div>
+      </div>
+      <div class="phase p5">
+        <div class="phase-title">⑤ 海外版本 (i18n)</div>
+        <div class="phase-tasks">英文/日文 · 适配海外 AI 厂商</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== 5 个里程碑 ===== -->
+  <!-- ============================================ -->
+  <div class="roadmap">
+    <h2 class="roadmap-title">🏁 5 个关键里程碑</h2>
+    <div class="milestones">
+      <div class="milestone m1">
+        <div class="ms-flag">🚩</div>
+        <div class="ms-name">M1 · 主链跑通</div>
+        <div class="ms-date">2026-07 末</div>
+        <div class="ms-goal">登录→写字→AI 全部跑通,可演示</div>
+      </div>
+      <div class="milestone m2">
+        <div class="ms-flag">🏗️</div>
+        <div class="ms-name">M2 · 17 模块齐备</div>
+        <div class="ms-date">2026-08 末</div>
+        <div class="ms-goal">17 块乐高全部能用,可写完整小说</div>
+      </div>
+      <div class="milestone m3">
+        <div class="ms-flag">✨</div>
+        <div class="ms-name">M3 · Beta 测试</div>
+        <div class="ms-date">2026-10 中</div>
+        <div class="ms-goal">邀请 100 个种子用户内测</div>
+      </div>
+      <div class="milestone m4">
+        <div class="ms-flag">🎉</div>
+        <div class="ms-name">M4 · 公开上线 v1.0</div>
+        <div class="ms-date">2026-11 末</div>
+        <div class="ms-goal">面向公众开放注册</div>
+      </div>
+      <div class="milestone m5">
+        <div class="ms-flag">💰</div>
+        <div class="ms-name">M5 · 商业化</div>
+        <div class="ms-date">2026-12 末</div>
+        <div class="ms-goal">Pro 付费开通,1000+ 付费用户</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== 关键决策矩阵 ===== -->
+  <!-- ============================================ -->
+  <div class="roadmap">
+    <h2 class="roadmap-title">⚖️ 关键决策矩阵(待办状态)</h2>
+    <table class="decision-matrix">
+      <thead>
+        <tr><th>决策</th><th>状态</th><th>负责</th><th>下一步</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ADR 0001-0016 (16 个基础架构)</td>
+          <td><span class="ok">✅ 已定</span></td>
+          <td>主控</td>
+          <td>已落地</td>
+        </tr>
+        <tr>
+          <td>ADR 0017 子 agent 便当法</td>
+          <td><span class="pending">🟡 PROPOSED</span></td>
+          <td>用户拍板</td>
+          <td>已给推荐答案,待最终确认</td>
+        </tr>
+        <tr>
+          <td>ADR 0018 git 协作规则</td>
+          <td><span class="pending">🟡 PROPOSED</span></td>
+          <td>用户拍板</td>
+          <td>已给推荐答案,待最终确认</td>
+        </tr>
+        <tr>
+          <td>S0-09/10/14 缺的契约 (chapter/outline/routing)</td>
+          <td><span class="blocked">🔴 未开始</span></td>
+          <td>主控</td>
+          <td>定稿 ADR 后立即写</td>
+        </tr>
+        <tr>
+          <td>第一个试点子 agent (infra/backend?)</td>
+          <td><span class="pending">🟡 待挑</span></td>
+          <td>用户拍板</td>
+          <td>建议先 infra-agent S0-15</td>
+        </tr>
+        <tr>
+          <td>团队成员到位 (招聘 4-5 人)</td>
+          <td><span class="blocked">🔴 未启动</span></td>
+          <td>用户/HR</td>
+          <td>Sprint 0 末必须到位</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== 风险登记 ===== -->
+  <!-- ============================================ -->
+  <div class="roadmap">
+    <h2 class="roadmap-title">⚠️ 主要风险与缓解</h2>
+    <div class="risks">
+      <div class="risk high">
+        <span class="risk-level">高</span>
+        <div class="risk-name">17 模块工时超 36 人月</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> Sprint 0/1 只做 P0/P1, P2/P3 后置
+        </div>
+      </div>
+      <div class="risk high">
+        <span class="risk-level">高</span>
+        <div class="risk-name">LLM 一致性无完美解</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> 5 层校验 + 人工审阅兜底
+        </div>
+      </div>
+      <div class="risk high">
+        <span class="risk-level">高</span>
+        <div class="risk-name">阅文等大厂竞争</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> 瞄准独立作者 + 海外
+        </div>
+      </div>
+      <div class="risk mid">
+        <span class="risk-level">中</span>
+        <div class="risk-name">AI 成本失控</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> 配额 + 模型路由 + BYOK
+        </div>
+      </div>
+      <div class="risk mid">
+        <span class="risk-level">中</span>
+        <div class="risk-name">蒸馏队列积压</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> BullMQ 监控 + 自动扩容
+        </div>
+      </div>
+      <div class="risk mid">
+        <span class="risk-level">中</span>
+        <div class="risk-name">12 厂商 API 变更</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> 抽象 + 监控 + 快速切换
+        </div>
+      </div>
+      <div class="risk mid">
+        <span class="risk-level">中</span>
+        <div class="risk-name">角色"人格漂移" / 已死角色复活</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> 状态机 + 角色卡持续注入
+        </div>
+      </div>
+      <div class="risk low">
+        <span class="risk-level">低</span>
+        <div class="risk-name">主控决策延迟</div>
+        <div class="risk-mitigate">
+          <strong>缓解:</strong> 30 分钟响应承诺 + 待定问题清单
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ===== 主控阶段心法 (子 agent 调度) ===== -->
+  <!-- ============================================ -->
+  <div class="roadmap">
+    <h2 class="roadmap-title">🎩 主控阶段心法</h2>
+    <table class="decision-matrix">
+      <thead>
+        <tr><th>阶段</th><th>主控做啥</th><th>子 agent 做啥</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="hl-y">研究</span></td>
+          <td>读 knowlage/, 写 brief</td>
+          <td>(不参与)</td>
+        </tr>
+        <tr>
+          <td><span class="hl-c">规划</span></td>
+          <td>写 ADR + feature_list</td>
+          <td>读 brief, 出小计划</td>
+        </tr>
+        <tr>
+          <td><span class="hl-p">构建</span></td>
+          <td>看 progress, 不写代码</td>
+          <td>按 brief 写代码</td>
+        </tr>
+        <tr>
+          <td><span class="hl-g">复盘</span></td>
+          <td>跑 contract-lint, 仲裁</td>
+          <td>跑 unit test, 报告问题</td>
+        </tr>
+        <tr>
+          <td><span class="hl-y">调试</span></td>
+          <td>解跨子项目冲突</td>
+          <td>修 bug, 回流问题给主控</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>🎤 教练问你下一步</h2>
+    <div class="cta-tips">
+      💡 <strong>这张图就是你的"项目北极星" — 任何时候迷路,回来看一眼。</strong>
+    </div>
+    <p style="margin-top:15px;">想看哪个细节?</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+      <div style="background:rgba(255,255,255,0.2); padding:14px; border-radius:10px; text-align:left;">
+        <strong style="color:#FFD700;">A. Sprint 0 细到任务</strong><br>
+        <small>37 个任务全部 Gantt 化</small>
+      </div>
+      <div style="background:rgba(255,255,255,0.2); padding:14px; border-radius:10px; text-align:left;">
+        <strong style="color:#FFD700;">B. 17 模块拆解</strong><br>
+        <small>每个 World Tab 的工时估算</small>
+      </div>
+      <div style="background:rgba(255,255,255,0.2); padding:14px; border-radius:10px; text-align:left;">
+        <strong style="color:#FFD700;">C. 团队招聘计划</strong><br>
+        <small>5 人怎么招 / 谁先到位</small>
+      </div>
+      <div style="background:rgba(255,255,255,0.2); padding:14px; border-radius:10px; text-align:left;">
+        <strong style="color:#FFD700;">D. 直接开干</strong><br>
+        <small>定稿 ADR 0017/0018, 派试点 agent</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🗺️ 整个项目执行规划 · 2026-06-07 · 教练版<br>
+    <em>主控 v1.0 · 关联 ADR 0001-0018 · 4 Sprint · 5 里程碑 · 8 风险</em>
+  </div>
+
+</div>
+</body>
+</html>

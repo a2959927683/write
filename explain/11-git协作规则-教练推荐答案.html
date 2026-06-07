@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Git 协作规则 · 教练推荐答案(5 题 + 3 延伸)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #0A0E27 0%, #1A1F4E 50%, #2E1A47 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #E8E8E8;
+    line-height: 1.8;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* 顶部状态 */
+  .status-bar {
+    background: linear-gradient(90deg, #00C9A7 0%, #00B4D8 100%);
+    color: white;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 25px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(0,180,216,0.4);
+  }
+  .status-bar .icon { margin-right: 8px; font-size: 1.2em; }
+
+  /* 顶部 */
+  .hero {
+    text-align: center;
+    padding: 35px 25px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-size: 2.4em;
+    background: linear-gradient(135deg, #FFD700 0%, #FF6B9D 50%, #00DBDE 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero .sub { color: #B0BEC5; font-size: 1.1em; margin: 8px 0; }
+  .hero .meta {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    background: rgba(0,201,167,0.2);
+    border: 1px solid #00C9A7;
+    color: #00C9A7;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+
+  /* 问题卡片 */
+  .q-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin: 28px 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .q-badge {
+    position: absolute;
+    top: -15px;
+    left: 25px;
+    background: linear-gradient(135deg, #FF6B9D 0%, #FFD700 100%);
+    color: #1A1F4E;
+    padding: 7px 18px;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 0.95em;
+    box-shadow: 0 6px 18px rgba(255,107,157,0.4);
+  }
+  .q-card h2 {
+    color: #00DBDE;
+    font-size: 1.55em;
+    margin: 10px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(0,219,222,0.3);
+  }
+  .q-card p { color: #CFD8DC; margin: 10px 0; }
+  .q-card strong { color: #FFD700; }
+  .q-card em { color: #00DBDE; font-style: normal; font-weight: bold; }
+
+  /* 选项对比表 */
+  .opt-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 15px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .opt-table th {
+    background: linear-gradient(135deg, #6A1B9A 0%, #4A148C 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+  .opt-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #CFD8DC;
+    font-size: 0.92em;
+  }
+  .opt-table tr:hover td { background: rgba(255,255,255,0.04); }
+  .opt-table .winner {
+    background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(255,107,157,0.1));
+    color: #FFD700 !important;
+    font-weight: bold;
+  }
+  .opt-table .winner td { color: #FFD700 !important; }
+  .crown { color: #FFD700; font-size: 1.2em; margin-right: 4px; }
+
+  /* 教练推荐盒 */
+  .coach-rec {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,107,157,0.1) 100%);
+    border: 2px solid #FFD700;
+    border-radius: 15px;
+    padding: 22px 25px;
+    margin: 18px 0;
+  }
+  .coach-title {
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 1.15em;
+    margin-bottom: 10px;
+  }
+  .coach-title::before { content: "🏆 "; margin-right: 5px; }
+  .coach-reason {
+    background: rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    border-left: 4px solid #00DBDE;
+    border-radius: 8px;
+    margin: 10px 0;
+    color: #B0BEC5;
+    font-size: 0.95em;
+  }
+  .coach-reason strong { color: #00DBDE; }
+
+  /* 代码块 */
+  pre {
+    background: #0A0E1A;
+    border: 1px solid rgba(0,219,222,0.2);
+    border-radius: 10px;
+    padding: 18px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    line-height: 1.7;
+    color: #C5E1A5;
+  }
+  pre .cmt { color: #607D8B; font-style: italic; }
+  pre .kw { color: #FF6B9D; font-weight: bold; }
+  pre .str { color: #FFD54F; }
+  pre .var { color: #4FC3F7; }
+  pre .fn { color: #FC00FF; }
+  pre .ok { color: #66BB6A; font-weight: bold; }
+  pre .bad { color: #EF5350; font-weight: bold; }
+  code.inline {
+    background: rgba(0,219,222,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #00DBDE;
+    font-size: 0.9em;
+  }
+
+  /* 分支结构图 */
+  .branch-diagram {
+    background: #0A0E1A;
+    border: 1px solid rgba(0,219,222,0.2);
+    border-radius: 12px;
+    padding: 22px;
+    font-family: monospace;
+    line-height: 2;
+    margin: 15px 0;
+    color: #B0BEC5;
+  }
+  .branch-diagram .main { color: #FFD700; font-weight: bold; font-size: 1.05em; }
+  .branch-diagram .feat { color: #00DBDE; }
+  .branch-diagram .arrow { color: #FC00FF; }
+  .branch-diagram .agent { color: #66BB6A; font-style: italic; }
+
+  /* 3 层防御 */
+  .defense {
+    margin: 15px 0;
+  }
+  .defense-layer {
+    background: rgba(255,255,255,0.05);
+    border-left: 6px solid;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 12px 0;
+  }
+  .defense-layer.l1 { border-color: #66BB6A; }
+  .defense-layer.l2 { border-color: #FFB300; }
+  .defense-layer.l3 { border-color: #EF5350; }
+  .defense-title { font-weight: bold; font-size: 1.05em; margin-bottom: 8px; }
+  .defense-layer.l1 .defense-title { color: #66BB6A; }
+  .defense-layer.l2 .defense-title { color: #FFB300; }
+  .defense-layer.l3 .defense-title { color: #EF5350; }
+  .defense-list { color: #CFD8DC; font-size: 0.95em; margin-left: 18px; }
+
+  /* 两档制对比 */
+  .two-tier {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  .tier {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid;
+  }
+  .tier.green { border-color: #66BB6A; background: rgba(102,187,106,0.08); }
+  .tier.red { border-color: #EF5350; background: rgba(239,83,80,0.08); }
+  .tier-title { font-weight: bold; font-size: 1.05em; margin-bottom: 10px; }
+  .tier.green .tier-title { color: #66BB6A; }
+  .tier.red .tier-title { color: #EF5350; }
+  .tier-flow {
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.85em;
+    color: #B0BEC5;
+    margin: 8px 0;
+    line-height: 1.7;
+  }
+  .tier-list { color: #CFD8DC; font-size: 0.9em; margin-left: 18px; margin-top: 8px; }
+
+  /* commit 模板示范 */
+  .commit-sample {
+    background: #0A0E1A;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(0,219,222,0.2);
+    margin: 15px 0;
+    font-family: monospace;
+    line-height: 1.8;
+  }
+  .commit-sample .id { color: #FFD700; font-weight: bold; }
+  .commit-sample .type { color: #FC00FF; font-weight: bold; }
+  .commit-sample .scope { color: #00DBDE; }
+  .commit-sample .subject { color: #E8E8E8; }
+  .commit-sample .body { color: #B0BEC5; font-size: 0.95em; }
+  .commit-sample .meta-line { color: #66BB6A; font-size: 0.88em; }
+  .commit-sample .coauthor { color: #FFB300; font-size: 0.88em; }
+
+  /* 4 关键点 */
+  .key-points {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+  }
+  .key {
+    background: rgba(0,219,222,0.08);
+    border: 1px solid #00DBDE;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .key-num {
+    display: inline-block;
+    background: #00DBDE;
+    color: #0A0E27;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    line-height: 26px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  .key-name { color: #00DBDE; font-weight: bold; font-size: 0.95em; margin-bottom: 4px; }
+  .key-desc { color: #B0BEC5; font-size: 0.85em; }
+
+  /* 汇总表 */
+  .summary-table {
+    background: linear-gradient(135deg, rgba(252,0,255,0.1), rgba(0,219,222,0.1));
+    border: 2px solid #FC00FF;
+    border-radius: 15px;
+    padding: 5px;
+    overflow: hidden;
+  }
+  .summary-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .summary-table th {
+    background: linear-gradient(135deg, #FC00FF 0%, #00DBDE 100%);
+    color: white;
+    padding: 14px;
+    text-align: left;
+    font-size: 1em;
+  }
+  .summary-table td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #CFD8DC;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table .qid { color: #FFD700; font-weight: bold; }
+  .summary-table .ans { color: #00DBDE; font-weight: bold; }
+
+  /* 延伸 */
+  .extends {
+    background: rgba(142, 36, 170, 0.15);
+    border: 1px solid #8E24AA;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+  }
+  .extends h3 { color: #CE93D8; margin-bottom: 10px; }
+  .extends-item {
+    background: rgba(0,0,0,0.2);
+    padding: 10px 14px;
+    border-left: 4px solid #CE93D8;
+    border-radius: 6px;
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: #E8E8E8;
+  }
+  .extends-id {
+    background: #8E24AA;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-right: 8px;
+    font-size: 0.85em;
+  }
+  .extends-ans { color: #66BB6A; font-weight: bold; }
+
+  /* 落地步骤 */
+  .steps-list {
+    list-style: none;
+    counter-reset: step;
+    margin: 15px 0;
+  }
+  .steps-list li {
+    background: rgba(255,255,255,0.05);
+    border-left: 5px solid #FFD700;
+    border-radius: 8px;
+    padding: 12px 18px 12px 50px;
+    margin: 8px 0;
+    position: relative;
+    counter-increment: step;
+  }
+  .steps-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #FFD700 0%, #FF6B9D 100%);
+    color: #0A0E27;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .steps-list .time { color: #00DBDE; font-weight: bold; float: right; }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FFD700 50%, #00DBDE 100%);
+    color: #0A0E27;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin: 35px 0 20px;
+    box-shadow: 0 15px 40px rgba(252,0,255,0.3);
+  }
+  .cta-box h2 { font-size: 1.6em; margin-bottom: 15px; color: #0A0E27; }
+  .cta-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .cta-opt {
+    background: rgba(10,14,39,0.85);
+    color: white;
+    padding: 16px;
+    border-radius: 10px;
+    text-align: left;
+  }
+  .cta-opt strong { color: #FFD700; display: block; margin-bottom: 5px; font-size: 1.05em; }
+  .cta-opt small { font-size: 0.88em; color: #B0BEC5; }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #607D8B;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* 高亮 */
+  .hl-y { color: #FFD700; font-weight: bold; }
+  .hl-c { color: #00DBDE; font-weight: bold; }
+  .hl-p { color: #FC00FF; font-weight: bold; }
+  .hl-g { color: #66BB6A; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 状态条 -->
+  <div class="status-bar">
+    <span class="icon">🎯</span>
+    教练答案稿 · 5 题 + 3 延伸 · 全部给出"业界主流 + 教练推荐"
+  </div>
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <h1>🎯 Git 协作规则 · 教练推荐答案</h1>
+    <p class="sub">不再让你选 ABCD 了 · 教练直接告诉你"业界这么干"</p>
+    <div class="meta">
+      <span class="meta-tag">📅 2026-06-07</span>
+      <span class="meta-tag">🏆 5 题全推荐</span>
+      <span class="meta-tag">💎 3 延伸顺手答</span>
+      <span class="meta-tag">⏱️ 1 小时可落地</span>
+    </div>
+  </div>
+
+  <!-- ===== Q1 · 分支策略 ===== -->
+  <div class="q-card">
+    <span class="q-badge">⚙️ Q1 · 分支策略</span>
+    <h2>每个子 agent 怎么开分支?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>选项</th><th>谁在用</th><th>优</th><th>缺</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A. 一 agent 一分支(<code class="inline">backend-dev</code>)</td><td>中小团队</td><td>简单</td><td>任务多了乱</td></tr>
+        <tr><td>B. 一任务一分支(<code class="inline">feature/S0-18</code>)</td><td>大厂 GitHub Flow</td><td>清晰</td><td>分支爆炸</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>C. 主线+worktree</td><td>AI 时代新玩法</td><td>快</td><td>依赖 worktree</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:B + C 混合</div>
+
+      <div class="branch-diagram">
+<span class="main">main</span> <span class="cmt">(主控守护, 永远稳定)</span>
+  ├─ <span class="feat">feature/S0-18-auth</span>      <span class="arrow">←</span> <span class="agent">backend agent 在 worktree-1 干</span>
+  ├─ <span class="feat">feature/S0-22-vue-shell</span> <span class="arrow">←</span> <span class="agent">frontend agent 在 worktree-2 干</span>
+  └─ <span class="feat">feature/S0-15-docker</span>    <span class="arrow">←</span> <span class="agent">infra agent 在 worktree-3 干</span>
+      </div>
+
+      <div class="coach-reason">
+        <strong>为什么:</strong>
+        <p>· 一任务一分支 → 完工合一个,失败回滚一个,<span class="hl-y">互不连坐</span></p>
+        <p>· worktree 隔离 → 物理目录分开,<span class="hl-y">不会改到对方文件</span></p>
+        <p>· AI agent 适合"短命分支"(几小时完工就合)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q2 · commit 规范 ===== -->
+  <div class="q-card">
+    <span class="q-badge">📝 Q2 · commit 规范</span>
+    <h2>commit 消息写什么风格?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>选项</th><th>谁在用</th><th>评价</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A. Conventional 英文</td><td>开源项目主流</td><td>✅ 通用</td></tr>
+        <tr><td>B. Conventional 中文</td><td>国内大厂</td><td>✅ 团队中文友好</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>C. 任务 ID 前缀 + Conventional 中文</td><td>本项目最合适</td><td>🏆</td></tr>
+        <tr><td>D. 子 agent 自由</td><td>小项目</td><td>❌ 不可追溯</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:C(混合版)</div>
+
+      <p style="margin:10px 0;"><strong>commit 模板:</strong></p>
+      <div class="commit-sample">
+<span class="id">[S0-18]</span> <span class="type">feat</span><span class="scope">(auth)</span>: <span class="subject">实现登录端点 + JWT 签发</span>
+
+<span class="body">- 添加 /api/auth/login 端点
+- 实现 bcrypt 密码校验
+- 返回 7 天有效期的 JWT token
+- 单测覆盖率 90%</span>
+
+<span class="meta-line">契约: contracts/openapi/auth.yaml
+brief: master/briefs/S0-18-auth.md</span>
+
+<span class="coauthor">Co-Authored-By: backend-agent &lt;agent@orchestrator.local&gt;</span>
+      </div>
+
+      <p style="margin:15px 0 10px;"><strong>4 个关键点:</strong></p>
+      <div class="key-points">
+        <div class="key">
+          <div class="key-num">1</div>
+          <div class="key-name">任务 ID 前缀</div>
+          <div class="key-desc">[S0-18] 立即定位到主控任务</div>
+        </div>
+        <div class="key">
+          <div class="key-num">2</div>
+          <div class="key-name">Conventional type</div>
+          <div class="key-desc">feat/fix/docs… CI 可解析</div>
+        </div>
+        <div class="key">
+          <div class="key-num">3</div>
+          <div class="key-name">scope 模块</div>
+          <div class="key-desc">(auth) 一眼看出改哪</div>
+        </div>
+        <div class="key">
+          <div class="key-num">4</div>
+          <div class="key-name">Co-Authored-By</div>
+          <div class="key-desc">标记 agent,出问题定位</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q3 · 合并节奏 ===== -->
+  <div class="q-card">
+    <span class="q-badge">🔀 Q3 · 合并节奏</span>
+    <h2>子 agent 完工立即合主控?还是攒一批?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>选项</th><th>速度</th><th>风险</th><th>适用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A. 完一个合一个</td><td>快</td><td>中(频繁冲突)</td><td>小团队</td></tr>
+        <tr><td>B. Sprint 末批量合</td><td>慢</td><td>高(大爆炸)</td><td>❌ 不推荐</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>C. 长开 PR + CI 自动合</td><td>中</td><td>低</td><td>AI 时代</td></tr>
+        <tr><td>D. 主控仲裁后合</td><td>慢</td><td>极低</td><td>关键模块</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:A + C 混合 · 两档制</div>
+
+      <div class="two-tier">
+        <div class="tier green">
+          <div class="tier-title">🟢 普通任务 → C(完工自动合)</div>
+          <div class="tier-flow">
+子 agent 完工<br>
+&nbsp;&nbsp;↓ push feature/S0-18<br>
+触发 GitHub Actions<br>
+&nbsp;&nbsp;├─ contract-lint<br>
+&nbsp;&nbsp;├─ unit test<br>
+&nbsp;&nbsp;├─ build<br>
+&nbsp;&nbsp;└─ 全过 → 自动 squash merge 到 main
+          </div>
+        </div>
+
+        <div class="tier red">
+          <div class="tier-title">🔴 敏感任务 → D(主控审才合)</div>
+          <ul class="tier-list">
+            <li>改了 <code class="inline">contracts/</code> 的任务</li>
+            <li>跨模块的任务</li>
+            <li>数据库迁移任务</li>
+            <li>影响主链的任务</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="coach-reason">
+        <strong>判断标准:</strong> 看 <code class="inline">feature_list.json</code> 任务的 <code class="inline">subproject</code> 字段:
+        <p>· <span class="hl-y">contracts / master</span> → 主控审</p>
+        <p>· <span class="hl-g">backend / frontend / ai-orchestrator</span> → CI 自动合</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q4 · 冲突解决 ===== -->
+  <div class="q-card">
+    <span class="q-badge">⚔️ Q4 · 冲突解决</span>
+    <h2>两个 agent 改同一文件怎么办?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>选项</th><th>评价</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A. 主控仲裁</td><td>✅ 关键时刻必须有</td></tr>
+        <tr><td>B. 后到让先到</td><td>❌ 不公平</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>C. CLAUDE.md 强制边界</td><td>🏆 防患于未然</td></tr>
+        <tr><td>D. 三方合并工具</td><td>✅ git 自带,兜底</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:C 优先 + A 兜底 + D 自动 · 3 层防御</div>
+
+      <div class="defense">
+        <div class="defense-layer l1">
+          <div class="defense-title">第 1 层 · 边界约束(C · 99% 的情况)</div>
+          <p style="color:#CFD8DC; margin:8px 0; font-size:0.95em;">在每个子项目 CLAUDE.md 里写死规矩:</p>
+          <ul class="defense-list">
+            <li>backend-agent <strong>只能改</strong> backend/</li>
+            <li>frontend-agent <strong>只能改</strong> frontend/</li>
+            <li>谁都<strong>不能改</strong> contracts/(除非主控明确派任务)</li>
+            <li>公共文件(README/CLAUDE.md)<strong>只能主控改</strong></li>
+          </ul>
+        </div>
+
+        <div class="defense-layer l2">
+          <div class="defense-title">第 2 层 · 自动合并(D · 真冲突时)</div>
+          <p style="color:#CFD8DC; margin:8px 0; font-size:0.95em;">git rebase + 自动 merge:</p>
+          <ul class="defense-list">
+            <li>不同文件 → git 自动合 ✅</li>
+            <li>同文件不同行 → git 自动合 ✅</li>
+            <li>同文件同行 → 进第 3 层 ⚠️</li>
+          </ul>
+        </div>
+
+        <div class="defense-layer l3">
+          <div class="defense-title">第 3 层 · 主控仲裁(A · 万分之一)</div>
+          <p style="color:#CFD8DC; margin:8px 0; font-size:0.95em;">主控读两边代码,判谁对:</p>
+          <ul class="defense-list">
+            <li>在 progress.txt 记录裁决</li>
+            <li>必要时开 ADR</li>
+            <li>败方 agent 重新基于胜方代码做</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q5 · 契约保护 ===== -->
+  <div class="q-card">
+    <span class="q-badge">🔒 Q5 · 契约保护(最关键!)</span>
+    <h2>contracts/ 是禁区,要不要 hook 阻止?</h2>
+
+    <table class="opt-table">
+      <thead>
+        <tr><th>选项</th><th>评价</th></tr>
+      </thead>
+      <tbody>
+        <tr class="winner"><td><span class="crown">👑</span>A. pre-commit hook</td><td>🏆 必做</td></tr>
+        <tr class="winner"><td><span class="crown">👑</span>B. CI 检测</td><td>🏆 必做(双保险)</td></tr>
+        <tr><td>C. 仅靠 CLAUDE.md</td><td>❌ AI 偶尔会忘</td></tr>
+        <tr><td>D. 文件权限</td><td>❌ Windows 不友好</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coach-rec">
+      <div class="coach-title">教练推荐:A + B 双保险</div>
+
+      <p style="margin:12px 0 8px;"><strong>🛡️ 第 1 道防线 · pre-commit hook(本地拦截)</strong></p>
+<pre><span class="cmt"># .git/hooks/pre-commit</span>
+#!/bin/bash
+
+<span class="cmt"># 检查是否改了 contracts/</span>
+CHANGED=$(<span class="fn">git diff</span> --cached --name-only | <span class="fn">grep</span> <span class="str">"^contracts/"</span>)
+
+<span class="kw">if</span> [ -n <span class="str">"$CHANGED"</span> ]; <span class="kw">then</span>
+  <span class="cmt"># 检查是不是主控 agent 在 commit</span>
+  <span class="kw">if</span> [ <span class="str">"$AGENT_TYPE"</span> != <span class="str">"orchestrator"</span> ]; <span class="kw">then</span>
+    <span class="fn">echo</span> <span class="bad">"❌ 拒绝 commit: 子 agent 不能改 contracts/"</span>
+    <span class="fn">echo</span> <span class="str">"改动的文件:"</span>
+    <span class="fn">echo</span> <span class="str">"$CHANGED"</span>
+    <span class="fn">echo</span> <span class="str">""</span>
+    <span class="fn">echo</span> <span class="str">"如需修改契约, 请联系主控发起 ADR。"</span>
+    <span class="kw">exit</span> 1
+  <span class="kw">fi</span>
+<span class="kw">fi</span>
+
+<span class="cmt"># 跑契约 lint</span>
+<span class="fn">python</span> scripts/contract-lint.py || <span class="kw">exit</span> 1</pre>
+
+      <p style="margin:15px 0 8px;"><strong>🛡️ 第 2 道防线 · GitHub Actions CI(远程兜底)</strong></p>
+<pre><span class="cmt"># .github/workflows/protect-contracts.yml</span>
+<span class="var">name</span>: <span class="str">Protect Contracts</span>
+<span class="var">on</span>: [pull_request]
+<span class="var">jobs</span>:
+  <span class="var">check</span>:
+    <span class="var">runs-on</span>: <span class="str">ubuntu-latest</span>
+    <span class="var">steps</span>:
+      - <span class="var">uses</span>: <span class="str">actions/checkout@v4</span>
+      - <span class="var">name</span>: <span class="str">检查 contracts/ 改动</span>
+        <span class="var">run</span>: |
+          <span class="kw">if</span> <span class="fn">git diff</span> --name-only origin/main | <span class="fn">grep</span> <span class="str">"^contracts/"</span>; <span class="kw">then</span>
+            <span class="kw">if</span> [[ <span class="str">"${{ github.actor }}"</span> != <span class="str">"orchestrator-bot"</span> ]]; <span class="kw">then</span>
+              <span class="fn">echo</span> <span class="bad">"❌ 只有主控可以改 contracts/"</span>
+              <span class="kw">exit</span> 1
+            <span class="kw">fi</span>
+          <span class="kw">fi</span>
+      - <span class="var">name</span>: <span class="str">跑 contract-lint</span>
+        <span class="var">run</span>: <span class="fn">python</span> scripts/contract-lint.py</pre>
+    </div>
+  </div>
+
+  <!-- ===== 教练答案汇总表 ===== -->
+  <div class="q-card">
+    <span class="q-badge">📊 答案汇总</span>
+    <h2>教练 5 题答案一表速查</h2>
+
+    <div class="summary-table">
+      <table>
+        <thead>
+          <tr><th>问题</th><th>教练推荐</th><th>一句话总结</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="qid">Q1 分支</span></td>
+            <td class="ans">B+C 混合</td>
+            <td><code class="inline">feature/S0-18-auth</code> + worktree</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q2 commit</span></td>
+            <td class="ans">C 混合版</td>
+            <td><code class="inline">[S0-18] feat(auth): 实现登录</code></td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q3 合并</span></td>
+            <td class="ans">A+D 两档制</td>
+            <td>普通自动合,敏感主控审</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q4 冲突</span></td>
+            <td class="ans">C+A+D 三层防御</td>
+            <td>99% 不冲突,1% 主控仲裁</td>
+          </tr>
+          <tr>
+            <td><span class="qid">Q5 契约保护</span></td>
+            <td class="ans">A+B 双保险</td>
+            <td>pre-commit hook + CI 检测</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== 延伸 3 题 ===== -->
+  <div class="q-card">
+    <span class="q-badge">💎 延伸 3 题</span>
+    <h2>顺手答完(E1 / E2 / E3)</h2>
+
+    <div class="extends">
+      <h3>🤔 教练顺手答</h3>
+      <div class="extends-item">
+        <span class="extends-id">E1</span>
+        <strong>push 远程?</strong> → <span class="extends-ans">✅ 必须 push</span>(否则 CI 跑不了)
+      </div>
+      <div class="extends-item">
+        <span class="extends-id">E2</span>
+        <strong>tag 规则?</strong> →
+        <span class="extends-ans">Sprint 0 = v0.1.0</span> /
+        <span class="extends-ans">Sprint 1 = v0.2.0</span> /
+        <span class="extends-ans">正式上线 = v1.0.0</span>
+      </div>
+      <div class="extends-item">
+        <span class="extends-id">E3</span>
+        <strong>reflog 兜底?</strong> → <span class="extends-ans">✅ 必须,保留 90 天,误删可恢复</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 落地清单 ===== -->
+  <div class="q-card">
+    <span class="q-badge">🚀 落地清单</span>
+    <h2>定稿后 1 小时搞定 ⏱️</h2>
+
+    <ol class="steps-list">
+      <li>写 <code class="inline">.git/hooks/pre-commit</code> <span class="time">10 分钟</span></li>
+      <li>写 <code class="inline">.github/workflows/protect-contracts.yml</code> <span class="time">15 分钟</span></li>
+      <li>写 <code class="inline">scripts/contract-lint.py</code> <span class="time">20 分钟</span></li>
+      <li>更新主控 <code class="inline">CLAUDE.md</code> 加 git 规则段 <span class="time">10 分钟</span></li>
+      <li>更新每个子项目 <code class="inline">CLAUDE.md</code> 边界段 <span class="time">25 分钟</span></li>
+    </ol>
+
+    <p style="margin-top:15px; color:#00DBDE; text-align:center; font-size:1.1em;">
+      <strong>合计:80 分钟 → 全套 git 规则上线 🎉</strong>
+    </p>
+  </div>
+
+  <!-- ===== CTA ===== -->
+  <div class="cta-box">
+    <h2>🎤 教练问你拍不拍板?</h2>
+    <p>3 种走法,挑一种:</p>
+    <div class="cta-opts">
+      <div class="cta-opt">
+        <strong>A. 全盘接受</strong>
+        <small>立刻写进 ADR 0018,转 ACCEPTED 落地</small>
+      </div>
+      <div class="cta-opt">
+        <strong>B. 部分修改</strong>
+        <small>告诉我哪几题想改,重新出方案</small>
+      </div>
+      <div class="cta-opt">
+        <strong>C. 继续讨论</strong>
+        <small>展开讲某一题(说哪题,教练细聊)</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🎯 Git 协作规则 · 教练答案稿 · 2026-06-07<br>
+    <em>关联 ADR 0018 · 等用户拍板后转 ACCEPTED</em>
+  </div>
+
+</div>
+</body>
+</html>

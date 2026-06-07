@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌈 一个故事讲清"主控项目" · 8 岁小孩也能听懂</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: linear-gradient(135deg, #FFE5F1 0%, #FFF4D6 25%, #D4F1F4 50%, #E5DEFF 75%, #FFE4C4 100%);
+    background-attachment: fixed;
+    color: #333;
+    line-height: 2;
+    padding: 30px 15px 60px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  /* 顶部大标题 */
+  .hero {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 30px 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  }
+  .hero h1 {
+    font-size: 2.8em;
+    color: #FF6B9D;
+    text-shadow: 3px 3px 0 #FFE066, 5px 5px 0 rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+  }
+  .hero .sub {
+    font-size: 1.3em;
+    color: #6B5B95;
+    margin: 10px 0;
+  }
+  .hero .tags {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .tag {
+    background: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(255,154,158,0.4);
+  }
+
+  /* 章节卡片 */
+  .chapter {
+    background: rgba(255,255,255,0.92);
+    border-radius: 25px;
+    padding: 30px 35px;
+    margin: 35px 0;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .chapter::before {
+    content: "";
+    position: absolute;
+    top: -15px;
+    left: 30px;
+    background: linear-gradient(135deg, #FFD93D 0%, #FF6B9D 100%);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.85em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .ch1::before  { content: "📖 故事 1"; }
+  .ch2::before  { content: "🏰 故事 2"; }
+  .ch3::before  { content: "👷 故事 3"; }
+  .ch4::before  { content: "🧱 故事 4"; }
+  .ch5::before  { content: "🧙 故事 5"; }
+  .ch6::before  { content: "🍳 故事 6"; }
+  .ch7::before  { content: "👨‍🏫 故事 7"; }
+  .ch8::before  { content: "📜 故事 8"; }
+  .ch9::before  { content: "📋 故事 9"; }
+  .ch10::before { content: "🎯 故事 10"; }
+  .ch11::before { content: "🎁 故事 11"; }
+
+  .chapter h2 {
+    color: #4A148C;
+    font-size: 1.7em;
+    margin: 15px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 3px dashed #FFD93D;
+  }
+  .chapter p { font-size: 1.08em; margin: 12px 0; color: #444; }
+  .chapter strong { color: #BF360C; }
+  .chapter em { color: #5E35B1; font-style: normal; font-weight: bold; }
+
+  /* 旁白盒子 */
+  .scene {
+    background: #FFF9E6;
+    border-left: 6px solid #FFA500;
+    padding: 18px 22px;
+    margin: 18px 0;
+    border-radius: 12px;
+    font-size: 1.05em;
+  }
+  .scene-title {
+    font-weight: bold;
+    color: #E65100;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 1.1em;
+  }
+
+  /* 对比盒子: 错 vs 对 */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 18px 0;
+  }
+  .compare > div { padding: 15px 20px; border-radius: 12px; }
+  .compare .bad {
+    background: #FFEBEE;
+    border: 2px solid #E53935;
+  }
+  .compare .good {
+    background: #E8F5E9;
+    border: 2px solid #43A047;
+  }
+  .compare .bad::before { content: "❌ 错误示范"; font-weight: bold; color: #C62828; display: block; margin-bottom: 6px; }
+  .compare .good::before { content: "✅ 正确做法"; font-weight: bold; color: #2E7D32; display: block; margin-bottom: 6px; }
+
+  /* 角色卡 */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .role {
+    background: white;
+    border-radius: 15px;
+    padding: 18px 12px;
+    text-align: center;
+    border: 3px solid #B39DDB;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+  }
+  .role:hover { transform: translateY(-5px) rotate(-1deg); }
+  .role-icon { font-size: 2.8em; margin-bottom: 6px; }
+  .role-name { font-weight: bold; color: #4527A0; font-size: 1.1em; margin-bottom: 4px; }
+  .role-job { font-size: 0.88em; color: #666; }
+
+  /* 列表 */
+  .steps {
+    list-style: none;
+    margin: 18px 0;
+  }
+  .steps li {
+    background: #E3F2FD;
+    border-left: 6px solid #1976D2;
+    padding: 12px 18px;
+    margin: 10px 0;
+    border-radius: 8px;
+    position: relative;
+    padding-left: 50px;
+  }
+  .steps li::before {
+    content: counter(step-counter);
+    counter-increment: step-counter;
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1976D2;
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 26px;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .steps { counter-reset: step-counter; }
+
+  /* 17 模块网格 */
+  .legos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .lego {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 8px;
+    text-align: center;
+    border: 2px solid #FFB74D;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .lego.p0 { border-color: #E53935; background: #FFEBEE; }
+  .lego.p1 { border-color: #FB8C00; background: #FFF3E0; }
+  .lego.p2 { border-color: #FDD835; background: #FFFDE7; }
+  .lego-num {
+    display: inline-block;
+    background: #BF360C;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75em;
+    margin-bottom: 6px;
+  }
+  .lego-icon { font-size: 1.8em; }
+  .lego-name { font-size: 0.9em; font-weight: bold; color: #5D4037; margin-top: 4px; }
+  .lego-tip { font-size: 0.75em; color: #888; margin-top: 4px; }
+
+  /* 12 法师 */
+  .mages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .mage {
+    background: linear-gradient(135deg, #E1BEE7 0%, #B39DDB 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .mage.default {
+    background: linear-gradient(135deg, #FFD93D 0%, #FF6B9D 100%);
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(255,107,157,0.4);
+  }
+  .mage-icon { font-size: 2em; }
+  .mage-name { font-weight: bold; margin-top: 4px; font-size: 0.95em; }
+  .mage-skill { font-size: 0.78em; opacity: 0.95; margin-top: 3px; }
+
+  /* SSE 打字机效果 */
+  .typing {
+    background: #263238;
+    color: #B0BEC5;
+    border-radius: 12px;
+    padding: 18px;
+    font-family: 'Courier New', monospace;
+    margin: 15px 0;
+    line-height: 1.7;
+  }
+  .typing .event { color: #FFD54F; font-weight: bold; }
+  .typing .delta { color: #4FC3F7; }
+
+  /* 蒸馏 3 阶段 */
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+  }
+  .pipe-step {
+    background: white;
+    border: 3px solid #00ACC1;
+    border-radius: 15px;
+    padding: 15px 10px;
+    text-align: center;
+  }
+  .pipe-arrow {
+    font-size: 1.8em;
+    color: #00ACC1;
+    text-align: center;
+  }
+  .pipe-icon { font-size: 2.2em; }
+  .pipe-name { font-weight: bold; color: #006064; margin-top: 5px; }
+  .pipe-job { font-size: 0.85em; color: #555; margin-top: 4px; }
+
+  /* 5 层老师 */
+  .teachers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .teacher {
+    border-radius: 15px;
+    padding: 14px 10px;
+    text-align: center;
+    color: white;
+  }
+  .teacher-icon { font-size: 2.5em; }
+  .teacher-name { font-weight: bold; margin-top: 5px; }
+  .teacher-job { font-size: 0.8em; opacity: 0.95; margin-top: 3px; }
+  .t1 { background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%); }
+  .t2 { background: linear-gradient(135deg, #FFA94D 0%, #FF8C42 100%); }
+  .t3 { background: linear-gradient(135deg, #FFD93D 0%, #FFC107 100%); color: #5D4037; }
+  .t4 { background: linear-gradient(135deg, #6BCB77 0%, #4D96FF 100%); }
+  .t5 { background: linear-gradient(135deg, #4D96FF 0%, #6B5BFF 100%); }
+
+  /* 11 条规矩表 */
+  .rules-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 20px 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    font-size: 0.95em;
+  }
+  .rules-table th {
+    background: linear-gradient(135deg, #6B5B95 0%, #4527A0 100%);
+    color: white;
+    padding: 12px 10px;
+    text-align: left;
+  }
+  .rules-table td {
+    padding: 10px;
+    border-bottom: 1px solid #EEE;
+  }
+  .rules-table tr:nth-child(even) { background: #FAFAFA; }
+  .rules-table tr:hover { background: #FFF9C4; }
+  .rules-table .ck {
+    color: #2E7D32;
+    font-weight: bold;
+  }
+  .rules-table .old {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 0.85em;
+  }
+
+  /* 进度条 */
+  .progress-bar {
+    background: #ECEFF1;
+    border-radius: 30px;
+    height: 35px;
+    margin: 15px 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, #66BB6A 0%, #43A047 100%);
+    height: 100%;
+    width: 24%;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    color: white;
+    font-weight: bold;
+    transition: width 1s;
+  }
+  .progress-tag {
+    display: inline-block;
+    background: #FFE082;
+    color: #5D4037;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin: 5px 5px 5px 0;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  /* 关键数字大格 */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .stat {
+    background: white;
+    border-radius: 15px;
+    padding: 15px 10px;
+    text-align: center;
+    border: 3px solid #FF6B9D;
+  }
+  .stat-num {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #BF360C;
+    line-height: 1;
+  }
+  .stat-name {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 6px;
+  }
+
+  /* 总结大语 */
+  .ending {
+    background: linear-gradient(135deg, #FFD93D 0%, #FF6B9D 50%, #6B5BFF 100%);
+    color: white;
+    border-radius: 25px;
+    padding: 40px 30px;
+    text-align: center;
+    margin: 50px 0 30px;
+    box-shadow: 0 15px 40px rgba(107,91,255,0.3);
+  }
+  .ending h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+  .ending p {
+    font-size: 1.15em;
+    line-height: 2;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+  }
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: #5D4037;
+    font-style: italic;
+  }
+
+  /* 工具箱 4 件套 */
+  .toolbox {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .tool {
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    border: 3px solid #4DB6AC;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+  .tool-icon { font-size: 2em; margin-bottom: 8px; }
+  .tool-title { font-weight: bold; color: #00695C; font-size: 1.1em; margin-bottom: 6px; }
+  .tool-file {
+    background: #263238;
+    color: #FFD54F;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85em;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .tool-desc { font-size: 0.92em; color: #555; }
+
+  /* 流程箭头 */
+  .flow-arrow {
+    text-align: center;
+    font-size: 1.8em;
+    color: #6B5B95;
+    margin: 5px 0;
+  }
+
+  /* 高亮黄色记号笔 */
+  .hl {
+    background: linear-gradient(120deg, transparent 0%, #FFF59D 20%, #FFF59D 80%, transparent 100%);
+    padding: 0 4px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== 顶部 ===== -->
+  <div class="hero">
+    <h1>🌈 一个故事讲清"主控项目"</h1>
+    <p class="sub">— 给 8 岁小朋友讲清楚:这个项目是干啥的、长啥样、谁在干活、怎么干 —</p>
+    <div class="tags">
+      <span class="tag">🏰 11 个故事</span>
+      <span class="tag">🎨 全图解</span>
+      <span class="tag">✨ 不用懂代码</span>
+      <span class="tag">⏱️ 15 分钟读完</span>
+    </div>
+  </div>
+
+  <!-- ===== 故事 1: 我们到底要造什么 ===== -->
+  <div class="chapter ch1">
+    <h2>📖 我们到底要造什么呀?</h2>
+
+    <p>想象一下,你超级喜欢 <em>写故事</em> ✍️,可是写着写着会发生很多<strong>头疼的事</strong>:</p>
+
+    <div class="scene">
+      <span class="scene-title">😫 小作家的烦恼</span>
+      <p>· "我主角叫啥来着?…啊忘了!" 👧</p>
+      <p>· "上次我说他有 100 块金币,这章怎么变 50 了?" 💰</p>
+      <p>· "我 5 章前埋了个超大伏笔,啥时候揭开?…完了,忘了!" 🕵️</p>
+      <p>· "这个角色不是已经死了吗?怎么又跑出来了?" 😱</p>
+    </div>
+
+    <p>有个超级聪明的产品叫 <strong>云笔AI 小说写作助手</strong> 🧙‍♂️,它就像一个<strong>会魔法的写作小助手</strong>:</p>
+    <p>· 帮你<strong>记住所有细节</strong> 📒</p>
+    <p>· 帮你<strong>自动续写故事</strong> 🤖</p>
+    <p>· 帮你<strong>查前后矛盾</strong> 🔍</p>
+
+    <p style="margin-top:18px; font-size:1.15em;">
+      <strong>我们这个项目,就是要造一个一模一样的"云笔AI"。</strong> 🔨
+    </p>
+
+    <p>但是 — 我们的角色很特别:</p>
+    <div class="compare">
+      <div class="bad">
+        我们不亲自去搬砖、不亲自画页面、不亲自写代码 🚫
+      </div>
+      <div class="good">
+        我们是 <strong>总设计师 👷‍♂️ + 总指挥 🎩</strong>,
+        告诉施工队"该怎么建"
+      </div>
+    </div>
+
+    <p>所以这个项目有个名字叫 <span class="hl">"主控 (orchestrator)"</span>,意思就是 <strong>"乐队指挥"</strong> 🎼。</p>
+  </div>
+
+  <!-- ===== 故事 2: 城堡比喻 ===== -->
+  <div class="chapter ch2">
+    <h2>🏰 我们的项目 = 一座大城堡</h2>
+
+    <p>整个项目像一座 <strong>会魔法的大城堡</strong>,里面有 <strong>7 间大房间</strong>,每间房间有不同的小精灵在工作:</p>
+
+    <div class="roles">
+      <div class="role">
+        <div class="role-icon">📜</div>
+        <div class="role-name">契约大殿</div>
+        <div class="role-job">放城堡所有"规矩"图纸,大家照着建</div>
+      </div>
+      <div class="role">
+        <div class="role-icon">🎨</div>
+        <div class="role-name">画家工坊</div>
+        <div class="role-job">前端小精灵画漂亮的页面</div>
+      </div>
+      <div class="role">
+        <div class="role-icon">⚙️</div>
+        <div class="role-name">机器工厂</div>
+        <div class="role-job">后端工程师管数据 + API</div>
+      </div>
+      <div class="role">
+        <div class="role-icon">🧙‍♂️</div>
+        <div class="role-name">魔法实验室</div>
+        <div class="role-job">12 个 AI 法师听调遣</div>
+      </div>
+      <div class="role">
+        <div class="role-icon">🗺️</div>
+        <div class="role-name">地图房</div>
+        <div class="role-job">知识图谱,记下所有关系</div>
+      </div>
+      <div class="role">
+        <div class="role-icon">🔧</div>
+        <div class="role-name">水电站</div>
+        <div class="role-job">基础设施:电、水、网</div>
+      </div>
+      <div class="role">
+        <div class="role-icon">🧪</div>
+        <div class="role-name">测试实验室</div>
+        <div class="role-job">检查所有东西能不能正常用</div>
+      </div>
+    </div>
+
+    <p>而我们 — 主控 — <strong>不进任何一间房间干活</strong>。我们站在 <strong>城堡中央的指挥塔</strong> 🗼,做 4 件事:</p>
+
+    <ul class="steps">
+      <li><strong>写图纸</strong>(契约):告诉每间房怎么对接</li>
+      <li><strong>排任务</strong>(feature_list):告诉每间房今天该干啥</li>
+      <li><strong>查进度</strong>(progress.txt):看谁干到哪了</li>
+      <li><strong>解决吵架</strong>(冲突裁决):画家和工程师吵起来,主控来调解</li>
+    </ul>
+  </div>
+
+  <!-- ===== 故事 3: 主控 vs 子项目 ===== -->
+  <div class="chapter ch3">
+    <h2>👷 谁是老板,谁是工人?</h2>
+
+    <div class="scene">
+      <span class="scene-title">🎬 用 3 个比喻秒懂</span>
+      <p>· <strong>导演</strong> 不亲自演戏,但他告诉每个演员该怎么演 🎬</p>
+      <p>· <strong>店长</strong> 不亲自煎汉堡,但他决定汉堡里放什么 🍔</p>
+      <p>· <strong>足球教练</strong> 不亲自踢球,但他决定谁上场、怎么传球 ⚽</p>
+    </div>
+
+    <p>我们的主控就像这些 — <strong>不下场,但决定一切重要的事</strong>。</p>
+
+    <div class="compare">
+      <div class="good">
+        <strong>主控做:</strong><br>
+        📜 写契约<br>
+        🗓️ 排 Sprint<br>
+        🤝 调度 AI<br>
+        ⚖️ 解决冲突
+      </div>
+      <div class="bad">
+        <strong>主控不做:</strong><br>
+        🎨 画 UI<br>
+        💻 写业务代码<br>
+        🤖 直接调 AI<br>
+        📚 修改知识库
+      </div>
+    </div>
+
+    <p style="margin-top:15px;">
+      <strong>这样有什么好处?</strong> 🤔
+    </p>
+    <p>· 主控有 <strong>"全局视角"</strong> 👁️,看得到整个城堡</p>
+    <p>· 5 个施工队 <strong>"互不干扰"</strong>,各干各的,效率超高 🚀</p>
+    <p>· 想换一个施工队?<strong>没问题</strong>,只要新队也照着图纸建 🔄</p>
+  </div>
+
+  <!-- ===== 故事 4: 17 块乐高 ===== -->
+  <div class="chapter ch4">
+    <h2>🧱 17 块乐高积木,搭一个不会矛盾的小宇宙</h2>
+
+    <p>写小说不能瞎写,得先 <strong>把世界搭好</strong>。云笔AI 给我们准备了 <strong>17 块乐高积木</strong>,每块都不一样:</p>
+
+    <div class="legos">
+      <div class="lego p0"><div class="lego-num">P0 #1</div><div class="lego-icon">🌍</div><div class="lego-name">世界观</div><div class="lego-tip">这是什么星球?</div></div>
+      <div class="lego p0"><div class="lego-num">P0 #2</div><div class="lego-icon">💎</div><div class="lego-name">故事核心</div><div class="lego-tip">主题/主线</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #3</div><div class="lego-icon">🗺️</div><div class="lego-name">地理地图</div><div class="lego-tip">35 个地方/6 级</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #4</div><div class="lego-icon">👑</div><div class="lego-name">势力阵营</div><div class="lego-tip">9 种类型</div></div>
+      <div class="lego p2"><div class="lego-num">P2 #5</div><div class="lego-icon">💰</div><div class="lego-name">货币体系</div><div class="lego-tip">3 种货币</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #6</div><div class="lego-icon">📦</div><div class="lego-name">物品列表</div><div class="lego-tip">86 件物品</div></div>
+      <div class="lego p0"><div class="lego-num">P0 #7</div><div class="lego-icon">⚔️</div><div class="lego-name">力量体系</div><div class="lego-tip">11 境界打架规则</div></div>
+      <div class="lego p2"><div class="lego-num">P2 #8</div><div class="lego-icon">📜</div><div class="lego-name">功法体系</div><div class="lego-tip">60×9</div></div>
+      <div class="lego p2"><div class="lego-num">P2 #9</div><div class="lego-icon">✨</div><div class="lego-name">特殊设定</div><div class="lego-tip">19 种金手指</div></div>
+      <div class="lego p0"><div class="lego-num">★P0 #10</div><div class="lego-icon">📋</div><div class="lego-name">大纲设定</div><div class="lego-tip">卷-章树形</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #11</div><div class="lego-icon">🧝</div><div class="lego-name">角色管理</div><div class="lego-tip">24 类型角色</div></div>
+      <div class="lego p2"><div class="lego-num">P2 #12</div><div class="lego-icon">💞</div><div class="lego-name">人物关系图</div><div class="lego-tip">8 种关系</div></div>
+      <div class="lego p0"><div class="lego-num">P0 #13</div><div class="lego-icon">🕵️</div><div class="lego-name">伏笔管理</div><div class="lego-tip">6+10 种</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #14</div><div class="lego-icon">📈</div><div class="lego-name">情节脉络</div><div class="lego-tip">5 种模板</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #15</div><div class="lego-icon">🌿</div><div class="lego-name">支线故事</div><div class="lego-tip">35 个事件</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #16</div><div class="lego-icon">⏰</div><div class="lego-name">时间线</div><div class="lego-tip">7 种事件</div></div>
+      <div class="lego p1"><div class="lego-num">P1 #17</div><div class="lego-icon">📚</div><div class="lego-name">已经历事件</div><div class="lego-tip">95 个</div></div>
+    </div>
+
+    <div class="scene">
+      <span class="scene-title">🎨 颜色含义</span>
+      <p>· 🔴 <strong>红色 P0</strong>:必须最先做的 5 块乐高,缺一不可</p>
+      <p>· 🟠 <strong>橙色 P1</strong>:第二批做的 8 块乐高,很重要</p>
+      <p>· 🟡 <strong>黄色 P2</strong>:可以后面再做的 4 块乐高</p>
+    </div>
+
+    <p>云笔有个超棒的功能叫 <strong>"11 步探讨式向导"</strong> 🎯:打开它,会一个一个问你 11 个问题,把所有积木都自动填好!不用你一个个想破头。</p>
+  </div>
+
+  <!-- ===== 故事 5: 12 个 AI 法师 ===== -->
+  <div class="chapter ch5">
+    <h2>🧙 你是国王,12 个 AI 大法师听你指挥</h2>
+
+    <p>城堡里的"魔法实验室"住着 <strong>12 个 AI 大法师</strong>,他们各有各的本事。你是国王 👑,主控是你的<strong>王国总管</strong>,帮你挑谁干活:</p>
+
+    <div class="mages">
+      <div class="mage default">
+        <div class="mage-icon">🐋</div>
+        <div class="mage-name">DeepSeek</div>
+        <div class="mage-skill">★ 默认<br>便宜+中文好</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🎩</div>
+        <div class="mage-name">Claude</div>
+        <div class="mage-skill">文笔最美</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🤖</div>
+        <div class="mage-name">GPT</div>
+        <div class="mage-skill">通用全能</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">💎</div>
+        <div class="mage-name">Gemini</div>
+        <div class="mage-skill">记得最多<br>(1 百万字)</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🧠</div>
+        <div class="mage-name">智谱 GLM</div>
+        <div class="mage-skill">国产 网文棒</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🐉</div>
+        <div class="mage-name">通义千问</div>
+        <div class="mage-skill">阿里出</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🌸</div>
+        <div class="mage-name">文心一言</div>
+        <div class="mage-skill">百度出</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🌙</div>
+        <div class="mage-name">Kimi</div>
+        <div class="mage-skill">擅长长文</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🫘</div>
+        <div class="mage-name">豆包</div>
+        <div class="mage-skill">字节出</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">⭐</div>
+        <div class="mage-name">讯飞星火</div>
+        <div class="mage-skill">语音强</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">☁️</div>
+        <div class="mage-name">腾讯混元</div>
+        <div class="mage-skill">腾讯出</div>
+      </div>
+      <div class="mage">
+        <div class="mage-icon">🏠</div>
+        <div class="mage-name">本地 Ollama</div>
+        <div class="mage-skill">不要钱</div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <span class="scene-title">🎯 主控怎么挑法师?</span>
+      <p>不同的事,叫不同的法师。这就是 <strong>"路由"</strong>:</p>
+      <p>· <strong>续写小说</strong> → 叫 DeepSeek 🐋(便宜)</p>
+      <p>· <strong>润色文笔</strong> → 叫 Claude 🎩(文笔最美)</p>
+      <p>· <strong>生成大纲</strong> → 叫 Claude Opus 👑(最聪明的那个)</p>
+      <p>· <strong>蒸馏摘要</strong> → 叫 DeepSeek(快又准)</p>
+    </div>
+  </div>
+
+  <!-- ===== 故事 6: 3 阶段蒸馏 ===== -->
+  <div class="chapter ch6">
+    <h2>🍳 3 阶段"蒸馏"魔法:把长故事变成笔记</h2>
+
+    <p>你写了一章小说,可能 <strong>5000 字</strong>!电脑要记很多东西:谁出场了、去了哪、埋了什么伏笔…</p>
+
+    <p>电脑不会看一遍就记住,它要 <strong>分 3 步消化</strong>,这个过程就叫 <strong>"蒸馏"</strong> ✨(就像把茶叶煮成浓茶):</p>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-icon">📝</div>
+        <div class="pipe-name">1. Generator</div>
+        <div class="pipe-job">"生成"摘要<br>(谁/事件/地点/转折/伏笔)</div>
+      </div>
+      <div class="pipe-arrow">➜</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🧲</div>
+        <div class="pipe-name">2. Extractor</div>
+        <div class="pipe-job">"抽取"结构<br>(整理成电脑能懂的格式)</div>
+      </div>
+      <div class="pipe-arrow">➜</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🔍</div>
+        <div class="pipe-name">3. Checker</div>
+        <div class="pipe-job">"检查"矛盾<br>("咦?他不是死了吗?")</div>
+      </div>
+    </div>
+
+    <p><strong>好处</strong> ✨:你写完一章,电脑自动记好所有细节。下次你写到第 100 章,它还能提醒你:</p>
+    <div class="scene">
+      <p>📣 "喂喂喂,你 50 章前埋的伏笔'戒指会发光',到现在还没揭开,该揭开了!"</p>
+      <p>📣 "等等,这个角色 3 章前死了,你怎么又写他出场?"</p>
+    </div>
+  </div>
+
+  <!-- ===== 故事 7: 5 个纠错老师 ===== -->
+  <div class="chapter ch7">
+    <h2>👨‍🏫 5 个纠错老师 + 1 个对讲机</h2>
+
+    <p>写 100 万字小说最最最难的是 <strong>"不前后矛盾"</strong>。云笔给你配了 <strong>5 个纠错老师</strong>,各管一摊:</p>
+
+    <div class="teachers">
+      <div class="teacher t1">
+        <div class="teacher-icon">📜</div>
+        <div class="teacher-name">L1 设定老师</div>
+        <div class="teacher-job">查"世界规则"</div>
+      </div>
+      <div class="teacher t2">
+        <div class="teacher-icon">📋</div>
+        <div class="teacher-name">L2 结构老师</div>
+        <div class="teacher-job">查"大纲完整"</div>
+      </div>
+      <div class="teacher t3">
+        <div class="teacher-icon">⏰</div>
+        <div class="teacher-name">L3 时间老师</div>
+        <div class="teacher-job">查"时间线"</div>
+      </div>
+      <div class="teacher t4">
+        <div class="teacher-icon">💞</div>
+        <div class="teacher-name">L4 关系老师</div>
+        <div class="teacher-job">查"人物关系"</div>
+      </div>
+      <div class="teacher t5">
+        <div class="teacher-icon">🔍</div>
+        <div class="teacher-name">L5 蒸馏老师</div>
+        <div class="teacher-job">AI 自动查错</div>
+      </div>
+    </div>
+
+    <p>📡 这 5 个老师之间,有一个 <strong>"对讲机"</strong>(技术名叫 <em>EventBus</em>)。</p>
+    <p>只要一个老师发现问题,对讲机一喊,<strong>所有老师都知道</strong>!</p>
+
+    <div class="scene">
+      <span class="scene-title">🎬 来看个例子</span>
+      <p>你新增了一个境界叫"神烬"(本来只有 10 个境界,现在 11 个了)</p>
+      <p>📡 对讲机一吼:"<strong>境界变了!境界变了!</strong>"</p>
+      <p>所有老师都收到:</p>
+      <p>· 📜 L1 设定老师:更新规则</p>
+      <p>· 💞 L4 关系老师:重算所有角色战力</p>
+      <p>· 🔍 L5 蒸馏老师:清掉旧的 AI 缓存</p>
+      <p>· 🎨 前端:在 UI 上标红提醒你</p>
+    </div>
+  </div>
+
+  <!-- ===== 故事 8: 11 条规矩 ===== -->
+  <div class="chapter ch8">
+    <h2>📜 11 条"金科玉律" — 大家争论时谁说了算?</h2>
+
+    <p>云笔的资料有<strong>两个版本</strong>,有时候说法不一样:</p>
+    <div class="compare">
+      <div class="bad">
+        ❌ 旧版本(5 月 31 日的研究)<br>
+        说"角色只有 8 种类型"
+      </div>
+      <div class="good">
+        ✅ 新版本(6 月 3 日新研究)<br>
+        说"角色有 24 种类型"
+      </div>
+    </div>
+
+    <p>主控当"法官" ⚖️,一锤定音:<strong>以 6 月 3 日新版本为准</strong>。一共有 11 条这样的"裁决":</p>
+
+    <table class="rules-table">
+      <tr><th>#</th><th>这个问题…</th><th>旧说法</th><th>新规矩 ✅</th></tr>
+      <tr><td>C01</td><td>有多少个 World 模块?</td><td class="old">16</td><td class="ck">17 块乐高</td></tr>
+      <tr><td>C02</td><td>大纲放哪里?</td><td class="old">归"叙事"二级</td><td class="ck">独立一级入口</td></tr>
+      <tr><td>C03</td><td>角色有几种类型?</td><td class="old">8</td><td class="ck">24 类 + 三层性格</td></tr>
+      <tr><td>C04</td><td>每个项目多少角色?</td><td class="old">预设 7-20</td><td class="ck">看你写,不限</td></tr>
+      <tr><td>C05</td><td>伏笔有几种?</td><td class="old">3 类型</td><td class="ck">6 类型 + 10 埋设</td></tr>
+      <tr><td>C06</td><td>时间线事件多少种?</td><td class="old">5</td><td class="ck">7 种(战斗/揭秘…)</td></tr>
+      <tr><td>C07</td><td>大纲是多少层?</td><td class="old">多级</td><td class="ck">卷-章 二级</td></tr>
+      <tr><td>C08</td><td>力量体系有几层?</td><td class="old">8 境界</td><td class="ck">11+6+5+4</td></tr>
+      <tr><td>C09</td><td>势力有几种?</td><td class="old">6</td><td class="ck">9 种</td></tr>
+      <tr><td>C10</td><td>项目 ID 范围?</td><td class="old">1-10000</td><td class="ck">真实样本</td></tr>
+      <tr><td>C11</td><td>支持多少 AI 厂商?</td><td class="old">10</td><td class="ck">12 个法师</td></tr>
+    </table>
+  </div>
+
+  <!-- ===== 故事 9: 4 件套工具箱 ===== -->
+  <div class="chapter ch9">
+    <h2>📋 每个施工队入职都要发"4 件套"</h2>
+
+    <p>就像小朋友开学第一天,老师会发 4 样东西(书 + 本 + 笔 + 校徽)。<br>
+    每个子项目"入职"时,主控也要发 4 件套:</p>
+
+    <div class="toolbox">
+      <div class="tool">
+        <div class="tool-icon">📋</div>
+        <div class="tool-title">1. 你是谁</div>
+        <div class="tool-file">CLAUDE.md</div>
+        <div class="tool-desc">"你叫啥、长啥样、谁能改你、谁不能改你"</div>
+      </div>
+      <div class="tool">
+        <div class="tool-icon">📝</div>
+        <div class="tool-title">2. 拼装步骤</div>
+        <div class="tool-file">feature_list.json</div>
+        <div class="tool-desc">"先做轮子,再做车身,最后装方向盘"</div>
+      </div>
+      <div class="tool">
+        <div class="tool-icon">✅</div>
+        <div class="tool-title">3. 今天到哪了</div>
+        <div class="tool-file">progress.txt</div>
+        <div class="tool-desc">"昨天拼了 5 块,今天接着拼第 6 块"</div>
+      </div>
+      <div class="tool">
+        <div class="tool-icon">🔌</div>
+        <div class="tool-title">4. 电源开关</div>
+        <div class="tool-file">init.sh</div>
+        <div class="tool-desc">"按这个按钮,灯就亮,机器就跑起来"</div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <span class="scene-title">⚠️ 没这 4 件套会咋样?</span>
+      <p>小朋友(AI 工程师)打开盒子,看到 <strong>500 块零件</strong>,完全不知从哪开始 🤯<br>
+      然后瞎拼,拼出一辆 <strong>"4 个轮子朝天的车"</strong>,跟你说"我干完啦!" 😅</p>
+    </div>
+  </div>
+
+  <!-- ===== 故事 10: 主链 = 用户的一次旅程 ===== -->
+  <div class="chapter ch10">
+    <h2>🎯 用户写故事的"魔法 7 步旅程"</h2>
+
+    <p>等城堡建好之后,一个用户来写故事,会发生什么呢?来看看:</p>
+
+    <ul class="steps">
+      <li>用户打开网页 → 看到登录页 → <strong>注册个号</strong>(机器工厂发个"通行证")</li>
+      <li>登录成功 → 跳到"我的项目"页 → 看到 <strong>4 个统计小卡片</strong>(总字数/章节数/角色数/项目数)</li>
+      <li>点"新建项目" → 输入小说名"烬都奇谭" → <strong>项目创建</strong>(机器工厂存入数据库)</li>
+      <li>进入编辑器 → 看到 <strong>三栏布局</strong>:左侧大纲树 / 中间编辑区 / 右侧 AI 助手</li>
+      <li>用户开始写字 → 写完 100 字 → <strong>2 秒后自动保存</strong>(不用点保存键!)</li>
+      <li>用户卡住了,点 "AI 续写" → DeepSeek 法师上线 → <strong>像打字机一样一个字一个字蹦出来</strong> ⚡</li>
+      <li>用户满意 → 点"采纳插入" → 内容存进去 → <strong>30 秒后蒸馏老师自动做摘要</strong> 🍳</li>
+    </ul>
+
+    <div class="typing">
+<span class="event">event: stream.start</span>
+data: {"sessionId":"abc","model":"deepseek-chat","mode":"续写"}
+
+<span class="event">event: stream.chunk</span>
+data: {"delta":"<span class="delta">他</span>","index":1}
+
+<span class="event">event: stream.chunk</span>
+data: {"delta":"<span class="delta">走</span>","index":2}
+
+<span class="event">event: stream.chunk</span>
+data: {"delta":"<span class="delta">进</span>","index":3}
+
+<span class="event">event: stream.chunk</span>
+data: {"delta":"<span class="delta">了</span>","index":4}
+
+<span class="event">event: stream.done</span>
+data: {"content":"他走进了破旧的客栈...","totalTokens":42}
+    </div>
+
+    <p>这种"一个字一个字飞出来"的魔法,叫 <span class="hl">SSE(Server-Sent Events)</span>,翻译成人话就是 <strong>"服务器一边想,一边把字推给你"</strong>,体验快 10 倍!</p>
+  </div>
+
+  <!-- ===== 故事 11: 我们做到哪了 ===== -->
+  <div class="chapter ch11">
+    <h2>🎁 我们目前做到哪了?</h2>
+
+    <p>主控自己,已经悄悄准备好 <strong>所有图纸 + 决策 + 任务清单</strong>。来看看进度条 📊:</p>
+
+    <div class="progress-bar">
+      <div class="progress-fill">24% · 9/37</div>
+    </div>
+
+    <p><strong>已经做完的事</strong> ✅:</p>
+    <div>
+      <span class="progress-tag">✅ 主控目录骨架</span>
+      <span class="progress-tag">✅ CLAUDE.md 项目说明</span>
+      <span class="progress-tag">✅ 1825 行完整规格书</span>
+      <span class="progress-tag">✅ 16 个架构决策(ADR)</span>
+      <span class="progress-tag">✅ 11 个数据模型 schema</span>
+      <span class="progress-tag">✅ 3 个 API 契约(auth/project/ai)</span>
+      <span class="progress-tag">✅ 12 厂商注册表</span>
+      <span class="progress-tag">✅ SSE 7 事件类型</span>
+      <span class="progress-tag">✅ 37 任务清单</span>
+      <span class="progress-tag">✅ 这些童话故事网页</span>
+    </div>
+
+    <p style="margin-top:20px;"><strong>接下来要做</strong> 🚧:</p>
+    <div>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ chapter.yaml(11 端点)</span>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ outline.yaml(22 端点)</span>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ Docker Compose 启动脚本</span>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ 后端 6 个模块</span>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ 前端 7 个页面</span>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ AI 调度接入 DeepSeek</span>
+      <span class="progress-tag" style="background:#FFCDD2;">⏳ E2E 冒烟测试</span>
+    </div>
+
+    <p style="margin-top:20px;"><strong>目标</strong> 🎯:跑通这条"主链" —</p>
+    <div class="scene">
+      <p style="text-align:center; font-size:1.1em;">
+        <strong>注册 → 登录 → 新建项目 → 写 100 字 → AI 续写 200 字 → 采纳保存</strong> ✨
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== 关键数字 ===== -->
+  <div class="chapter">
+    <h2 style="border-bottom:3px dashed #FFD93D; color:#4A148C;">📊 几个超重要的数字(吹牛专用 😎)</h2>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-num">230+</div><div class="stat-name">API 端点</div></div>
+      <div class="stat"><div class="stat-num">17</div><div class="stat-name">世界模块</div></div>
+      <div class="stat"><div class="stat-num">12</div><div class="stat-name">AI 厂商</div></div>
+      <div class="stat"><div class="stat-num">24</div><div class="stat-name">角色类型</div></div>
+      <div class="stat"><div class="stat-num">6+10</div><div class="stat-name">伏笔类型+模式</div></div>
+      <div class="stat"><div class="stat-num">11</div><div class="stat-name">力量境界</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-name">蒸馏阶段</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-name">纠错老师</div></div>
+      <div class="stat"><div class="stat-num">7</div><div class="stat-name">SSE 事件</div></div>
+      <div class="stat"><div class="stat-num">11</div><div class="stat-name">冲突裁决</div></div>
+      <div class="stat"><div class="stat-num">16</div><div class="stat-name">架构决策</div></div>
+      <div class="stat"><div class="stat-num">100万+</div><div class="stat-name">云笔用户</div></div>
+      <div class="stat"><div class="stat-num">5000万+</div><div class="stat-name">累计字数</div></div>
+      <div class="stat"><div class="stat-num">87</div><div class="stat-name">知识库页</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 终极总结 ===== -->
+  <div class="ending">
+    <h2>🏆 一句话总结整个项目</h2>
+    <p>
+      <strong>我们的"主控"</strong>就像一个超级总指挥 🎩,<br>
+      手下有 <strong>5 个施工队</strong>(画家/工程师/AI 调度/地图/水电),<br>
+      他们要按 <strong>主控写的图纸</strong> 📜,<br>
+      搭出一座有 <strong>17 块乐高积木</strong> 🧱 的写作城堡 🏰,<br>
+      城堡里住着 <strong>12 个 AI 法师</strong> 🧙‍♂️ 帮人写故事,<br>
+      还有 <strong>5 个纠错老师</strong> 👨‍🏫 保证故事不矛盾,<br>
+      最后让用户 <strong>登录 → 写小说 → 一个字一个字飞出来</strong> ✨,<br>
+      就 <span style="font-size:1.3em;">完美~</span> 🎉
+    </p>
+  </div>
+
+  <div class="footer">
+    🌈 这就是我们的主控项目!不复杂吧?<br>
+    现在,你可以骄傲地跟小伙伴说:"我懂这个项目啦!" 🥳<br>
+    <br>
+    <em>· 1825 行规格书 + 16 个 ADR + 230+ API + 17 模块 + 12 厂商,全部装进这一页故事书 ·</em>
+  </div>
+
+</div>
+</body>
+</html>
