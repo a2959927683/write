@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/event-line.json",
+  "title": "EventLine/EventFlow/ElementBindx (支线故事) — 17 World Tab 模块之一 (#15)",
+  "description": "云笔AI 支线故事 4 个子模块聚合, 35 事件, 3 步 AI 生成。",
+  "type": "object",
+  "definitions": {
+    "EventLine": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer"},
+        "project_id": {"type": "integer"},
+        "标题": {"type": "string"},
+        "描述": {"type": "string"},
+        "状态": {"type": "string", "enum": ["进行中", "已完成", "暂停", "废弃"]},
+        "ext": {"type": "object"}
+      }
+    },
+    "EventFlow": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "integer"},
+        "line_id": {"type": "integer", "description": "FK → event_lines.id"},
+        "event_order": {"type": "integer"},
+        "章节ID": {"type": ["integer", "null"]},
+        "角色IDs": {"type": "array", "items": {"type": "integer"}},
+        "事件描述": {"type": "string"}
+      }
+    },
+    "ElementBindx": {
+      "type": "object",
+      "description": "要素绑定: 章节/角色/伏笔/势力 的绑定表",
+      "properties": {
+        "id": {"type": "integer"},
+        "event_id": {"type": "integer", "description": "FK → event_flows.id"},
+        "要素名称": {"type": "string"},
+        "bindings": {
+          "type": "object",
+          "description": "{章节: [...], 角色: [...], 伏笔: [...], 势力: [...]}"
+        }
+      }
+    }
+  },
+  "x-key-api-endpoints": [
+    "GET /element-bindx/project/:id/bindx-summary",
+    "POST /element-bindx/project/:id/event/:eId/batch"
+  ]
+}

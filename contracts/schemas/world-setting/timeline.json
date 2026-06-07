@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/timeline.json",
+  "title": "Timeline (时间线) — 17 World Tab 模块之一 (#16)",
+  "description": "云笔AI 时间线, 自定义历法, C06 冲突裁决: 7 类型。子表 3: timeline_calendars / timeline_events / timeline_chapter_time。",
+  "type": "object",
+  "definitions": {
+    "Calendar": {
+      "type": "object",
+      "required": ["project_id", "历法名称"],
+      "properties": {
+        "id": {"type": "integer"},
+        "project_id": {"type": "integer"},
+        "历法名称": {"type": "string", "maxLength": 128},
+        "年长度": {"type": "integer", "description": "一年多少天"},
+        "月数": {"type": "integer"},
+        "月长度": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "description": "每个月多少天"
+        },
+        "纪年方式": {"type": "string", "description": "如\"圣历\"\"星历\""}
+      }
+    },
+    "Event": {
+      "type": "object",
+      "required": ["project_id", "标题"],
+      "properties": {
+        "id": {"type": "integer"},
+        "project_id": {"type": "integer"},
+        "标题": {"type": "string"},
+        "历法日期": {"type": "string", "description": "如\"星历1325年·夏·望月·十五\""},
+        "章节ID": {"type": ["integer", "null"], "description": "FK → chapters.id"},
+        "类型": {
+          "type": "string",
+          "enum": ["出场", "战斗", "揭秘", "关系", "地点", "势力", "其他"],
+          "description": "C06 裁决: 7 类型"
+        },
+        "描述": {"type": "string"},
+        "ext": {"type": "object"},
+        "importance": {"type": "integer", "minimum": 1, "maximum": 5}
+      }
+    },
+    "ChapterTime": {
+      "type": "object",
+      "description": "章节与历法日期的映射 (UNIQUE (project_id, 章节ID))",
+      "properties": {
+        "project_id": {"type": "integer"},
+        "章节ID": {"type": "integer"},
+        "历法日期": {"type": "string"},
+        "ext": {"type": "object"}
+      }
+    }
+  },
+  "x-key-api-endpoints": [
+    "GET /timeline/calendar/:projectId",
+    "PUT /timeline/calendar/:projectId",
+    "GET /timeline/validate/:projectId (校验时间线一致性)",
+    "GET /timeline/context/:projectId/:nodeId (大, 可达 196 KB)",
+    "GET /timeline/events/:projectId"
+  ]
+}

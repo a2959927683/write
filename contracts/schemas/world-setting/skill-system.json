@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/skill-system.json",
+  "title": "SkillSystem (功法体系) — 17 World Tab 模块之一 (#8)",
+  "description": "云笔AI 功法体系, 60 类型 × 9 品级。",
+  "type": "object",
+  "required": ["project_id", "功法名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "功法名称": {"type": "string", "maxLength": 128},
+    "品级": {
+      "type": "string",
+      "enum": ["黄", "玄", "地", "天", "仙", "神", "禁", "圣", "道"]
+    },
+    "类型": {
+      "type": "string",
+      "enum": ["攻击", "防御", "身法", "辅助", "控制", "治疗", "召唤", "阵法", "炼丹", "炼器", "占卜", "其他"]
+    },
+    "体系ID": {"type": ["integer", "null"], "description": "FK → power_systems.id"},
+    "描述": {"type": "string"},
+    "ext": {"type": "object"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  }
+}

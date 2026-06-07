@@ -1,0 +1,105 @@
+{
+  "name": "orchestrator-master",
+  "version": "1.0.0",
+  "description": "云笔AI 复刻项目主控 (Orchestrator) - 不是产品本身, 而是前后端契约权威与全栈调度中枢",
+  "type": "module",
+  "harness": {
+    "version": "l3-v4",
+    "enabled": true,
+    "phases": [
+      {
+        "id": "research",
+        "name": "研究",
+        "description": "读取 knowlage/ 知识库, 把握项目方向",
+        "inputs": [
+          "C:\\Users\\Administrator\\Desktop\\claude\\write_clone\\knowlage\\wiki\\index.md",
+          "C:\\Users\\Administrator\\Desktop\\claude\\write_clone\\knowlage\\wiki\\overview\\产品全景.md",
+          "C:\\Users\\Administrator\\Desktop\\claude\\write_clone\\knowlage\\wiki\\overview\\技术选型.md",
+          "C:\\Users\\Administrator\\Desktop\\claude\\write_clone\\knowlage\\wiki\\sources\\_conflicts\\2026-06-03 冲突清单.md"
+        ],
+        "outputs": ["docs/granular/05-world-tab-17-modules.md", "docs/granular/06-ai-orchestration.md"]
+      },
+      {
+        "id": "plan",
+        "name": "规划",
+        "description": "在主控 docs/ 下写规划与 ADR",
+        "outputs": ["docs/adr/0001-*.md ... 0016-*.md", "docs/architecture/system-overview.md"]
+      },
+      {
+        "id": "build",
+        "name": "构建",
+        "description": "拆解 Sprint 任务, 调度子项目实现",
+        "outputs": ["feature_list.json", "progress.txt", "contracts/openapi/*.yaml"]
+      },
+      {
+        "id": "review",
+        "name": "复盘",
+        "description": "契约一致性检查 + 子项目 PR review",
+        "scripts": ["scripts/contract-lint.py"]
+      },
+      {
+        "id": "debug",
+        "name": "调试",
+        "description": "跨子项目问题定位 (知识图谱一致性 / 蒸馏失败 / 设定变更传播)"
+      }
+    ],
+    "decisionPrinciples": [
+      "权威性优先: 11 条冲突全部采纳 2026-06-03 新研究 (C01-C11)",
+      "1:1 复刻: API 端点 / 字段名 / 路径 1:1 还原云笔",
+      "契约先行: 任何子项目改动前必须先改 contracts/",
+      "颗粒化: docs/granular/ 必须拆分到 sub-agent 一次能读完",
+      "可执行: feature_list.json 中每条任务必须有 产出物 与 验收标准",
+      "可追溯: 任何重要决策必须落 ADR, 不能只在聊天里"
+    ]
+  },
+  "subprojects": {
+    "frontend": {
+      "path": "frontend/",
+      "stack": ["Vue 3", "Vite", "TipTap", "Pinia", "Tailwind", "Remix Icon"],
+      "owner": "frontend-agent"
+    },
+    "backend": {
+      "path": "backend/",
+      "stack": ["Node.js", "NestJS 或 Fastify", "Prisma 或 Drizzle", "JWT"],
+      "owner": "backend-agent"
+    },
+    "ai-orchestrator": {
+      "path": "ai-orchestrator/",
+      "stack": ["Python", "FastAPI", "BullMQ consumer", "OpenAI SDK", "Anthropic SDK"],
+      "owner": "ai-agent"
+    },
+    "knowledge-graph": {
+      "path": "knowledge-graph/",
+      "stack": ["PostgreSQL + JSONB", "pgvector", "Redis"],
+      "owner": "consistency-agent"
+    },
+    "infra": {
+      "path": "infra/",
+      "stack": ["Docker", "Docker Compose", "Prometheus", "Grafana"],
+      "owner": "infra-agent"
+    }
+  },
+  "contracts": {
+    "openapiPath": "contracts/openapi/",
+    "schemaPath": "contracts/schemas/",
+    "eventPath": "contracts/events/",
+    "aiPath": "contracts/ai/",
+    "frontendPath": "contracts/frontend/",
+    "format": {
+      "openapi": "3.1.0",
+      "jsonSchema": "draft/2020-12"
+    }
+  },
+  "knowledgeBase": {
+    "path": "C:\\Users\\Administrator\\Desktop\\claude\\write_clone\\knowlage\\",
+    "readOnly": true,
+    "indexFile": "wiki/index.md",
+    "conflictFile": "wiki/sources/_conflicts/2026-06-03 冲突清单.md"
+  },
+  "sprint": {
+    "current": 0,
+    "goal": "跑通 登录 → 创建项目 → 编辑器 → AI 续写(SSE) 主链",
+    "taskCount": 37,
+    "estimatedMonths": 2
+  }
+}

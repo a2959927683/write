@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/item.json",
+  "title": "Item (物品列表) — 17 World Tab 模块之一 (#6)",
+  "description": "云笔AI 物品列表, 86 物品, 17 字段。",
+  "type": "object",
+  "required": ["project_id", "物品名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "物品名称": {"type": "string", "maxLength": 128},
+    "类别": {
+      "type": "string",
+      "enum": ["系统金手指", "武器", "丹药", "法器", "防具", "饰品", "符箓", "卷轴", "宠物", "坐骑", "材料", "书籍", "食物", "工具", "其他"]
+    },
+    "作用": {"type": "string"},
+    "出处": {"type": "string"},
+    "获取难度": {
+      "type": "string",
+      "enum": ["易", "中", "难", "极难", "传说"]
+    },
+    "威力": {"type": "string"},
+    "价值": {"type": "string"},
+    "特征": {"type": "string"},
+    "使用人群": {"type": "string"},
+    "注意事项": {"type": "string"},
+    "保存期限": {"type": "string"},
+    "用量": {"type": "string"},
+    "使用代价": {"type": "string"},
+    "防御力": {"type": "string"},
+    "排序顺序": {"type": "integer", "default": 0},
+    "ext": {"type": "object"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  }
+}

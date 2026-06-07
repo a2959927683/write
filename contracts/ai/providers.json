@@ -1,0 +1,151 @@
+{
+  "$schema": "https://orchestrator.cloudpen/schemas/ai/providers.json",
+  "version": "1.0.0",
+  "description": "12 AI 厂商注册表 (主控权威)。C11 冲突裁决: 12 家。云笔真实厂商列表 + 主控扩展 (BYOK 模式)。",
+  "updatedAt": "2026-06-07",
+  "providers": [
+    {
+      "key": "deepseek",
+      "name": "DeepSeek",
+      "name_zh": "深度求索",
+      "defaultBaseUrl": "https://api.deepseek.com/v1",
+      "authScheme": "bearer",
+      "enabled": true,
+      "isDefault": true,
+      "models": [
+        { "key": "deepseek-chat", "name": "DeepSeek-V3 Chat", "支持思考": true, "maxTokens": 8192, "contextWindow": 64000, "defaultTemperature": 0.85 },
+        { "key": "deepseek-reasoner", "name": "DeepSeek-R1 Reasoner", "支持思考": true, "maxTokens": 8192, "contextWindow": 64000, "defaultTemperature": 0.6 }
+      ]
+    },
+    {
+      "key": "anthropic",
+      "name": "Anthropic Claude",
+      "name_zh": "Anthropic",
+      "defaultBaseUrl": "https://api.anthropic.com/v1",
+      "authScheme": "x-api-key",
+      "enabled": true,
+      "models": [
+        { "key": "claude-opus-4-8", "name": "Claude Opus 4.8", "支持思考": true, "maxTokens": 8192, "contextWindow": 200000, "defaultTemperature": 0.85 },
+        { "key": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "支持思考": true, "maxTokens": 8192, "contextWindow": 200000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "openai",
+      "name": "OpenAI",
+      "defaultBaseUrl": "https://api.openai.com/v1",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "gpt-4o", "name": "GPT-4o", "支持思考": false, "maxTokens": 4096, "contextWindow": 128000, "defaultTemperature": 0.85 },
+        { "key": "o1", "name": "o1", "支持思考": true, "maxTokens": 32768, "contextWindow": 200000, "defaultTemperature": 1.0 },
+        { "key": "o1-mini", "name": "o1-mini", "支持思考": true, "maxTokens": 65536, "contextWindow": 128000, "defaultTemperature": 1.0 }
+      ]
+    },
+    {
+      "key": "google",
+      "name": "Google Gemini",
+      "defaultBaseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "authScheme": "query-key",
+      "enabled": true,
+      "models": [
+        { "key": "gemini-2.0-flash-exp", "name": "Gemini 2.0 Flash", "支持思考": false, "maxTokens": 8192, "contextWindow": 1000000, "defaultTemperature": 0.85 },
+        { "key": "gemini-1.5-pro", "name": "Gemini 1.5 Pro", "支持思考": false, "maxTokens": 8192, "contextWindow": 2000000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "zhipu",
+      "name": "智谱 AI",
+      "name_zh": "智谱",
+      "defaultBaseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "glm-4-plus", "name": "GLM-4 Plus", "支持思考": false, "maxTokens": 8192, "contextWindow": 128000, "defaultTemperature": 0.85 },
+        { "key": "glm-4-flash", "name": "GLM-4 Flash", "支持思考": false, "maxTokens": 8192, "contextWindow": 128000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "qwen",
+      "name": "通义千问",
+      "defaultBaseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "qwen-max", "name": "Qwen Max", "支持思考": false, "maxTokens": 8192, "contextWindow": 32000, "defaultTemperature": 0.85 },
+        { "key": "qwen-plus", "name": "Qwen Plus", "支持思考": false, "maxTokens": 8192, "contextWindow": 128000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "wenxin",
+      "name": "文心一言",
+      "defaultBaseUrl": "https://qianfan.baidubce.com/v2",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "ernie-4.0", "name": "ERNIE 4.0", "支持思考": false, "maxTokens": 8192, "contextWindow": 8000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "moonshot",
+      "name": "月之暗面 Kimi",
+      "defaultBaseUrl": "https://api.moonshot.cn/v1",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "moonshot-v1-128k", "name": "Kimi 128K", "支持思考": false, "maxTokens": 8192, "contextWindow": 128000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "doubao",
+      "name": "豆包",
+      "defaultBaseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "doubao-pro-256k", "name": "豆包 Pro 256K", "支持思考": false, "maxTokens": 8192, "contextWindow": 256000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "spark",
+      "name": "讯飞星火",
+      "defaultBaseUrl": "https://spark-api-open.xf-yun.com/v1",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "spark-v3.5", "name": "Spark V3.5", "支持思考": false, "maxTokens": 8192, "contextWindow": 128000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "hunyuan",
+      "name": "腾讯混元",
+      "defaultBaseUrl": "https://hunyuan.tencent.com/v1",
+      "authScheme": "bearer",
+      "enabled": true,
+      "models": [
+        { "key": "hunyuan-pro", "name": "Hunyuan Pro", "支持思考": false, "maxTokens": 8192, "contextWindow": 32000, "defaultTemperature": 0.85 }
+      ]
+    },
+    {
+      "key": "local",
+      "name": "本地模型 (Ollama / LM Studio / vLLM)",
+      "name_zh": "本地",
+      "defaultBaseUrl": "http://localhost:11434/v1",
+      "authScheme": "none",
+      "enabled": true,
+      "isLocal": true,
+      "models": [
+        { "key": "qwen2.5:72b", "name": "Qwen 2.5 72B (本地)", "支持思考": false, "maxTokens": 8192, "contextWindow": 32000, "defaultTemperature": 0.85 }
+      ]
+    }
+  ],
+  "routingDefaults": {
+    "续写": { "provider": "deepseek", "model": "deepseek-chat" },
+    "蒸馏": { "provider": "deepseek", "model": "deepseek-chat" },
+    "扩写": { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "润色": { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "改写": { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "对话": { "provider": "deepseek", "model": "deepseek-chat" },
+    "大纲生成": { "provider": "anthropic", "model": "claude-opus-4-8" },
+    "角色生成": { "provider": "anthropic", "model": "claude-opus-4-8" }
+  }
+}

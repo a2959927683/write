@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/story-core.json",
+  "title": "StoryCore (故事核心) — 17 World Tab 模块之一 (#2)",
+  "description": "云笔AI 故事核心, 6 字段, 一项目一记录。",
+  "type": "object",
+  "required": ["project_id"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "主题": {"type": "string", "description": "故事的主题, 如\"命运的抗争\""},
+    "主线": {"type": "string", "description": "主要故事线"},
+    "冲突": {"type": "string", "description": "核心冲突"},
+    "高潮": {"type": "string", "description": "高潮场景"},
+    "结局": {"type": "string", "description": "结局走向"},
+    "核心意义": {"type": "string", "description": "作者想表达的核心意义"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  }
+}

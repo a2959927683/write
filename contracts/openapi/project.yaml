@@ -1,0 +1,182 @@
+openapi: 3.1.0
+info:
+  title: 云笔AI 复刻 · 项目 API
+  version: 1.0.0
+  description: |
+    主控权威契约 - 项目模块 (/projects)
+    字段名采用中文, 与云笔 API 1:1 对应
+
+servers:
+  - url: /api
+
+tags:
+  - name: project
+    description: 项目 (小说) 模块
+
+paths:
+  /projects:
+    get:
+      tags: [project]
+      summary: 列出当前用户项目 (分页 + 筛选)
+      security: [bearerAuth: []]
+      parameters:
+        - { in: query, name: page, schema: { type: integer, default: 1 } }
+        - { in: query, name: limit, schema: { type: integer, default: 12, enum: [12, 24, 48, 96] } }
+        - { in: query, name: keyword, schema: { type: string } }
+        - { in: query, name: 项目类型, schema: { type: string } }
+        - { in: query, name: 项目状态, schema: { type: string, enum: [连载中, 已完结, 暂停] } }
+        - { in: query, name: sort, schema: { type: string, enum: [createdAt_desc, createdAt_asc, updatedAt_desc, 总字数_desc] } }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '../../schemas/project.json' }
+                  pagination:
+                    type: object
+                    properties:
+                      total: { type: integer }
+                      page: { type: integer }
+                      limit: { type: integer }
+                      totalPages: { type: integer }
+    post:
+      tags: [project]
+      summary: 创建项目
+      security: [bearerAuth: []]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [项目名称, 项目类型]
+              properties:
+                项目名称: { type: string, maxLength: 128 }
+                项目类型: { type: string, maxLength: 32 }
+                项目状态: { type: string, default: "连载中" }
+                描述: { type: string }
+                封面: { type: string, format: uri }
+                tags:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200': { description: 创建成功, 返回 Project }
+        '403': { description: 项目配额已满 (free: 1 个, pro: 10 个) }
+
+  /projects/my-quota:
+    get:
+      tags: [project]
+      summary: 当前用户项目配额
+      security: [bearerAuth: []]
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      当前项目数: { type: integer }
+                      最大项目数: { type: integer }
+                      可创建: { type: boolean }
+
+  /projects/{id}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: integer } }
+    get:
+      tags: [project]
+      summary: 获取项目详情
+      security: [bearerAuth: []]
+      responses:
+        '200': { description: 成功, content: { application/json: { schema: { $ref: '../../schemas/project.json' } } } }
+        '404': { description: 不存在 }
+    put:
+      tags: [project]
+      summary: 更新项目
+      security: [bearerAuth: []]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                项目名称: { type: string }
+                项目类型: { type: string }
+                项目状态: { type: string }
+                描述: { type: string }
+                封面: { type: string, format: uri }
+      responses:
+        '200': { description: 成功 }
+        '403': { description: 无权访问该项目 }
+    delete:
+      tags: [project]
+      summary: 删除项目 (级联)
+      security: [bearerAuth: []]
+      responses:
+        '200': { description: 成功 }
+        '403': { description: 无权访问 }
+
+  /projects/{id}/export:
+    post:
+      tags: [project]
+      summary: 导出项目
+      security: [bearerAuth: []]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [format]
+              properties:
+                format: { type: string, enum: [markdown, txt, docx, pdf] }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      url: { type: string, format: uri, description: 导出文件下载 URL (S3 签名) }
+
+  /projects/{id}/export/chapters:
+    get:
+      tags: [project]
+      summary: 列出可导出的章节 (Markdown)
+      security: [bearerAuth: []]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    章节标题: { type: string }
+                    内容: { type: string }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

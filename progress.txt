@@ -1,0 +1,64 @@
+# Master Project · Sprint Progress Log
+
+> 主控进度日志 (按时间倒序追加, 不删除历史)
+
+---
+
+## [2026-06-07] Sprint 0 · 主控初始化
+
+### 目标
+跑通"登录 → 创建项目 → 编辑器 → AI 续写 (SSE)"主链。
+
+### 今日完成
+1. ✅ 深度扫描 knowlage/ 知识库 (87 个 wiki 页, 50 个 Opus agent 并行, 128 万 tokens)
+2. ✅ 合成主控规格说明书 v1.0 (1825 行, 13 章节 + 2 附录)
+3. ✅ 初始化 master/ monorepo 目录结构
+4. ✅ 编写主控 README.md (导航)
+5. ✅ 编写主控 CLAUDE.md (Claude Code 读的项目说明)
+6. ✅ 编写 harness.config.json (l3-v4 5 阶段配置)
+7. ✅ 编写 feature_list.json (Sprint 0: 37 任务清单)
+8. ✅ 编写 contracts/schemas/ (11 个 JSON Schema: project, chapter, outline, character, worldview, story-core, geo-map, faction, currency, item, power-system, skill-system, special-setting, timeline, foreshadow, plot-structure, event-line)
+9. ✅ 编写 contracts/openapi/ (3 个: auth.yaml, project.yaml, ai.yaml)
+10. ✅ 编写 contracts/ai/providers.json (12 厂商注册表)
+11. ✅ 编写 contracts/events/ai-stream.ts (SSE 7 事件类型)
+
+### 任务进度
+- 已完成 passes: true: 9 个 (S0-01, S0-02, S0-03, S0-05, S0-07, S0-08, S0-11, S0-12, S0-13)
+- 进行中: 0 个
+- 未开始: 28 个
+- 阻塞: 0 个
+
+### 今日计划 (2026-06-08)
+- S0-04: 编写 init.sh (跨平台一键启动)
+- S0-06: 初始化 progress.txt 详细化
+- S0-09 / S0-10 / S0-14: 补全剩余 OpenAPI 契约 (chapter/outline/routing-rules)
+- S0-34: 编写 16 个 ADR
+- S0-35: 编写 system-overview.md
+
+### 障碍 / 风险
+- 无
+
+### 关键决策
+- 主控 Base URL 采用 `/api` (与云笔真实 API 一致), 不是用户消息中的 `/api/v1/`
+- 数据模型字段 1:1 还原中文字段名 (项目名称, 关联大纲节点ID, 蒸馏状态, 三重冗余)
+- AI 厂商注册表 12 家 (DeepSeek 默认), 全部支持 BYOK
+- 蒸馏管线采用 3 阶段 (Generator → Extractor → Checker)
+
+### 主链 (Sprint 0 验收) 当前状态
+- [ ] 登录 (S0-18 待实现)
+- [ ] 创建项目 (S0-19 待实现)
+- [ ] 进入编辑器 (S0-25 待实现)
+- [ ] 输入 100 字 + 自动保存 (S0-26 待实现)
+- [ ] 触发 AI 续写 200 字 (S0-29 待实现)
+- [ ] SSE 流式显示 (S0-29 待实现)
+- [ ] 手动采纳插入 + 保存 (待拆)
+
+### 下一阶段 (Sprint 1)
+1. 实现 17 World Tab 模块后端 (60+ 端点)
+2. 实现蒸馏管线 (3 阶段 BullMQ 任务)
+3. 实现跨模块一致性 (知识图谱)
+4. 接入第 2 家 AI 厂商 (Claude)
+
+---
+
+*最后更新: 2026-06-07 · 主控 v1.0 · 启动: 22:00 · 当前: 22:30*

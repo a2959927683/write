@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/character.json",
+  "title": "Character (角色) — 17 World Tab 模块之一 (★P1)",
+  "description": "云笔AI 角色管理实体,24 类型 + 三层性格 + 7 段背景。子表 4 个:character_items / character_relations / character_appearances / character_realm_breakthroughs。",
+  "type": "object",
+  "required": ["project_id", "姓名", "类型"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "姓名": {"type": "string", "maxLength": 64},
+    "类型": {
+      "type": "string",
+      "enum": [
+        "主角", "女主", "男主", "反派", "导师", "配角", "盟友", "对手",
+        "家族成员", "恋人", "朋友", "敌人", "路人", "神秘人物", "历史人物",
+        "穿越者", "重生者", "系统持有者", "金手指持有者", "阵营领袖",
+        "组织成员", "种族代表", "其他"
+      ],
+      "description": "C03 冲突裁决: 24 类"
+    },
+    "性别": {
+      "type": "string",
+      "enum": ["男", "女", "其他", "不明"]
+    },
+    "年龄": {
+      "type": "string",
+      "maxLength": 16,
+      "description": "字符串, 支持\"十七岁\"\"三千岁\"等"
+    },
+    "身份": {"type": "string", "maxLength": 64, "description": "如\"星涡宿主\""},
+    "境界": {"type": "string", "maxLength": 64, "description": "当前境界名称, 来自 power_systems.境界列表"},
+    "武器": {"type": "string", "maxLength": 128},
+    "外貌": {"type": "string"},
+    "结局": {
+      "type": "string",
+      "maxLength": 64,
+      "enum": ["存活", "死亡", "失踪", "成神", "退场", "未揭示"]
+    },
+    "性格": {
+      "type": "object",
+      "description": "C03 三层性格模型",
+      "properties": {
+        "表层": {"type": "string", "description": "外在表现"},
+        "中层": {"type": "string", "description": "待人接物"},
+        "内核": {"type": "string", "description": "本质/核心动机"}
+      }
+    },
+    "人生经历": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "事件": {"type": "string"},
+          "章节": {"type": "integer"}
+        }
+      }
+    },
+    "核心意义": {"type": "string"},
+    "其他信息": {
+      "type": "object",
+      "description": "扩展 JSON"
+    },
+    "简介": {"type": "string"},
+    "头像颜色": {
+      "type": "string",
+      "description": "Tailwind 渐变类, 如 from-blue-500 to-purple-600"
+    },
+    "颜色": {
+      "type": "string",
+      "description": "HEX, 如 #FF6B6B"
+    },
+    "力量体系ID": {"type": ["integer", "null"], "description": "FK → power_systems.id"},
+    "初始境界ID": {"type": ["integer", "null"], "description": "FK → power_realms.id"},
+    "当前境界ID": {"type": ["integer", "null"], "description": "FK → power_realms.id"},
+    "初始战力系数": {"type": "number"},
+    "当前战力系数": {"type": "number"},
+    "存续状态": {
+      "type": "string",
+      "enum": ["活跃", "死亡", "失踪", "退场", "未登场"]
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-related-tables": [
+    "character_items", "character_relations",
+    "character_appearances", "character_realm_breakthroughs"
+  ],
+  "x-api-endpoints": [
+    "/characters (CRUD 5)",
+    "/characters/:id/enhance-context",
+    "/characters/:id/sync-appearances",
+    "/characters/:id/clear-appearances",
+    "/characters/:id/realm/* (8 端点)"
+  ]
+}

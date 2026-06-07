@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/chapter.json",
+  "title": "Chapter (章节) — 主控权威数据模型",
+  "description": "云笔AI 章节实体。注意: 内容/正文/content 三重冗余字段。",
+  "type": "object",
+  "required": ["project_id", "标题"],
+  "properties": {
+    "id": {"type": "integer", "description": "章节 ID, BIGSERIAL"},
+    "project_id": {"type": "integer", "description": "FK → projects.id CASCADE"},
+    "关联大纲节点ID": {
+      "type": ["integer", "null"],
+      "description": "FK → outlines.id SET NULL, 关联大纲节点"
+    },
+    "标题": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "章节标题, 含章节号, 如\"第一章 楔子\""
+    },
+    "字数": {"type": "integer", "default": 0, "description": "实时字数"},
+    "状态": {
+      "type": "string",
+      "enum": ["pending", "complete", "draft"],
+      "default": "pending"
+    },
+    "内容": {
+      "type": "string",
+      "description": "列表接口用 (三重冗余之一)"
+    },
+    "正文": {
+      "type": "string",
+      "description": "详情接口用 (三重冗余之一, 与 内容 一致)"
+    },
+    "content": {
+      "type": "string",
+      "description": "英文键名版本 (三重冗余之一, 与 内容/正文 一致)"
+    },
+    "场景脚本": {
+      "type": "string",
+      "description": "SC|序号|地点|... 格式的场景脚本"
+    },
+    "蒸馏状态": {
+      "type": "string",
+      "enum": ["未蒸馏", "进行中", "已完成", "失败"],
+      "default": "未蒸馏"
+    },
+    "蒸馏失败原因": {"type": ["string", "null"]},
+    "蒸馏模型": {"type": ["string", "null"], "description": "使用的模型标识, 如 deepseek-chat"},
+    "蒸馏完成时间": {"type": ["string", "null"], "format": "date-time"},
+    "正文快照哈希": {
+      "type": ["string", "null"],
+      "maxLength": 6,
+      "description": "6 位短哈希, 用于变更检测"
+    },
+    "排序顺序": {"type": "integer", "default": 0},
+    "target_word_count": {"type": "integer", "default": 3000, "description": "目标字数, 默认 3000"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false,
+  "x-three-fold-redundancy": {
+    "description": "云笔 API 在不同接口返回不同字段名,主控短期保留兼容,长期建议废弃 正 文 / content",
+    "fields": ["内容", "正文", "content"]
+  }
+}

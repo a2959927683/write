@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/worldview.json",
+  "title": "Worldview (世界观设定) — 17 World Tab 模块之一 (#1)",
+  "description": "云笔AI 世界观设定实体, 一项目一记录 (UNIQUE project_id)。",
+  "type": "object",
+  "required": ["project_id"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {
+      "type": "integer",
+      "description": "UNIQUE 一项目一世界观"
+    },
+    "世界名称": {"type": "string", "maxLength": 128},
+    "世界类型": {
+      "type": "string",
+      "enum": ["都市异能", "玄幻", "仙侠", "科幻", "魔幻", "末世", "无限流", "历史", "军事", "校园", "其他"]
+    },
+    "时代背景": {"type": "string"},
+    "核心规则": {"type": "string", "description": "世界运行的核心规则"},
+    "地理环境": {"type": "string"},
+    "社会结构": {"type": "string"},
+    "历史背景": {"type": "string"},
+    "特殊元素": {"type": "string"},
+    "主要冲突": {"type": "string"},
+    "势力格局": {"type": "string"},
+    "备注": {"type": "string"},
+    "ext": {
+      "type": "object",
+      "description": "扩展 JSON, 包含: 历法子系统 / 版本历史 / 子表引用"
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-key-api-endpoints": [
+    "GET /worldviews/project/:id",
+    "GET /worldviews/project/:id/full (完整版本)",
+    "GET /worldviews/project/:id/versions (版本历史)",
+    "POST /worldviews/project/:id/versions (保存版本)",
+    "PUT /worldviews/project/:id/versions/:vId/rollback (回滚)",
+    "POST /worldviews/project/:id/sync (同步)"
+  ]
+}

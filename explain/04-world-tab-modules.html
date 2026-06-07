@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>🗺️ 17 个世界观模块:乐高积木搭世界</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFF9C4 0%, #FFCCBC 50%, #C8E6C9 100%);
+    min-height: 100vh;
+    padding: 30px 20px;
+    line-height: 1.8;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #BF360C;
+    font-size: 2.2em;
+    margin-bottom: 20px;
+  }
+  .intro {
+    background: white;
+    border: 3px dashed #FF6F00;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    font-size: 1.1em;
+  }
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .module {
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    text-align: center;
+    border: 3px solid #FF9800;
+    transition: transform 0.2s;
+  }
+  .module:hover { transform: scale(1.05); }
+  .module.priority-p0 { border-color: #E53935; background: #FFEBEE; }
+  .module.priority-p1 { border-color: #FB8C00; background: #FFF3E0; }
+  .module.priority-p2 { border-color: #43A047; background: #E8F5E9; }
+  .module-num {
+    display: inline-block;
+    background: #FF6F00;
+    color: white;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  .module-icon { font-size: 2.5em; }
+  .module-name { font-weight: bold; color: #E65100; margin: 8px 0; }
+  .module-desc { font-size: 0.85em; color: #555; }
+  .lego-section {
+    background: white;
+    border: 3px solid #5E35B1;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 30px 0;
+  }
+  .lego-section h2 { color: #4527A0; text-align: center; }
+  .story {
+    background: #FFF3E0;
+    border: 3px dashed #FF6F00;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+  }
+  .story h2 { color: #E65100; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🗺️ 17 个世界观模块 = 17 块乐高积木</h1>
+
+  <div class="intro">
+    <h2>📖 故事:你想写一本小说,需要什么?</h2>
+    <p>写小说不是"瞎写",你得先想好:</p>
+    <p>· 🌍 <strong>世界长什么样?</strong> (有魔法吗?有高科技吗?)<br>
+       · 🧝 <strong>主角是谁?</strong> (他有什么能力?性格怎么样?)<br>
+       · 🗺️ <strong>地图长什么样?</strong> (有几座城市?有什么山?)<br>
+       · 👑 <strong>有哪几个国家/门派?</strong> (他们打不打架?)<br>
+       · 💰 <strong>用什么钱?</strong> (金币?灵石?)<br>
+       · ⚔️ <strong>打架怎么算输赢?</strong> (等级?战力?)<br>
+       · 🕵️ <strong>埋了什么伏笔?</strong> (什么时候揭穿?)<br>
+       · ⏰ <strong>故事发生在什么时候?</strong> (哪一年?)<br>
+       · ... 还有好多好多!</p>
+    <p style="margin-top:15px;">
+    <strong>云笔AI 帮你准备了 17 块"乐高积木"</strong>,一块一块搭,你的小说世界就成型啦!
+    </p>
+  </div>
+
+  <h2 style="text-align:center; color:#BF360C; margin: 30px 0 15px;">🧱 17 块乐高积木</h2>
+  <p style="text-align:center; color:#666; margin-bottom: 20px;">
+    🔴 红色 = 最优先 (P0) · 🟠 橙色 = 重要 (P1) · 🟢 绿色 = 锦上添花 (P2)
+  </p>
+
+  <div class="module-grid">
+
+    <div class="module priority-p0">
+      <div class="module-num">1</div>
+      <div class="module-icon">🌍</div>
+      <div class="module-name">世界观设定</div>
+      <div class="module-desc">世界长什么样?有魔法还是科技?</div>
+    </div>
+
+    <div class="module priority-p0">
+      <div class="module-num">2</div>
+      <div class="module-icon">💎</div>
+      <div class="module-name">故事核心</div>
+      <div class="module-desc">6 个字段:主题/主线/冲突/高潮/结局/意义</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">3</div>
+      <div class="module-icon">🗺️</div>
+      <div class="module-name">地理地图</div>
+      <div class="module-desc">6 级树形:世界→大陆→区域→城市→地点→子地点</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">4</div>
+      <div class="module-icon">👑</div>
+      <div class="module-name">势力阵营</div>
+      <div class="module-desc">9 种类型,带关系图(谁跟谁是盟友?)</div>
+    </div>
+
+    <div class="module priority-p2">
+      <div class="module-num">5</div>
+      <div class="module-icon">💰</div>
+      <div class="module-name">货币体系</div>
+      <div class="module-desc">3 种货币:主币/辅币/虚拟</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">6</div>
+      <div class="module-icon">📦</div>
+      <div class="module-name">物品列表</div>
+      <div class="module-desc">86 件物品,17 个字段(武器/丹药/宝物)</div>
+    </div>
+
+    <div class="module priority-p0">
+      <div class="module-num">7</div>
+      <div class="module-icon">⚔️</div>
+      <div class="module-name">力量体系</div>
+      <div class="module-desc">11 境界 + 6 能力 + 5 限制 + 4 路径(打架规则)</div>
+    </div>
+
+    <div class="module priority-p2">
+      <div class="module-num">8</div>
+      <div class="module-icon">📜</div>
+      <div class="module-name">功法体系</div>
+      <div class="module-desc">60 种类型 × 9 个品级</div>
+    </div>
+
+    <div class="module priority-p2">
+      <div class="module-num">9</div>
+      <div class="module-icon">✨</div>
+      <div class="module-name">特殊设定 (金手指)</div>
+      <div class="module-desc">19 种类型:系统/穿越/重生/签到/抽奖…</div>
+    </div>
+
+    <div class="module priority-p0">
+      <div class="module-num">10</div>
+      <div class="module-icon">📋</div>
+      <div class="module-name">大纲设定 ⭐</div>
+      <div class="module-desc">★ 最优先!卷-章树形,22 个 API 端点</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">11</div>
+      <div class="module-icon">🧝</div>
+      <div class="module-name">角色管理</div>
+      <div class="module-desc">24 种类型 + 三层性格(表/中/内)</div>
+    </div>
+
+    <div class="module priority-p2">
+      <div class="module-num">12</div>
+      <div class="module-icon">💞</div>
+      <div class="module-name">人物关系图</div>
+      <div class="module-desc">8 种关系 + 13 种 chip 颜色</div>
+    </div>
+
+    <div class="module priority-p0">
+      <div class="module-num">13</div>
+      <div class="module-icon">🕵️</div>
+      <div class="module-name">伏笔管理</div>
+      <div class="module-desc">6 类型 + 10 埋设模式(埋坑+回收)</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">14</div>
+      <div class="module-icon">📈</div>
+      <div class="module-name">情节脉络</div>
+      <div class="module-desc">5 种模板:起承转合/英雄之旅/三幕剧…</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">15</div>
+      <div class="module-icon">🌿</div>
+      <div class="module-name">支线故事</div>
+      <div class="module-desc">35 个事件,3 步 AI 生成</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">16</div>
+      <div class="module-icon">⏰</div>
+      <div class="module-name">时间线</div>
+      <div class="module-desc">自定义历法 + 7 种事件</div>
+    </div>
+
+    <div class="module priority-p1">
+      <div class="module-num">17</div>
+      <div class="module-icon">📚</div>
+      <div class="module-name">已经历事件</div>
+      <div class="module-desc">95 个事件,自动蒸馏回流</div>
+    </div>
+
+  </div>
+
+  <div class="lego-section">
+    <h2>🧱 怎么搭? 11 步探讨式向导</h2>
+    <p>云笔会 <strong>一个一个问你</strong>, 像填问卷一样:</p>
+    <p style="margin-top: 15px;">
+      📝 <strong>第 1 步</strong>: 你的小说叫什么名字? (基础信息)<br>
+      🌍 <strong>第 2 步</strong>: 你想写什么类型? (世界观)<br>
+      💎 <strong>第 3 步</strong>: 故事的核心是什么? (故事核心)<br>
+      🧝 <strong>第 4 步</strong>: 主角是谁? (角色)<br>
+      📈 <strong>第 5 步</strong>: 故事怎么发展? (情节结构)<br>
+      🕵️ <strong>第 6 步</strong>: 要埋什么伏笔? (伏笔)<br>
+      🗺️ <strong>第 7 步</strong>: 在哪些地方发生? (地理)<br>
+      👑 <strong>第 8 步</strong>: 有哪些势力? (阵营)<br>
+      ⚔️ <strong>第 9 步</strong>: 打架怎么算? (力量体系)<br>
+      ✨ <strong>第 10 步</strong>: 主角有什么金手指? (特殊设定)<br>
+      💰 <strong>第 11 步</strong>: 用什么钱? (货币)
+    </p>
+    <p style="margin-top: 20px; text-align: center; font-size: 1.2em;">
+      ✨ <strong>填完这 11 步,你的小说世界就搭建好了!</strong> ✨
+    </p>
+  </div>
+
+  <div class="story">
+    <h2>🎁 还有 3 种创建方式</h2>
+    <p>除了"11 步探讨式",还有:</p>
+    <p>🎴 <strong>抽卡式</strong> — 像抽卡一样,AI 给你随机生成 3 套设定,挑你喜欢的</p>
+    <p>🎬 <strong>剧情式</strong> — 你讲一句话,AI 自动展开成一整个世界</p>
+    <p>📋 <strong>60 个精品模板</strong> — 别人搭好的,你直接套用!</p>
+  </div>
+
+  <div class="story" style="background: #E8F5E9; border-color: #4CAF50;">
+    <h2>🎯 一句话总结</h2>
+    <p style="font-size: 1.2em; text-align: center;">
+      <strong>17 块乐高积木 = 17 个世界观模块</strong><br>
+      从最基础的世界,到最复杂的伏笔,一块一块搭。<br>
+      搭完你就有了一个 <strong>不会前后矛盾的小宇宙</strong>! 🌌<br>
+      <br>
+      而且 AI 还能帮你 <strong>自动填充</strong> 每块积木,<br>
+      你只需要告诉它:"我想要一个玄幻世界,主角是废柴逆袭" ✨
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

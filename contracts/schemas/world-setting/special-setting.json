@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/special-setting.json",
+  "title": "SpecialSetting (特殊设定/金手指) — 17 World Tab 模块之一 (#9)",
+  "description": "云笔AI 特殊设定, 19 类型 / 5 大类 chip。",
+  "type": "object",
+  "required": ["project_id", "名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "名称": {"type": "string", "maxLength": 128},
+    "类型": {
+      "type": "string",
+      "enum": [
+        "系统", "重生", "穿越", "签到", "兑换", "抽奖", "副本", "升级",
+        "修炼", "血脉", "异能", "天眼", "预知", "吞噬", "复制",
+        "召唤", "鉴定", "强化", "其他"
+      ],
+      "description": "19 类金手指"
+    },
+    "描述": {"type": "string"},
+    "标签": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "ext": {"type": "object"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  }
+}

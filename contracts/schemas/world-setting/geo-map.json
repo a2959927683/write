@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/geo-map.json",
+  "title": "GeoMap (地理地图) — 17 World Tab 模块之一 (#3)",
+  "description": "云笔AI 地理地图, 35 地点, 树形 6 级, 双视图 (列表/地图)。",
+  "type": "object",
+  "required": ["project_id", "名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "parent_id": {
+      "type": ["integer", "null"],
+      "description": "树形父节点"
+    },
+    "名称": {"type": "string", "maxLength": 128},
+    "描述": {"type": "string"},
+    "地图等级": {
+      "type": "integer",
+      "enum": [0, 1, 2, 3, 4, 5],
+      "description": "0=世界, 1=大陆, 2=区域, 3=城市, 4=地点, 5=子地点"
+    },
+    "地图类型": {
+      "type": "string",
+      "enum": ["世界", "大陆", "区域", "城市", "地点", "子地点"]
+    },
+    "父地图名称": {
+      "type": ["string", "null"],
+      "maxLength": 128,
+      "description": "冗余字段, 便于列表展示"
+    },
+    "ext": {
+      "type": "object",
+      "description": "扩展 JSON, 包含: 坐标 / 连边 / 网络布局参数"
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-key-api-endpoints": [
+    "GET /geo-maps/project/:id/list",
+    "GET /geo-maps/project/:id/map/:mapId",
+    "GET /geo-maps/project/:id/children-count",
+    "GET /geo-maps/project/:id/worldview",
+    "POST /geo-maps/project/:id/visits/batch"
+  ]
+}

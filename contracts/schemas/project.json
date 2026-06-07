@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/project.json",
+  "title": "Project (项目) — 主控权威数据模型",
+  "description": "云笔AI 项目实体的 JSON Schema 定义。中文字段名与云笔 API 1:1 对应。",
+  "type": "object",
+  "required": ["项目名称", "项目类型"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "项目 ID, BIGSERIAL, 与云笔 ID 范围 6310/9657/9529/9320 对应"
+    },
+    "user_id": {
+      "type": "integer",
+      "description": "所属用户 ID, 外键 → users.id"
+    },
+    "项目名称": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "小说名,如\"烬都奇谭\"、\"玄穹开\""
+    },
+    "项目类型": {
+      "type": "string",
+      "maxLength": 32,
+      "enum": ["玄幻", "仙侠", "都市", "言情", "科幻", "历史", "军事", "游戏", "悬疑", "其他"],
+      "description": "项目类型,13 种类型 55 流派"
+    },
+    "项目状态": {
+      "type": "string",
+      "maxLength": 16,
+      "enum": ["连载中", "已完结", "暂停", "废弃"],
+      "default": "连载中"
+    },
+    "描述": {
+      "type": "string",
+      "description": "项目简介, Markdown 格式"
+    },
+    "封面": {
+      "type": "string",
+      "format": "uri",
+      "description": "封面图片 URL (S3 兼容存储)"
+    },
+    "每幕事件数量配置": {
+      "type": "object",
+      "description": "节奏配置, AI 生成时使用",
+      "properties": {
+        "setup": {"type": "integer", "default": 3},
+        "rising": {"type": "integer", "default": 5},
+        "climax": {"type": "integer", "default": 3},
+        "falling": {"type": "integer", "default": 2}
+      }
+    },
+    "总字数": {
+      "type": "integer",
+      "default": 0,
+      "description": "聚合缓存, 由 chapters.字数 求和"
+    },
+    "章节数": {
+      "type": "integer",
+      "default": 0,
+      "description": "聚合缓存, 由 chapters.id 计数"
+    },
+    "角色数": {
+      "type": "integer",
+      "default": 0,
+      "description": "聚合缓存, 由 characters.id 计数"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "流派标签, 13 类型 55 流派"
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": 6310,
+      "user_id": 1,
+      "项目名称": "烬都奇谭",
+      "项目类型": "都市",
+      "项目状态": "连载中",
+      "描述": "一个关于星烬九考的奇谭故事",
+      "总字数": 18356,
+      "章节数": 5,
+      "角色数": 7,
+      "tags": ["都市", "异能", "长篇", "连载中"]
+    }
+  ]
+}

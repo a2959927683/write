@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/foreshadow.json",
+  "title": "Foreshadow (伏笔) — 17 World Tab 模块之一 (#13)",
+  "description": "云笔AI 伏笔管理实体, C05 冲突裁决: 6 类型 + 10 埋设模式 + 19 伏笔实例。",
+  "type": "object",
+  "required": ["project_id", "标题", "类型"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "标题": {"type": "string", "maxLength": 255},
+    "描述": {"type": "string"},
+    "类型": {
+      "type": "string",
+      "enum": ["悬念", "伏线", "暗喻", "预言", "巧合", "对照"],
+      "description": "C05 裁决: 6 种类型"
+    },
+    "埋设模式": {
+      "type": "string",
+      "enum": [
+        "对话暗示", "物件刻画", "景物烘托", "梦境预言", "他人转述",
+        "旁白议论", "行为异常", "环境异常", "数字暗示", "姓名暗示"
+      ],
+      "description": "C05 裁决: 10 种埋设模式"
+    },
+    "埋设章节ID": {"type": ["integer", "null"], "description": "FK → chapters.id"},
+    "状态": {
+      "type": "string",
+      "enum": ["已埋设", "发展中", "已回收", "已废弃"]
+    },
+    "重要度": {"type": "integer", "minimum": 1, "maximum": 5},
+    "回收章节ID": {"type": ["integer", "null"], "description": "FK → chapters.id"},
+    "ext": {
+      "type": "object",
+      "description": "扩展 JSON, 包含 echoes (回响) 子数组"
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-echo-table": {
+    "table": "foreshadow_echoes",
+    "fields": ["foreshadow_id", "章节ID", "描述", "echoed_at"]
+  },
+  "x-key-api-endpoints": [
+    "POST /foreshadows/project/:id/foreshadow/:fId/echo",
+    "GET /foreshadows/project/:id/chapter/:chapterId/foreshadows",
+    "POST /foreshadows/project/:id/find-chapter",
+    "GET /foreshadows/stats"
+  ]
+}

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>🧙 AI 调度:12 个大法师怎么听你指挥?</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FCE4EC 0%, #E1BEE7 50%, #B39DDB 100%);
+    min-height: 100vh;
+    padding: 30px 20px;
+    line-height: 1.8;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #6A1B9A;
+    font-size: 2.2em;
+    margin-bottom: 30px;
+  }
+  .story {
+    background: white;
+    border: 3px solid #AB47BC;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    font-size: 1.1em;
+  }
+  .magicians {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .magician {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    border: 3px solid #FFD700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .magician.default { border-color: #FF6B6B; background: #FFE6E6; }
+  .magician-icon { font-size: 2.5em; }
+  .magician-name { font-weight: bold; margin: 8px 0; color: #6A1B9A; }
+  .magician-tag { font-size: 0.85em; color: #666; }
+  .pipeline {
+    background: #FFF8E1;
+    border: 3px solid #FFA000;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+  }
+  .pipeline h2 { color: #E65100; margin-bottom: 15px; }
+  .stage {
+    background: white;
+    border: 2px solid #FFA000;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+  }
+  .stage-title { font-weight: bold; color: #E65100; font-size: 1.15em; }
+  .sse {
+    background: #E0F7FA;
+    border: 3px solid #00ACC1;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+  }
+  .sse h2 { color: #006064; margin-bottom: 15px; }
+  code {
+    background: #263238;
+    color: #B0BEC5;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+  }
+  .sse-event {
+    background: #263238;
+    color: #B0BEC5;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    margin: 8px 0;
+    font-size: 0.9em;
+  }
+  .event-name { color: #FFD54F; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🧙 AI 调度:12 个大法师听你指挥</h1>
+
+  <div class="story">
+    <h2>📖 故事:你是一个国王,手下有 12 个大法师</h2>
+    <p>每个大法师都有自己的 <strong>特长</strong>:</p>
+    <p>· 有的便宜 (DeepSeek, 每 100 万字只要 ¥1)<br>
+       · 有的最聪明 (Claude Opus, 什么都会)<br>
+       · 有的看很长的书 (Gemini, 能读 100 万字)<br>
+       · 有的就在你家 (本地 Ollama, 不花钱)</p>
+    <p><strong>主控 = 王国总管</strong>,负责挑哪个法师做哪件事。</p>
+  </div>
+
+  <div class="story">
+    <h2>👥 12 位大法师(默认是红色的 DeepSeek!)</h2>
+    <div class="magicians">
+
+      <div class="magician default">
+        <div class="magician-icon">⭐</div>
+        <div class="magician-name">DeepSeek</div>
+        <div class="magician-tag">⭐ 默认!便宜 + 中文好</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🤖</div>
+        <div class="magician-name">Claude</div>
+        <div class="magician-tag">最聪明, 写故事最棒</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">💬</div>
+        <div class="magician-name">GPT-4o</div>
+        <div class="magician-tag">通用, 啥都会</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">💎</div>
+        <div class="magician-name">Gemini</div>
+        <div class="magician-tag">看得最长 (1M 字)</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🧠</div>
+        <div class="magician-name">智谱 GLM</div>
+        <div class="magician-tag">国产, 中文网文好</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🐉</div>
+        <div class="magician-name">通义千问</div>
+        <div class="magician-tag">阿里出, 便宜</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🌸</div>
+        <div class="magician-name">文心一言</div>
+        <div class="magician-tag">百度出</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🌙</div>
+        <div class="magician-name">Kimi</div>
+        <div class="magician-tag">月之暗面, 长文</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🫘</div>
+        <div class="magician-name">豆包</div>
+        <div class="magician-tag">字节出</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">⭐</div>
+        <div class="magician-name">讯飞星火</div>
+        <div class="magician-tag">语音强</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">☁️</div>
+        <div class="magician-name">腾讯混元</div>
+        <div class="magician-tag">腾讯出</div>
+      </div>
+
+      <div class="magician">
+        <div class="magician-icon">🏠</div>
+        <div class="magician-name">本地 (Ollama)</div>
+        <div class="magician-tag">在家跑, 不要钱</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <h2>🍳 3 阶段"蒸馏"魔法:把长故事变成"笔记"</h2>
+    <p>你写了一章小说(可能 5000 字),但电脑要记很多东西:人物、地点、伏笔、时间…</p>
+    <p>电脑不会看一遍就记住,它要 <strong>分 3 步</strong> 来"消化":</p>
+
+    <div class="stage">
+      <div class="stage-title">📝 第 1 步:Generator (生成摘要)</div>
+      AI 读完全章,写出 5 个字段:
+      <code>人物 / 事件 / 地点 / 转折 / 伏笔</code>
+    </div>
+
+    <div class="stage">
+      <div class="stage-title">🧲 第 2 步:Extractor (抽取结构)</div>
+      AI 把摘要整理成电脑能懂的格式:
+      <code>event_flows / timeline_events / foreshadows</code>
+    </div>
+
+    <div class="stage">
+      <div class="stage-title">🔍 第 3 步:Checker (检查矛盾)</div>
+      AI 拿摘要去和"知识图谱"对比:
+      <code>"咦?这个角色 3 章前死了,怎么又出现了?"</code>
+    </div>
+
+    <p style="margin-top:15px;">
+    ✨ <strong>好处</strong>:你写完一章,电脑自动记好所有细节,你再也不用担心前后矛盾!
+    </p>
+  </div>
+
+  <div class="sse">
+    <h2>⚡ SSE 流式魔法:打字机效果</h2>
+    <p>你有没有注意到,ChatGPT 回复你的时候,是一个字一个字蹦出来的?</p>
+    <p>那是因为用了 <strong>SSE (Server-Sent Events)</strong> — 服务端一边想,一边把字推给你。</p>
+    <p>不需要等 AI 全部想完才开始看,体验 <strong>快 10 倍</strong>!</p>
+
+    <p style="margin-top:15px;"><strong>主控的 AI 流有 7 种事件:</strong></p>
+
+    <div class="sse-event">
+      <span class="event-name">event: stream.start</span><br>
+      data: <code>{"sessionId":"abc","model":"deepseek-chat"}</code>
+    </div>
+
+    <div class="sse-event">
+      <span class="event-name">event: stream.chunk</span><br>
+      data: <code>{"delta":"这是","index":1}</code>
+    </div>
+
+    <div class="sse-event">
+      <span class="event-name">event: stream.chunk</span><br>
+      data: <code>{"delta":"一段","index":2}</code>
+    </div>
+
+    <div class="sse-event">
+      <span class="event-name">event: stream.chunk</span><br>
+      data: <code>{"delta":"续写","index":3}</code>
+    </div>
+
+    <div class="sse-event">
+      <span class="event-name">event: stream.done</span><br>
+      data: <code>{"totalTokens":42,"finishReason":"stop","content":"这是一段续写..."}</code>
+    </div>
+
+    <p style="margin-top:15px;">
+    💡 <strong>前端看到 chunk 就追加一个字</strong>,像打字机一样!这叫"流式渲染"。
+    </p>
+  </div>
+
+  <div class="story" style="background: #FCE4EC;">
+    <h2>🎯 一句话总结</h2>
+    <p style="font-size: 1.2em; text-align: center;">
+      <strong>主控不是法师,主控是"法师调度员"!</strong><br>
+      你想要 AI 写什么,主控帮你挑最合适的法师。<br>
+      法师写完,主控帮他整理笔记、查错。<br>
+      整个过程像打字机一样,一个字一个字飞到你眼前! ⚡
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

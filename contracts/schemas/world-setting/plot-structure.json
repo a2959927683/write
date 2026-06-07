@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/plot-structure.json",
+  "title": "PlotStructure (情节脉络) — 17 World Tab 模块之一 (#14)",
+  "description": "云笔AI 情节脉络, 5 模板/7 幕。",
+  "type": "object",
+  "required": ["project_id", "名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "名称": {"type": "string"},
+    "模板": {
+      "type": "string",
+      "enum": ["起承转合", "英雄之旅", "三幕剧", "七点不测", "救猫咪"],
+      "description": "5 种经典叙事模板"
+    },
+    "结构详情": {
+      "type": "object",
+      "description": "幕结构 JSON, 7 幕示例: {1: setup, 2: inciting, 3: rising, 4: midpoint, 5: crisis, 6: climax, 7: resolution}"
+    },
+    "关联章节IDs": {
+      "type": "array",
+      "items": {"type": "integer"}
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  }
+}

@@ -1,0 +1,335 @@
+[
+  {
+    "id": "S0-01",
+    "title": "初始化 monorepo 目录 + .gitignore + README",
+    "subproject": "master",
+    "depends": [],
+    "产出物": "master/ 完整目录结构 (§10)",
+    "验收": "tree master 与 §10 100% 一致",
+    "passes": true
+  },
+  {
+    "id": "S0-02",
+    "title": "编写主控 CLAUDE.md (给 Claude Code 读的项目说明)",
+    "subproject": "master",
+    "depends": ["S0-01"],
+    "产出物": "CLAUDE.md",
+    "验收": "包含 §1-§13 全部摘要, Claude Code 能直接读懂",
+    "passes": true
+  },
+  {
+    "id": "S0-03",
+    "title": "编写 harness.config.json (harness-l3-v4 配置)",
+    "subproject": "master",
+    "depends": ["S0-02"],
+    "产出物": "harness.config.json",
+    "验收": "5 阶段配置完整 (research/plan/build/review/debug)",
+    "passes": true
+  },
+  {
+    "id": "S0-04",
+    "title": "编写 init.sh (Windows + Linux/Mac 跨平台)",
+    "subproject": "master",
+    "depends": ["S0-01"],
+    "产出物": "init.sh",
+    "验收": "一键 init.sh dev 启动 PG+Redis+MinIO+API+FE",
+    "passes": false
+  },
+  {
+    "id": "S0-05",
+    "title": "编写 feature_list.json (Sprint 0: 37 个 feature 任务)",
+    "subproject": "master",
+    "depends": ["S0-02"],
+    "产出物": "feature_list.json",
+    "验收": "37 条任务, 含 id/title/depends/passes",
+    "passes": true
+  },
+  {
+    "id": "S0-06",
+    "title": "初始化 progress.txt",
+    "subproject": "master",
+    "depends": ["S0-05"],
+    "产出物": "progress.txt",
+    "验收": "Sprint 0 目标/今日计划/障碍 三段式",
+    "passes": false
+  },
+  {
+    "id": "S0-07",
+    "title": "编写 OpenAPI 契约 auth.yaml (8 端点 + JWT + 心跳)",
+    "subproject": "contracts",
+    "depends": [],
+    "产出物": "contracts/openapi/auth.yaml",
+    "验收": "100% 与 §4.1 对应",
+    "passes": true
+  },
+  {
+    "id": "S0-08",
+    "title": "编写 OpenAPI 契约 project.yaml (8 端点 + 配额)",
+    "subproject": "contracts",
+    "depends": [],
+    "产出物": "contracts/openapi/project.yaml",
+    "验收": "字段中文名, 8 端点齐全",
+    "passes": true
+  },
+  {
+    "id": "S0-09",
+    "title": "编写 OpenAPI 契约 chapter.yaml (11 端点 + 三重冗余)",
+    "subproject": "contracts",
+    "depends": [],
+    "产出物": "contracts/openapi/chapter.yaml",
+    "验收": "11 端点 + 三重冗余字段",
+    "passes": false
+  },
+  {
+    "id": "S0-10",
+    "title": "编写 OpenAPI 契约 outline.yaml (22 端点 + 树形 + 移动)",
+    "subproject": "contracts",
+    "depends": [],
+    "产出物": "contracts/openapi/outline.yaml",
+    "验收": "22 端点齐全",
+    "passes": false
+  },
+  {
+    "id": "S0-11",
+    "title": "编写 OpenAPI 契约 ai.yaml (8 端点 + SSE 规范)",
+    "subproject": "contracts",
+    "depends": [],
+    "产出物": "contracts/openapi/ai.yaml + contracts/events/ai-stream.ts",
+    "验收": "8 端点 + 7 个 SSE 事件",
+    "passes": true
+  },
+  {
+    "id": "S0-12",
+    "title": "编写 JSON Schema (project + chapter + outline + character + worldview + foreshadow + power-system)",
+    "subproject": "contracts",
+    "depends": ["S0-07"],
+    "产出物": "contracts/schemas/*.json + world-setting/*.json",
+    "验收": "11 个 schema 文件, 与 §3 表字段 100% 一致",
+    "passes": true
+  },
+  {
+    "id": "S0-13",
+    "title": "编写 AI provider 注册表 (12 厂商)",
+    "subproject": "contracts",
+    "depends": [],
+    "产出物": "contracts/ai/providers.json",
+    "验收": "12 厂商, 含默认 baseUrl/model/思考模式",
+    "passes": true
+  },
+  {
+    "id": "S0-14",
+    "title": "编写模型路由规则",
+    "subproject": "contracts",
+    "depends": ["S0-13"],
+    "产出物": "contracts/ai/routing-rules.yaml",
+    "验收": "8 任务类型路由",
+    "passes": false
+  },
+  {
+    "id": "S0-15",
+    "title": "编写 init.sh Docker Compose (PG+Redis+MinIO+API+FE)",
+    "subproject": "infra",
+    "depends": ["S0-04"],
+    "产出物": "docker-compose.yml + docker-compose.dev.yml",
+    "验收": "docker compose up 一键启动, 健康检查通过",
+    "passes": false
+  },
+  {
+    "id": "S0-16",
+    "title": "初始化 NestJS/Fastify backend 骨架",
+    "subproject": "backend",
+    "depends": ["S0-15"],
+    "产出物": "backend/src/main.ts",
+    "验收": "/health 返回 200",
+    "passes": false
+  },
+  {
+    "id": "S0-17",
+    "title": "实现 Prisma/Drizzle schema (users + projects + chapters)",
+    "subproject": "backend",
+    "depends": ["S0-12", "S0-16"],
+    "产出物": "prisma/schema.prisma",
+    "验收": "prisma migrate dev 成功",
+    "passes": false
+  },
+  {
+    "id": "S0-18",
+    "title": "实现 auth 模块 (8 端点 + JWT + 心跳)",
+    "subproject": "backend",
+    "depends": ["S0-07", "S0-17"],
+    "产出物": "backend/src/modules/auth/",
+    "验收": "登录返回 token, 心跳保活",
+    "passes": false
+  },
+  {
+    "id": "S0-19",
+    "title": "实现 project 模块 (8 端点 + 配额)",
+    "subproject": "backend",
+    "depends": ["S0-08", "S0-17"],
+    "产出物": "backend/src/modules/project/",
+    "验收": "CRUD + 配额校验",
+    "passes": false
+  },
+  {
+    "id": "S0-20",
+    "title": "实现 chapter 模块 (11 端点 + 三重冗余 + 自动保存)",
+    "subproject": "backend",
+    "depends": ["S0-09", "S0-17"],
+    "产出物": "backend/src/modules/chapter/",
+    "验收": "PUT /chapters/:id 写时同时写 3 字段",
+    "passes": false
+  },
+  {
+    "id": "S0-21",
+    "title": "实现 outline 模块 (22 端点 + 树形 + 移动 + 重编号)",
+    "subproject": "backend",
+    "depends": ["S0-10", "S0-17"],
+    "产出物": "backend/src/modules/outline/",
+    "验收": "卷-章树形 CRUD 完整",
+    "passes": false
+  },
+  {
+    "id": "S0-22",
+    "title": "初始化 Vue 3 + Vite + TipTap + Pinia + Tailwind 骨架",
+    "subproject": "frontend",
+    "depends": ["S0-15"],
+    "产出物": "frontend/src/main.ts + App.vue",
+    "验收": "pnpm dev 启动, 空白首页",
+    "passes": false
+  },
+  {
+    "id": "S0-23",
+    "title": "实现登录/注册页 + auth store",
+    "subproject": "frontend",
+    "depends": ["S0-22", "S0-07"],
+    "产出物": "pages/Login.vue + stores/auth.ts",
+    "验收": "登录跳 /projects",
+    "passes": false
+  },
+  {
+    "id": "S0-24",
+    "title": "实现项目列表页 (4 统计卡片 + 网格 + 搜索 + 分页)",
+    "subproject": "frontend",
+    "depends": ["S0-19", "S0-23"],
+    "产出物": "pages/ProjectList.vue",
+    "验收": "显示用户项目, 12/页",
+    "passes": false
+  },
+  {
+    "id": "S0-25",
+    "title": "实现编辑器三栏布局 (顶/左/中/右/底)",
+    "subproject": "frontend",
+    "depends": ["S0-22"],
+    "产出物": "components/editor/EditorLayout.vue",
+    "验收": "三栏 250/auto/300, 顶底全宽",
+    "passes": false
+  },
+  {
+    "id": "S0-26",
+    "title": "集成 TipTap + 自动保存 (debounce 2s)",
+    "subproject": "frontend",
+    "depends": ["S0-20", "S0-25"],
+    "产出物": "components/editor/TipTapEditor.vue",
+    "验收": "输入 2s 后 PUT /chapters/:id",
+    "passes": false
+  },
+  {
+    "id": "S0-27",
+    "title": "实现左侧 项目 Tab 大纲树",
+    "subproject": "frontend",
+    "depends": ["S0-21", "S0-25"],
+    "产出物": "components/editor/OutlineTree.vue",
+    "验收": "卷-章折叠/展开/选中",
+    "passes": false
+  },
+  {
+    "id": "S0-28",
+    "title": "实现 AI 助手面板 (6 按钮 + 输入框)",
+    "subproject": "frontend",
+    "depends": ["S0-25"],
+    "产出物": "components/ai/AIPanel.vue",
+    "验收": "6 按钮可点击",
+    "passes": false
+  },
+  {
+    "id": "S0-29",
+    "title": "实现 AI 续写 SSE 流式渲染",
+    "subproject": "frontend + ai-orchestrator",
+    "depends": ["S0-11", "S0-28"],
+    "产出物": "composables/useAIStream.ts + ai-orchestrator/sse_gateway.py",
+    "验收": "点击续写 → 流式打字 → 完成",
+    "passes": false
+  },
+  {
+    "id": "S0-30",
+    "title": "接入 DeepSeek (一个厂商) 验证",
+    "subproject": "ai-orchestrator",
+    "depends": ["S0-29", "S0-13"],
+    "产出物": "ai-orchestrator/provider_registry.py",
+    "验收": "续写真实调用 DeepSeek 成功",
+    "passes": false
+  },
+  {
+    "id": "S0-31",
+    "title": "编写 E2E 冒烟: 登录 → 创建项目 → 进编辑器 → 续写 1 章",
+    "subproject": "tests",
+    "depends": ["S0-23", "S0-24", "S0-25", "S0-26", "S0-27", "S0-28", "S0-29", "S0-30"],
+    "产出物": "scripts/e2e-smoke.sh + tests/e2e/smoke.spec.ts",
+    "验收": "跑通主链, 截图存档",
+    "passes": false
+  },
+  {
+    "id": "S0-32",
+    "title": "编写 docker-compose.yml 集成测试",
+    "subproject": "infra",
+    "depends": ["S0-31"],
+    "产出物": "docker-compose.yml",
+    "验收": "docker compose up 启动后 E2E 通过",
+    "passes": false
+  },
+  {
+    "id": "S0-33",
+    "title": "初始化监控 (Prometheus + Grafana)",
+    "subproject": "infra",
+    "depends": ["S0-32"],
+    "产出物": "infra/monitoring/",
+    "验收": "Grafana 显示 API 延迟/AI 调用次数",
+    "passes": false
+  },
+  {
+    "id": "S0-34",
+    "title": "编写 16 个 ADR (架构决策记录)",
+    "subproject": "docs",
+    "depends": [],
+    "产出物": "docs/adr/0001..0016.md",
+    "验收": "16 个 ADR 完整, 每条含 决策/备选/理由/影响",
+    "passes": false
+  },
+  {
+    "id": "S0-35",
+    "title": "编写 docs/architecture/system-overview.md",
+    "subproject": "docs",
+    "depends": ["S0-34"],
+    "产出物": "docs/architecture/system-overview.md",
+    "验收": "含主控定位/模块图/数据流",
+    "passes": false
+  },
+  {
+    "id": "S0-36",
+    "title": "编写 scripts/contract-lint.py 契约一致性检查",
+    "subproject": "scripts",
+    "depends": ["S0-07", "S0-08", "S0-09", "S0-10", "S0-11", "S0-12", "S0-13", "S0-14"],
+    "产出物": "scripts/contract-lint.py",
+    "验收": "检查 schema 字段名与 OpenAPI 一致",
+    "passes": false
+  },
+  {
+    "id": "S0-37",
+    "title": "CI 工作流 (GitHub Actions) lint+test+build",
+    "subproject": "infra/ci",
+    "depends": ["S0-36"],
+    "产出物": ".github/workflows/ci.yml",
+    "验收": "push 触发, 全部通过",
+    "passes": false
+  }
+]

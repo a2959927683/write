@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/power-system.json",
+  "title": "PowerSystem (力量体系) — 17 World Tab 模块之一 (#7)",
+  "description": "云笔AI 力量体系实体, C08 冲突裁决: 11 境界 + 6 能力 + 5 限制 + 4 路径。",
+  "type": "object",
+  "required": ["project_id", "体系名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "体系名称": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "如\"星烬九考\"、\"修真九境\""
+    },
+    "体系类型": {
+      "type": "string",
+      "enum": ["异能体系", "修真体系", "魔法体系", "斗气体系", "神契体系", "血脉体系", "科技体系", "混合体系"]
+    },
+    "体系描述": {"type": "string"},
+    "力量来源": {"type": "string"},
+    "境界列表": {
+      "type": "array",
+      "description": "C08: 11 境界",
+      "items": {
+        "type": "object",
+        "required": ["境界名称", "境界等级"],
+        "properties": {
+          "id": {"type": "integer"},
+          "境界名称": {"type": "string"},
+          "境界等级": {"type": "integer", "minimum": 1, "maximum": 11},
+          "战力系数": {"type": "number"},
+          "境界描述": {"type": "string"},
+          "提升条件": {"type": "string"},
+          "能力表现": {"type": "string"},
+          "特殊标志": {"type": "string"},
+          "排序顺序": {"type": "integer"}
+        }
+      }
+    },
+    "能力列表": {
+      "type": "array",
+      "description": "C08: 6 能力",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "能力名称": {"type": "string"},
+          "能力类型": {"type": "string"},
+          "能力描述": {"type": "string"},
+          "学习条件": {"type": "string"},
+          "消耗代价": {"type": "string"},
+          "排序顺序": {"type": "integer"}
+        }
+      }
+    },
+    "修行路径": {
+      "type": "object",
+      "description": "C08: 4 路径",
+      "properties": {
+        "修行方法": {"type": "string"},
+        "修行资源": {"type": "string"},
+        "修行难点": {"type": "string"},
+        "突破要点": {"type": "string"}
+      }
+    },
+    "限制约束": {
+      "type": "object",
+      "description": "C08: 5 限制",
+      "properties": {
+        "使用限制": {"type": "string"},
+        "副作用": {"type": "string"},
+        "反噬风险": {"type": "string"},
+        "禁忌条款": {"type": "string"}
+      }
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  }
+}

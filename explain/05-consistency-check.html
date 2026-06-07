@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>🔍 5 层一致性检查:5 个纠错老师帮你查矛盾</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #E0F2F1 0%, #E8EAF6 50%, #F3E5F5 100%);
+    min-height: 100vh;
+    padding: 30px 20px;
+    line-height: 1.8;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #283593;
+    font-size: 2.2em;
+    margin-bottom: 20px;
+  }
+  .intro {
+    background: white;
+    border: 3px dashed #5C6BC0;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    font-size: 1.1em;
+  }
+  .layer {
+    background: white;
+    border: 3px solid #3F51B5;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    border-left: 12px solid #3F51B5;
+  }
+  .layer h2 { color: #1A237E; margin-bottom: 10px; }
+  .layer-icon { font-size: 3em; float: right; }
+  .example {
+    background: #FFEBEE;
+    border-left: 4px solid #E53935;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+  }
+  .example.ok {
+    background: #E8F5E9;
+    border-left-color: #43A047;
+  }
+  .layer-1 { border-left-color: #E91E63; }
+  .layer-2 { border-left-color: #9C27B0; }
+  .layer-3 { border-left-color: #3F51B5; }
+  .layer-4 { border-left-color: #009688; }
+  .layer-5 { border-left-color: #FF9800; }
+  .event {
+    background: #263238;
+    color: #B0BEC5;
+    padding: 15px;
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    margin: 10px 0;
+  }
+  .event-name { color: #FFD54F; font-weight: bold; }
+  .teacher-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .teacher {
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    text-align: center;
+    border: 3px solid #5C6BC0;
+  }
+  .teacher-icon { font-size: 2.5em; }
+  .teacher-name { font-weight: bold; color: #283593; margin: 8px 0; }
+  .teacher-task { font-size: 0.85em; color: #555; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🔍 5 个纠错老师帮你查矛盾</h1>
+
+  <div class="intro">
+    <h2>📖 故事:你写了一本 100 万字的小说</h2>
+    <p>写到第 50 章的时候,你突然发现:</p>
+    <p>· 😱 <strong>"等等!主角 3 章前就死了,怎么又出来了?!"</strong></p>
+    <p>· 😱 <strong>"第 10 章明明说今天下雨,第 30 章怎么变成大太阳?"</strong></p>
+    <p>· 😱 <strong>"我挖了个伏笔说宝剑在山洞里,怎么第 80 章宝剑突然在他口袋?"</strong></p>
+    <p style="margin-top:15px;">
+    <strong>写长篇小说,最难的就是"不前后矛盾"</strong>!
+    </p>
+    <p style="margin-top:15px;">
+    云笔AI 给你配了 <strong>5 个纠错老师</strong>, 每天帮你检查作业! ✨
+    </p>
+  </div>
+
+  <h2 style="text-align:center; color: #283593;">👨‍🏫 5 个纠错老师</h2>
+
+  <div class="teacher-grid">
+    <div class="teacher">
+      <div class="teacher-icon">📜</div>
+      <div class="teacher-name">L1 设定老师</div>
+      <div class="teacher-task">检查设定本身合不合理</div>
+    </div>
+
+    <div class="teacher">
+      <div class="teacher-icon">📋</div>
+      <div class="teacher-name">L2 结构老师</div>
+      <div class="teacher-task">检查大纲/章节完整</div>
+    </div>
+
+    <div class="teacher">
+      <div class="teacher-icon">⏰</div>
+      <div class="teacher-name">L3 时间老师</div>
+      <div class="teacher-task">检查时间线有没有乱</div>
+    </div>
+
+    <div class="teacher">
+      <div class="teacher-icon">💞</div>
+      <div class="teacher-name">L4 关系老师</div>
+      <div class="teacher-task">检查人物关系</div>
+    </div>
+
+    <div class="teacher">
+      <div class="teacher-icon">🔍</div>
+      <div class="teacher-name">L5 蒸馏老师</div>
+      <div class="teacher-task">AI 自动检查</div>
+    </div>
+  </div>
+
+  <div class="layer layer-1">
+    <div class="layer-icon">📜</div>
+    <h2>L1 设定老师:检查"世界规则"</h2>
+    <p><strong>问题</strong>:你的世界有"等级 1-10",但角色到了 11 级怎么办?</p>
+    <div class="example">
+      ❌ <strong>错</strong>: 主角突然变成了"半神",但你的世界只允许到 10 级
+    </div>
+    <div class="example ok">
+      ✅ <strong>对</strong>: "半神" 是 10 级以上的官方头衔
+    </div>
+    <p style="margin-top:10px;">
+    <strong>老师怎么查</strong>:用 JSON Schema 严格约束,字段填错就不让你保存。
+    </p>
+  </div>
+
+  <div class="layer layer-2">
+    <div class="layer-icon">📋</div>
+    <h2>L2 结构老师:检查"大纲完整"</h2>
+    <p><strong>问题</strong>:你说要写 100 章,但只写了 50 章就"大结局"了?</p>
+    <div class="example">
+      ❌ <strong>错</strong>: 第 50 章就"全书完",但大纲说还有 50 章
+    </div>
+    <div class="example ok">
+      ✅ <strong>对</strong>: 大纲的 100 章都标"已写"或"已废弃"
+    </div>
+    <p style="margin-top:10px;">
+    <strong>老师怎么查</strong>:对比大纲树和实际章节,缺了提醒你。
+    </p>
+  </div>
+
+  <div class="layer layer-3">
+    <div class="layer-icon">⏰</div>
+    <h2>L3 时间老师:检查"时间对不对"</h2>
+    <p><strong>问题</strong>:你世界的时间是怎么算的?主角几岁?</p>
+    <div class="example">
+      ❌ <strong>错</strong>: 第 5 章说"小明 17 岁",第 30 章"小明 15 岁"
+    </div>
+    <div class="example ok">
+      ✅ <strong>对</strong>: 用自定义历法"星历 1325 年·夏·望月",AI 自动算年龄
+    </div>
+    <p style="margin-top:10px;">
+    <strong>老师怎么查</strong>:每天 3 点跑一遍,看时间线有没有冲突。
+    </p>
+  </div>
+
+  <div class="layer layer-4">
+    <div class="layer-icon">💞</div>
+    <h2>L4 关系老师:检查"人和人的关系"</h2>
+    <p><strong>问题</strong>:你说 A 是 B 的师父,但他们从来没一起出现过?</p>
+    <div class="example">
+      ❌ <strong>错</strong>: A 是 B 的师父,但整本书 A 和 B 从没说过话
+    </div>
+    <div class="example ok">
+      ✅ <strong>对</strong>: 至少有一章里 A 教 B 武功
+    </div>
+    <p style="margin-top:10px;">
+    <strong>老师怎么查</strong>:每天 5 点扫描"关系网",看哪些关系没体现。
+    </p>
+  </div>
+
+  <div class="layer layer-5">
+    <div class="layer-icon">🔍</div>
+    <h2>L5 蒸馏老师:AI 自动查错</h2>
+    <p><strong>问题</strong>:你写得太快,可能漏掉细节?</p>
+    <div class="example">
+      ❌ <strong>错</strong>: 第 60 章你说"小明有 100 个金币",但前面从没提到他赚钱
+    </div>
+    <div class="example ok">
+      ✅ <strong>对</strong>: AI 在第 30 章就记下了"小明挖到 100 金币"
+    </div>
+    <p style="margin-top:10px;">
+    <strong>老师怎么查</strong>:每写完一章,AI 自动做"3 阶段蒸馏"摘要,然后比对所有知识。
+    </p>
+  </div>
+
+  <h2 style="text-align:center; color: #283593; margin-top: 30px;">📡 事件总线:5 个老师怎么沟通?</h2>
+
+  <p style="text-align: center;">老师之间不是各干各的,他们有一个 <strong>"对讲机"</strong>!</p>
+
+  <p>当 L1 老师说"境界变了",对讲机就广播:</p>
+
+  <div class="event">
+    <span class="event-name">event: powersystem.realm.changed</span><br>
+    data: {<br>
+    &nbsp;&nbsp;projectId: 1,<br>
+    &nbsp;&nbsp;systemId: 1,<br>
+    &nbsp;&nbsp;realmId: 11,  <span style="color: #66BB6A;">// 新增"神烬"</span><br>
+    &nbsp;&nbsp;oldValue: 10,<br>
+    &nbsp;&nbsp;newValue: 11<br>
+    }
+  </div>
+
+  <p>所有老师都听到了:</p>
+  <ul style="margin: 15px 0; padding-left: 30px;">
+    <li>🤖 AI 法师说: <em>"我得重新组装 prompt,告诉 AI 新境界"</em></li>
+    <li>🗺️ 知识图谱说: <em>"我得更新所有角色的境界"</em></li>
+    <li>🎨 画家说: <em>"我得告诉所有打开页面的用户,世界变了!"</em></li>
+  </ul>
+
+  <h2 style="text-align:center; color: #283593; margin-top: 30px;">⏰ 老师的工作时间表</h2>
+
+  <div class="layer layer-3">
+    <h2>📅 每日自动检查</h2>
+    <p>· ⏰ <strong>3:00</strong> — L3 时间老师巡场 (时间线)<br>
+       · ⏰ <strong>4:00</strong> — L4 关系老师扫描 (伏笔过期)<br>
+       · ⏰ <strong>5:00</strong> — L4 关系老师巡查 (角色 ↔ 章节)<br>
+       · ⏰ <strong>6:00</strong> — L1 设定老师审核 (力量体系)<br>
+       · ⏰ <strong>每 30 分钟</strong> — L5 蒸馏老师消费队列 (AI 自动摘要)</p>
+  </div>
+
+  <h2 style="text-align:center; color: #283593; margin-top: 30px;">⚠️ 错误等级</h2>
+
+  <p>5 个老师发现错误会分 3 个等级:</p>
+
+  <div class="example">
+    <strong>🔴 错误 (Error)</strong>: 自动修复 + 通知你<br>
+    例子: 伏笔回收章节不存在
+  </div>
+
+  <div class="example">
+    <strong>🟡 警告 (Warning)</strong>: 标红 + 问你<br>
+    例子: 角色在已死章节又出现
+  </div>
+
+  <div class="example">
+    <strong>🔵 提示 (Info)</strong>: 只告诉你<br>
+    例子: 时间线跨度超过一年
+  </div>
+
+  <div class="intro" style="background: #E8F5E9; border-color: #4CAF50;">
+    <h2>🎯 一句话总结</h2>
+    <p style="font-size: 1.2em; text-align: center;">
+      <strong>5 个纠错老师 + 对讲机 = 永远不会写矛盾!</strong><br>
+      <br>
+      L1 检查世界规则<br>
+      L2 检查大纲完整<br>
+      L3 检查时间对不对<br>
+      L4 检查人和人的关系<br>
+      L5 让 AI 帮你自动查<br>
+      <br>
+      你只管写故事,纠错的事交给他们! ✨🛡️
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

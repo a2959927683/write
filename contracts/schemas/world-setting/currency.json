@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/currency.json",
+  "title": "Currency (货币体系) — 17 World Tab 模块之一 (#5)",
+  "description": "云笔AI 货币体系, 3 货币 (主币/辅币/虚拟), 子表 currency_exchange_rates。",
+  "type": "object",
+  "required": ["project_id", "名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "名称": {"type": "string", "maxLength": 128},
+    "类型": {
+      "type": "string",
+      "enum": ["主币", "辅币", "虚拟"]
+    },
+    "兑换比例": {
+      "type": "string",
+      "description": "字符串表示的兑换比例, 如 1:100"
+    },
+    "图标": {"type": "string"},
+    "描述": {"type": "string"},
+    "ext": {"type": "object"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-exchange-rate-table": {
+    "name": "currency_exchange_rates",
+    "fields": ["from_currency_id", "to_currency_id", "rate", "valid_at"]
+  }
+}

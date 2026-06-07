@@ -1,0 +1,45 @@
+# Build artifacts
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+.next/
+.nuxt/
+.output/
+
+# OS files
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Docker
+.docker/
+
+# Test
+tests/screenshots/
+playwright-report/
+test-results/

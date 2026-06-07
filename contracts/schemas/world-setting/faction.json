@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/world-setting/faction.json",
+  "title": "Faction (势力阵营) — 17 World Tab 模块之一 (#4)",
+  "description": "云笔AI 势力阵营, C09 冲突裁决: 9 类型, 4 视图 (列表/关系图/详情/编辑)。子表 faction_relations。",
+  "type": "object",
+  "required": ["project_id", "名称"],
+  "properties": {
+    "id": {"type": "integer"},
+    "project_id": {"type": "integer"},
+    "名称": {"type": "string", "maxLength": 128},
+    "类型": {
+      "type": "string",
+      "enum": ["组织", "国家", "门派", "家族", "商会", "学院", "宗教", "部落", "其他"],
+      "description": "C09 裁决: 9 类型"
+    },
+    "描述": {"type": "string"},
+    "影响力": {
+      "type": "string",
+      "enum": ["微弱", "一般", "较强", "强大", "统治级"]
+    },
+    "核心人物": {"type": "string", "description": "JSON 数组, 引用 characters"},
+    "控制区域": {"type": "string"},
+    "宗旨": {"type": "string"},
+    "图标": {"type": "string", "description": "Remix Icon 类名"},
+    "颜色": {"type": "string", "description": "HEX"},
+    "ext": {"type": "object"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-relation-table": {
+    "name": "faction_relations",
+    "fields": ["faction_a", "faction_b", "关系类型", "强度"]
+  },
+  "x-key-api-endpoints": [
+    "GET /factions/project/:id/list",
+    "GET /factions/project/:id/faction/:fId",
+    "GET /factions/project/:id/relations",
+    "POST /factions/project/:id/relations",
+    "PUT /factions/relations/:id",
+    "DELETE /factions/relations/:id",
+    "GET /factions/project/:id/context"
+  ]
+}

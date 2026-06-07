@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏰 云笔AI 复刻项目 · 架构总览(小孩版)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFE4B5 0%, #FFB6C1 50%, #B0E0E6 100%);
+    min-height: 100vh;
+    padding: 30px 20px;
+    color: #333;
+    line-height: 1.8;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 2.5em;
+    color: #FF6B6B;
+    text-shadow: 2px 2px 0 #FFE066;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 1.2em;
+    color: #6B5B95;
+    margin-bottom: 40px;
+  }
+  .story {
+    background: rgba(255, 255, 255, 0.85);
+    border: 4px dashed #FF6B6B;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    font-size: 1.15em;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .story h2 { color: #FF6B6B; margin-bottom: 15px; font-size: 1.5em; }
+  .emoji { font-size: 1.4em; }
+  .castle {
+    background: rgba(255, 255, 255, 0.92);
+    border: 3px solid #6B5B95;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px 0;
+  }
+  .castle h2 {
+    text-align: center;
+    color: #6B5B95;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+  }
+  .rooms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .room {
+    background: #FFF9E6;
+    border: 3px solid #FFA500;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .room:hover { transform: scale(1.05) rotate(-1deg); }
+  .room-icon { font-size: 3em; margin-bottom: 10px; }
+  .room-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FF8C00;
+    margin-bottom: 8px;
+  }
+  .room-desc { font-size: 0.95em; color: #555; }
+  .flow {
+    background: rgba(255, 255, 255, 0.92);
+    border: 3px solid #4A90E2;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px 0;
+  }
+  .flow h2 { color: #4A90E2; text-align: center; margin-bottom: 20px; }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    background: #E6F3FF;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 12px 0;
+  }
+  .flow-num {
+    background: #4A90E2;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  .magic {
+    background: linear-gradient(135deg, #FFE066 0%, #FF9FF3 100%);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px 0;
+    color: #5A2D8A;
+  }
+  .magic h2 { text-align: center; margin-bottom: 20px; font-size: 1.8em; }
+  .magic-list { list-style: none; }
+  .magic-list li {
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin: 10px 0;
+  }
+  .note {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: #6B5B95;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🏰 云笔AI 复刻项目 · 架构大冒险</h1>
+  <p class="subtitle">— 给 8 岁小孩讲清楚这个项目是什么 —</p>
+
+  <!-- 故事引入 -->
+  <div class="story">
+    <h2>📖 先听个故事</h2>
+    <p>想象一下,你最喜欢写故事 ✍️ ,可是有时候写着写着会忘记:
+    <br>· <span class="emoji">👧</span> 主角叫什么名字? (忘了!)
+    <br>· <span class="emoji">🗺️</span> 这个地方在哪里? (忘了!)
+    <br>· <span class="emoji">🕵️</span> 我之前埋了一个伏笔,什么时候回收? (忘了!)
+    </p>
+    <p style="margin-top:15px;">
+    <strong>云笔AI</strong>就像一个 <span class="emoji">🧙‍♂️</span> <strong>超级智能写作小助手</strong>,
+    它帮你记下所有这些细节,还能帮你 <span class="emoji">🤖</span> 自动续写故事!
+    </p>
+    <p style="margin-top:15px;">
+    <strong>我们这个项目</strong>,就是要 <span class="emoji">🔨</span> <strong>造一个一模一样的云笔AI</strong>!
+    不是造云笔AI 本身(那是后面的工人做的),而是我们当 <span class="emoji">👷</span> <strong>总指挥</strong>。
+    </p>
+  </div>
+
+  <!-- 城堡比喻 -->
+  <div class="castle">
+    <h2>🏰 我们的项目 = 一座大城堡</h2>
+    <p style="text-align:center; margin-bottom:20px;">
+      我们不是去搬砖的工人,我们是 <strong>城堡总设计师</strong>!
+    </p>
+    <div class="rooms">
+
+      <div class="room">
+        <div class="room-icon">📜</div>
+        <div class="room-name">契约大殿</div>
+        <div class="room-desc">
+          这里放着城堡里所有"规矩"。<br>
+          比如门多宽、窗多高。<br>
+          <em>工匠们必须照着规矩建。</em>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-icon">🎨</div>
+        <div class="room-name">画家工坊</div>
+        <div class="room-desc">
+          这里画出城堡长什么样,<br>
+          让用户看到漂亮的页面。<br>
+          <em>(前端小精灵在工作)</em>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-icon">⚙️</div>
+        <div class="room-name">机器工厂</div>
+        <div class="room-desc">
+          这里负责"想事情"和"存东西"。<br>
+          用户说了什么,机器要回答;<br>
+          故事要存到哪里,机器要知道。<br>
+          <em>(后端工程师在工作)</em>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-icon">🧙‍♂️</div>
+        <div class="room-name">魔法实验室</div>
+        <div class="room-desc">
+          这里召唤 12 个 <strong>AI 大法师</strong>:<br>
+          DeepSeek、Claude、GPT、豆包…<br>
+          帮用户写故事、想点子!<br>
+          <em>(AI 调度员在工作)</em>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-icon">🗺️</div>
+        <div class="room-name">记忆图书馆</div>
+        <div class="room-desc">
+          这里存了所有故事的"秘密":<br>
+          角色、伏笔、时间线、地图…<br>
+          还要保证它们不矛盾!<br>
+          <em>(知识图谱守护者在工作)</em>
+        </div>
+      </div>
+
+      <div class="room">
+        <div class="room-icon">🚜</div>
+        <div class="room-name">后勤仓库</div>
+        <div class="room-desc">
+          这里准备电脑、服务器、<br>
+          网络、监控摄像头…<br>
+          就像城堡的水电系统!<br>
+          <em>(基础设施在运行)</em>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 流程比喻 -->
+  <div class="flow">
+    <h2>🚶 用户写故事的旅程</h2>
+    <p style="text-align:center; margin-bottom:20px;">从"打开网站"到"AI 帮你续写",发生了什么?</p>
+
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div><strong>👧 小朋友来到城堡</strong><br>她打开浏览器,看到一个漂亮的登录页面。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div><strong>🔐 输入账号密码</strong><br>画家工坊把账号发给机器工厂,工厂问"记忆图书馆":这个小朋友是谁?</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div><strong>📚 看到自己的故事书</strong><br>机器工厂说:"你有 2 本故事书哦!" 显示出列表。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div><strong>📖 打开一本开始写</strong><br>进入"三栏式 IDE 编辑器":左边是大纲,中间是稿纸,右边是 AI 助手。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">5</div>
+      <div><strong>✍️ 输入"小明走进山洞"</strong><br>画家工坊 2 秒后自动保存(悄悄发给机器工厂)。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">6</div>
+      <div><strong>🤖 点击"AI 续写"</strong><br>机器工厂把任务转给魔法实验室,实验室召唤 DeepSeek 大法师。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">7</div>
+      <div><strong>⚡ 大法师一边想一边写</strong><br>字一个字地"流"回来,屏幕上像打字机一样逐字显示(SSE 流式)。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">8</div>
+      <div><strong>👍 小朋友觉得好,点"采纳"</strong><br>续写的内容自动插入稿纸,机器工厂存到记忆图书馆。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">9</div>
+      <div><strong>🧙‍♂️ 后台偷偷做蒸馏</strong><br>实验室的"3 阶段蒸馏"自动运行:摘要 → 抽取人物事件 → 检查有没有前后矛盾。</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">10</div>
+      <div><strong>🌟 写完一本长篇小说!</strong><br>17 个模块的世界观 + 角色 + 伏笔 + 时间线,全都乖乖地记着,没有矛盾!</div>
+    </div>
+  </div>
+
+  <!-- 魔法能力 -->
+  <div class="magic">
+    <h2>✨ 云笔AI 的 6 大魔法</h2>
+    <ul class="magic-list">
+      <li>🧙 <strong>17 个世界观模块</strong> — 像乐高积木一样拼出一个完整世界</li>
+      <li>🤖 <strong>12 个 AI 大法师</strong> — 想用谁就用谁,DeepSeek 默认(便宜好用)</li>
+      <li>🕵️ <strong>伏笔自动追踪</strong> — 6 种类型 + 10 种埋法,AI 帮你记账</li>
+      <li>⏰ <strong>自定义时间线</strong> — 你的世界有"星历",AI 帮你算日子</li>
+      <li>👥 <strong>24 种角色 + 关系图</strong> — 谁是谁的师父?谁爱谁?AI 都记得</li>
+      <li>📊 <strong>5 层一致性检查</strong> — 像 5 个纠错老师,保证你写的不矛盾</li>
+    </ul>
+  </div>
+
+  <!-- 总结 -->
+  <div class="story" style="background: rgba(255, 240, 245, 0.92); border-color: #FF69B4;">
+    <h2>🎯 一句话总结</h2>
+    <p style="font-size: 1.3em; text-align: center;">
+      <strong>我们 = 城堡总设计师</strong><br>
+      我们的工作 = 画图纸、定规矩、分任务、查质量 🏗️<br>
+      <br>
+      <span class="emoji">🏰</span> 城堡会由 5 个工人队伍一起建好:<br>
+      画家工坊、机器工厂、魔法实验室、记忆图书馆、后勤仓库<br>
+      <br>
+      而我们设计师只需要告诉他们:<strong>"照着契约大殿里的图纸建,别偷工减料!"</strong> 📐
+    </p>
+  </div>
+
+  <div class="note">
+    🌈 这个项目最终会跑通"写小说全程 AI 辅助"的体验 🌈<br>
+    由 50 个 AI 助手 + 87 份研究文档 + 16 个架构决策 + 14 份契约 + 8 份设计稿 共同打造 🌈
+  </div>
+
+</div>
+</body>
+</html>

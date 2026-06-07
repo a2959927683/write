@@ -1,0 +1,190 @@
+openapi: 3.1.0
+info:
+  title: 云笔AI 复刻 · 认证 API
+  version: 1.0.0
+  description: |
+    主控权威契约 - 认证模块 (/auth)
+    1:1 复刻云笔AI 真实 API 端点 (Base URL: /api, NOT /api/v1/)
+    必选头: Authorization: Bearer <token>, Content-Type: application/json, Origin: <your-domain>
+    统一响应: { success: true|false, data: {...}, message: "..." }
+servers:
+  - url: /api
+    description: 主控 Base URL
+
+tags:
+  - name: auth
+    description: 认证模块
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: 用户名密码登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string, maxLength: 64 }
+                password: { type: string, minLength: 6, maxLength: 128 }
+      responses:
+        '200': { description: 成功, content: { application/json: { schema: { $ref: '#/components/schemas/LoginResponse' } } } }
+        '401': { description: 用户名或密码错误 }
+        '403': { description: 账号被封禁 }
+
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: 注册 (需邮箱验证码)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email, password, code]
+              properties:
+                username: { type: string, maxLength: 64 }
+                email: { type: string, format: email, maxLength: 128 }
+                password: { type: string, minLength: 6, maxLength: 128 }
+                code: { type: string, minLength: 4, maxLength: 8, description: 邮箱验证码 }
+      responses:
+        '200': { description: 注册成功, 返回 token + user }
+        '409': { description: 邮箱已注册 }
+
+  /auth/send-register-code:
+    post:
+      tags: [auth]
+      summary: 发送注册验证码
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: 发送成功 }
+        '429': { description: 频率限制 (1 分钟 1 次) }
+
+  /auth/puzzle-token:
+    get:
+      tags: [auth]
+      summary: 获取拼图验证 token + 图片
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token: { type: string }
+                      imageUrl: { type: string, format: uri }
+
+  /auth/registration-mode:
+    get:
+      tags: [auth]
+      summary: 查询注册模式 (开放/beta/关闭)
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    enum: [open, beta, closed]
+
+  /auth/password:
+    put:
+      tags: [auth]
+      summary: 修改密码
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [oldPassword, newPassword]
+              properties:
+                oldPassword: { type: string }
+                newPassword: { type: string, minLength: 6 }
+      responses:
+        '200': { description: 成功 }
+        '401': { description: 旧密码错误或未认证 }
+
+  /auth/profile:
+    get:
+      tags: [auth]
+      summary: 获取当前用户信息
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '../../schemas/user.json'
+        '401': { description: 未认证 }
+
+    put:
+      tags: [auth]
+      summary: 更新当前用户信息
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname: { type: string, maxLength: 64 }
+                avatar: { type: string, format: uri, maxLength: 255 }
+      responses:
+        '200': { description: 成功 }
+        '400': { description: 校验失败 }
+
+  /heartbeat:
+    post:
+      tags: [auth]
+      summary: 心跳保活 (前端每 30s 调用, sendBeacon)
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: 成功 }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginResponse:
+      type: object
+      properties:
+        success: { type: boolean, enum: [true] }
+        data:
+          type: object
+          properties:
+            token: { type: string, description: JWT (HS256) }
+            user: { $ref: '../../schemas/user.json' }
+        message: { type: string, example: "操作成功" }

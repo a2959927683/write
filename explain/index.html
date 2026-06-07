@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>📚 explain 目录 · 5 个故事讲清楚项目架构</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FFEEAA 0%, #FFB199 100%);
+    min-height: 100vh;
+    padding: 30px 20px;
+    line-height: 1.8;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #D84315;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #5D4037;
+    margin-bottom: 40px;
+    font-size: 1.1em;
+  }
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    border: 3px solid #FF8A65;
+    transition: transform 0.2s;
+  }
+  .card:hover { transform: translateY(-5px); }
+  .card a {
+    text-decoration: none;
+    color: #BF360C;
+  }
+  .card h2 { margin-bottom: 10px; }
+  .num {
+    display: inline-block;
+    background: #FF6F00;
+    color: white;
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: bold;
+    margin-right: 12px;
+  }
+  .desc { color: #555; padding-left: 50px; }
+  .emoji { font-size: 1.4em; }
+  .footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    color: #5D4037;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>📚 explain · 5 个故事讲清项目架构</h1>
+  <p class="subtitle">每一页都用"小孩子能听懂的话"讲清楚主控做了什么、为什么这么做</p>
+
+  <div class="card">
+    <a href="01-architecture-overview.html">
+      <h2><span class="num">1</span> 🏰 架构总览 — 整个项目是一座大城堡</h2>
+    </a>
+    <p class="desc">
+      <span class="emoji">👑</span> 把整个项目比喻成一座城堡,主控是 <strong>总设计师</strong>,5 个子项目是 <strong>施工队</strong>。<br>
+      <span class="emoji">🚶</span> 还讲了"用户写故事的 10 步旅程"——从打开网页到 AI 续写完成,发生了什么。<br>
+      <span class="emoji">✨</span> 6 大魔法:17 模块、12 法师、伏笔追踪、时间线、24 角色、5 层一致性。
+    </p>
+  </div>
+
+  <div class="card">
+    <a href="02-master-vs-subprojects.html">
+      <h2><span class="num">2</span> 👷 主控 vs 子项目 — 谁是老板谁是工人?</h2>
+    </a>
+    <p class="desc">
+      <span class="emoji">🎬</span> 比喻: 导演不会亲自演戏,店长不会亲自煎汉堡。<br>
+      <span class="emoji">📋</span> 主控做什么(写契约、画图纸、拆任务、查质量) vs 子项目做什么(真正干活)。<br>
+      <span class="emoji">🤝</span> 5 个施工队各干什么 + 他们怎么沟通(看同一张"图纸"——契约)。
+    </p>
+  </div>
+
+  <div class="card">
+    <a href="03-ai-orchestration.html">
+      <h2><span class="num">3</span> 🧙 AI 调度 — 12 个大法师听你指挥</h2>
+    </a>
+    <p class="desc">
+      <span class="emoji">👑</span> 你是国王,手下有 12 个大法师,主控是王国总管帮你挑谁干活。<br>
+      <span class="emoji">⭐</span> 默认 DeepSeek (便宜 + 中文好),还可以换 Claude/GPT/Gemini/智谱等。<br>
+      <span class="emoji">🍳</span> 3 阶段蒸馏魔法:Generator → Extractor → Checker,自动摘要 + 查矛盾。<br>
+      <span class="emoji">⚡</span> SSE 流式:像打字机一样,一个字一个字飞到你眼前。
+    </p>
+  </div>
+
+  <div class="card">
+    <a href="04-world-tab-modules.html">
+      <h2><span class="num">4</span> 🗺️ 17 块乐高积木 — 搭一个不矛盾的小宇宙</h2>
+    </a>
+    <p class="desc">
+      <span class="emoji">🧱</span> 写小说不是瞎写,先要搭世界。17 块乐高积木帮你搭:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;🌍 世界观 · 💎 故事核心 · 🗺️ 地图 · 👑 势力 · 💰 货币 · 📦 物品 · ⚔️ 力量 · 📜 功法 · ✨ 金手指<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;📋 大纲 · 🧝 角色 · 💞 关系 · 🕵️ 伏笔 · 📈 情节 · 🌿 支线 · ⏰ 时间线 · 📚 已经历<br>
+      <span class="emoji">🎯</span> 11 步探讨式向导,一个一个问你,自动帮你填好!
+    </p>
+  </div>
+
+  <div class="card">
+    <a href="05-consistency-check.html">
+      <h2><span class="num">5</span> 🔍 5 个纠错老师 — 帮你查前后矛盾</h2>
+    </a>
+    <p class="desc">
+      <span class="emoji">👨‍🏫</span> 写 100 万字小说最难的是"不前后矛盾"。云笔给你配了 5 个纠错老师:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;📜 L1 设定老师 — 检查世界规则<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;📋 L2 结构老师 — 检查大纲完整<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;⏰ L3 时间老师 — 检查时间线<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;💞 L4 关系老师 — 检查人物关系<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;🔍 L5 蒸馏老师 — AI 自动查错<br>
+      <span class="emoji">📡</span> 老师之间有"对讲机"(EventBus),一个人发现,所有人知道!
+    </p>
+  </div>
+
+  <div class="footer">
+    🌈 <strong>主控已完成 56 个文件的初始化</strong> · 87 个 wiki 页深度阅读 · 16 个架构决策 · 5 个故事讲清架构 🌈
+  </div>
+
+</div>
+</body>
+</html>

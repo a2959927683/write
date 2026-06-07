@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestrator.cloudpen/schemas/outline.json",
+  "title": "Outline (大纲) — 主控权威数据模型",
+  "description": "云笔AI 大纲实体,自引用树形 (卷-章 二级)。★P0 模块,关联 22 个 API 端点。",
+  "type": "object",
+  "required": ["project_id", "类型", "标题"],
+  "properties": {
+    "id": {"type": "integer", "description": "大纲节点 ID, BIGSERIAL"},
+    "project_id": {"type": "integer", "description": "FK → projects.id CASCADE"},
+    "父节点ID": {
+      "type": ["integer", "null"],
+      "description": "FK → outlines.id CASCADE NULL, 卷级父节点"
+    },
+    "类型": {
+      "type": "string",
+      "enum": ["volume", "chapter"],
+      "description": "volume=卷, chapter=章"
+    },
+    "标题": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "节点标题, 如\"第一卷 星涡初现\""
+    },
+    "关联章节ID": {
+      "type": ["integer", "null"],
+      "description": "FK → chapters.id SET NULL, 已蒸馏章节"
+    },
+    "正文字数": {"type": "integer", "default": 0},
+    "状态": {
+      "type": "string",
+      "enum": ["pending", "complete"],
+      "default": "pending"
+    },
+    "优先级": {
+      "type": "string",
+      "enum": ["low", "normal", "high", "urgent"],
+      "default": "normal"
+    },
+    "截止日期": {"type": ["string", "null"], "format": "date-time"},
+    "标签": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": []
+    },
+    "摘要": {
+      "type": "string",
+      "description": "Markdown 详细摘要"
+    },
+    "摘要核心": {
+      "type": "string",
+      "description": "一句话核心"
+    },
+    "颜色": {
+      "type": ["string", "null"],
+      "description": "rgb(...) 格式, 节点颜色"
+    },
+    "排序顺序": {"type": "integer", "default": 0},
+    "目标字数": {"type": "integer", "default": 3000},
+    "实际字数": {"type": "integer", "default": 0},
+    "关键对话": {"type": "string"},
+    "人性细化": {"type": "string"},
+    "写作要点": {"type": "string"},
+    "道具物品": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "势力阵营": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "情绪列表": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "伏笔列表": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "节奏控制": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "视觉画面": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "声音氛围": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"}
+  },
+  "x-ai-context-endpoint": "/outlines/project/:id/context (大, 可达 196 KB)",
+  "x-related-endpoints": [
+    "/outlines/project/:id/context", "/outlines/project/:id/characters",
+    "/outlines/project/:id/foreshadows", "/outlines/project/:id/factions",
+    "/outlines/project/:id/scenes", "/outlines/project/:id/event-line",
+    "/outlines/project/:id/generations", "/outlines/project/:id/auto-link"
+  ]
+}
