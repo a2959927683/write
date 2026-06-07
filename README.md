@@ -8,10 +8,26 @@
 
 ---
 
+## ⭐ 项目北极星 (必读)
+
+> 📍 **任何时候迷路, 回来看这两份文档:**
+>
+> - 🗺️ **[`docs/ROADMAP.md`](docs/ROADMAP.md)** — 整个项目执行路线图 (4 Sprint + 5 里程碑 + 风险)
+> - 🟢 **[`docs/sprints/sprint-0.md`](docs/sprints/sprint-0.md)** — 当前 Sprint 0 完整细节 (37 任务 / 5 阶段 / 6 周排期)
+>
+> 🎨 可视化版本: [`explain/13-整个项目执行规划-路线图.html`](explain/13-整个项目执行规划-路线图.html) (双击浏览器打开)
+
+**当前状态:** Sprint 0 第 1 周 · 主控阶段 · 整体进度 6% · 24% Sprint 0 内进度
+**下一里程碑:** M1 · 主链跑通 (2026-07-19)
+
+---
+
 ## ⚡ 快速导航
 
 | 你要做什么 | 看哪里 |
 |------------|--------|
+| 🗺️ **整个项目执行规划 (推荐先看)** | [`docs/ROADMAP.md`](docs/ROADMAP.md) (4 Sprint + 5 里程碑) |
+| 🟢 **当前 Sprint 0 细节 (推荐先看)** | [`docs/sprints/sprint-0.md`](docs/sprints/sprint-0.md) (37 任务 / 6 周排期) |
 | 了解整个项目的全貌 | [`docs/MASTER-PROJECT-SPEC.md`](docs/MASTER-PROJECT-SPEC.md) (1825 行,13 章节) |
 | 找前后端契约 (权威) | [`contracts/openapi/`](contracts/openapi/), [`contracts/schemas/`](contracts/schemas/) |
 | 看主控规划的目录结构 | [`docs/granular/02-master-repo-layout.md`](docs/granular/02-master-repo-layout.md) |
@@ -19,7 +35,9 @@
 | 了解 17 个 World Tab 模块 | [`docs/granular/05-world-tab-17-modules.md`](docs/granular/05-world-tab-17-modules.md) |
 | 了解 AI 调度机制 (12 厂商) | [`docs/granular/06-ai-orchestration.md`](docs/granular/06-ai-orchestration.md) |
 | 了解 11 条冲突裁决 | [`docs/granular/07-conflict-adjudication.md`](docs/granular/07-conflict-adjudication.md) |
-| 看架构决策 | [`docs/adr/`](docs/adr/) (16 个 ADR) |
+| 看架构决策 | [`docs/adr/`](docs/adr/) (18 个 ADR · 16 已定 + 2 PROPOSED) |
+| 看讨论稿 (子 agent/git 规则) | [`docs/discussions/`](docs/discussions/) |
+| 童话版可视化 (小白友好) | [`explain/index.html`](explain/index.html) (13 个 HTML 故事) |
 
 ---
 
