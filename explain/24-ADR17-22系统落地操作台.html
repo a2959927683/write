@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADR 17-22 系统落地操作台</title>
+<style>
+  :root{
+    --bg:#101311;
+    --panel:#f4efe3;
+    --panel-2:#e8dfcf;
+    --ink:#191814;
+    --muted:#6e6659;
+    --line:rgba(25,24,20,.18);
+    --white:rgba(255,255,255,.78);
+    --green:#2f8f5b;
+    --green-soft:#dff1e7;
+    --amber:#c87a24;
+    --amber-soft:#f6e2c6;
+    --blue:#2e6f8f;
+    --blue-soft:#dcecf2;
+    --red:#b84648;
+    --red-soft:#f3d7d4;
+    --black:#111312;
+    --shadow:0 26px 70px rgba(0,0,0,.28);
+  }
+
+  *{box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    font-family:"Aptos","Microsoft YaHei","PingFang SC",sans-serif;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/42px 42px,
+      linear-gradient(0deg,rgba(255,255,255,.03) 1px,transparent 1px) 0 0/42px 42px,
+      radial-gradient(circle at 12% 18%,rgba(47,143,91,.36),transparent 26%),
+      radial-gradient(circle at 86% 12%,rgba(200,122,36,.3),transparent 24%),
+      linear-gradient(135deg,#101311 0%,#1d211d 52%,#121717 100%);
+  }
+
+  .shell{
+    width:min(1360px,calc(100% - 36px));
+    margin:0 auto;
+    padding:28px 0 54px;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    color:#f6efe1;
+    margin-bottom:18px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
+
+  .mark{
+    width:42px;
+    height:42px;
+    border:1px solid rgba(244,239,227,.28);
+    background:linear-gradient(135deg,#f4efe3,#c9b98f);
+    color:#101311;
+    display:grid;
+    place-items:center;
+    font-weight:900;
+    border-radius:8px;
+    box-shadow:0 12px 30px rgba(0,0,0,.24);
+  }
+
+  .brand b{
+    display:block;
+    font-size:16px;
+    letter-spacing:.08em;
+  }
+
+  .brand span{
+    display:block;
+    color:rgba(246,239,225,.68);
+    font-size:13px;
+    margin-top:2px;
+  }
+
+  .status-chip{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    flex:0 0 auto;
+    border:1px solid rgba(244,239,227,.24);
+    color:#f4efe3;
+    background:rgba(244,239,227,.08);
+    padding:10px 14px;
+    border-radius:999px;
+    font-weight:700;
+  }
+
+  .pulse{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#6ee7a7;
+    box-shadow:0 0 0 7px rgba(110,231,167,.13);
+  }
+
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1.1fr) 360px;
+    gap:18px;
+    margin-bottom:18px;
+  }
+
+  .command{
+    position:relative;
+    overflow:hidden;
+    min-height:392px;
+    background:var(--panel);
+    border:1px solid rgba(244,239,227,.32);
+    box-shadow:var(--shadow);
+    border-radius:14px;
+    padding:34px;
+  }
+
+  .command:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(110deg,rgba(255,255,255,.54),transparent 38%),
+      linear-gradient(180deg,transparent,rgba(17,19,18,.08));
+    pointer-events:none;
+  }
+
+  .command>*{position:relative}
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    color:#4c4236;
+    background:rgba(255,255,255,.44);
+    font-weight:800;
+    font-size:13px;
+  }
+
+  .eyebrow span{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+  }
+
+  h1{
+    margin:20px 0 14px;
+    max-width:850px;
+    font-family:"Georgia","Times New Roman","Microsoft YaHei",serif;
+    font-size:clamp(38px,5.8vw,82px);
+    line-height:.95;
+    letter-spacing:0;
+  }
+
+  .lead{
+    max-width:780px;
+    color:#39352e;
+    font-size:18px;
+    line-height:1.76;
+    margin:0;
+  }
+
+  .lead strong{color:#111312}
+
+  .action-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:28px;
+  }
+
+  .button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:46px;
+    padding:0 18px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:900;
+    color:#f8f1e5;
+    background:#111312;
+    border:1px solid rgba(17,19,18,.12);
+    box-shadow:0 14px 26px rgba(0,0,0,.2);
+    transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+  }
+
+  .button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 18px 34px rgba(0,0,0,.26);
+    background:#20241f;
+  }
+
+  .button.secondary{
+    background:transparent;
+    color:#111312;
+    border-color:rgba(17,19,18,.28);
+    box-shadow:none;
+  }
+
+  .coach-card{
+    background:#151816;
+    color:#f4efe3;
+    border:1px solid rgba(244,239,227,.18);
+    border-radius:14px;
+    padding:24px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:392px;
+  }
+
+  .coach-card h2,.coach-card p{margin:0}
+
+  .coach-card h2{
+    font-size:22px;
+    letter-spacing:.02em;
+  }
+
+  .decision{
+    margin:22px 0;
+    border-left:4px solid #6ee7a7;
+    padding-left:15px;
+  }
+
+  .decision b{
+    display:block;
+    color:#bdf3cf;
+    font-size:26px;
+    line-height:1.15;
+    margin-bottom:8px;
+  }
+
+  .decision span{
+    color:rgba(244,239,227,.72);
+    line-height:1.68;
+  }
+
+  .meter{
+    display:grid;
+    gap:10px;
+  }
+
+  .meter-row{
+    display:grid;
+    grid-template-columns:74px 1fr 44px;
+    gap:10px;
+    align-items:center;
+    font-size:13px;
+    color:rgba(244,239,227,.72);
+  }
+
+  .track{
+    height:8px;
+    border-radius:999px;
+    background:rgba(244,239,227,.13);
+    overflow:hidden;
+  }
+
+  .bar{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg,#6ee7a7,#d7b35b);
+  }
+
+  .dashboard{
+    display:grid;
+    grid-template-columns:320px minmax(0,1fr);
+    gap:18px;
+  }
+
+  .side{
+    display:grid;
+    gap:18px;
+  }
+
+  .panel{
+    background:rgba(244,239,227,.95);
+    border:1px solid rgba(244,239,227,.34);
+    border-radius:14px;
+    box-shadow:0 18px 48px rgba(0,0,0,.18);
+    overflow:hidden;
+  }
+
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.42);
+  }
+
+  .panel-head h2{
+    margin:0;
+    font-size:18px;
+    letter-spacing:.02em;
+  }
+
+  .panel-body{padding:18px 20px}
+
+  .today-step{
+    display:grid;
+    grid-template-columns:40px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-bottom:1px solid rgba(25,24,20,.12);
+  }
+
+  .today-step:last-child{border-bottom:0}
+
+  .step-num{
+    width:40px;
+    height:40px;
+    border-radius:8px;
+    display:grid;
+    place-items:center;
+    font-weight:950;
+    color:#f8f1e5;
+    background:#111312;
+  }
+
+  .today-step b{
+    display:block;
+    margin-bottom:4px;
+  }
+
+  .today-step span{
+    color:var(--muted);
+    line-height:1.58;
+    font-size:14px;
+  }
+
+  .switchboard{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+  }
+
+  .adr-card{
+    position:relative;
+    min-height:238px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background:rgba(255,255,255,.56);
+    border:1px solid rgba(25,24,20,.16);
+    border-radius:12px;
+    padding:18px;
+    overflow:hidden;
+    transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  }
+
+  .adr-card:before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:6px;
+    background:var(--accent);
+  }
+
+  .adr-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(25,24,20,.26);
+    box-shadow:0 16px 36px rgba(25,24,20,.12);
+  }
+
+  .adr-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .adr-id{
+    display:inline-flex;
+    min-width:72px;
+    height:34px;
+    align-items:center;
+    justify-content:center;
+    border-radius:7px;
+    color:#f8f1e5;
+    background:var(--accent);
+    font-weight:950;
+    letter-spacing:.04em;
+  }
+
+  .state{
+    padding:7px 9px;
+    border-radius:999px;
+    background:var(--state-bg);
+    color:var(--state-fg);
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+
+  .adr-card h3{
+    margin:18px 0 8px;
+    font-size:21px;
+    line-height:1.25;
+  }
+
+  .adr-card p{
+    margin:0;
+    color:var(--muted);
+    line-height:1.62;
+    font-size:14px;
+  }
+
+  .adr-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid rgba(25,24,20,.12);
+    color:#4e473d;
+    font-size:13px;
+  }
+
+  .adr-footer b{color:#171914}
+
+  .a-green{--accent:var(--green);--state-bg:var(--green-soft);--state-fg:#1e6941}
+  .a-amber{--accent:var(--amber);--state-bg:var(--amber-soft);--state-fg:#8a5019}
+  .a-blue{--accent:var(--blue);--state-bg:var(--blue-soft);--state-fg:#245974}
+  .a-red{--accent:var(--red);--state-bg:var(--red-soft);--state-fg:#873335}
+  .a-black{--accent:var(--black);--state-bg:#e5e0d6;--state-fg:#33312b}
+
+  .lane{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .lane-item{
+    background:#151816;
+    color:#f4efe3;
+    border:1px solid rgba(244,239,227,.14);
+    border-radius:10px;
+    padding:14px;
+    min-height:138px;
+  }
+
+  .lane-item small{
+    display:block;
+    color:#d8b46b;
+    font-weight:900;
+    margin-bottom:10px;
+  }
+
+  .lane-item b{
+    display:block;
+    font-size:15px;
+    line-height:1.35;
+    margin-bottom:8px;
+  }
+
+  .lane-item span{
+    display:block;
+    color:rgba(244,239,227,.68);
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  .rules{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+
+  .rule{
+    border-radius:12px;
+    padding:16px;
+    border:1px solid rgba(25,24,20,.12);
+  }
+
+  .rule.ok{background:var(--green-soft)}
+  .rule.no{background:var(--red-soft)}
+  .rule h3{
+    margin:0 0 10px;
+    font-size:17px;
+  }
+
+  .rule ul{
+    margin:0;
+    padding-left:18px;
+    color:#3f3a32;
+    line-height:1.68;
+  }
+
+  .checklist{
+    display:grid;
+    gap:10px;
+  }
+
+  .check{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:10px;
+    align-items:start;
+    padding:11px;
+    border:1px solid rgba(25,24,20,.12);
+    border-radius:10px;
+    background:rgba(255,255,255,.5);
+  }
+
+  .box{
+    width:24px;
+    height:24px;
+    border-radius:6px;
+    border:2px solid #111312;
+    display:grid;
+    place-items:center;
+    font-size:14px;
+    font-weight:900;
+  }
+
+  .check b{display:block;margin-bottom:2px}
+  .check span{color:var(--muted);line-height:1.5;font-size:14px}
+
+  .footnote{
+    color:rgba(244,239,227,.58);
+    text-align:center;
+    margin-top:22px;
+    font-size:13px;
+  }
+
+  @media(max-width:1120px){
+    .hero,.dashboard{grid-template-columns:1fr}
+    .coach-card{min-height:auto}
+    .switchboard{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .lane{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+
+  @media(max-width:720px){
+    .shell{width:min(100% - 24px,1360px);padding-top:18px}
+    .topbar{align-items:flex-start;flex-direction:column}
+    .status-chip{width:100%;justify-content:center}
+    .command{padding:24px;min-height:auto}
+    .switchboard,.rules,.lane{grid-template-columns:1fr}
+    .panel-head{align-items:flex-start;flex-direction:column}
+    .action-row .button{width:100%}
+  }
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">17</div>
+      <div>
+        <b>MASTER ORCHESTRATOR</b>
+        <span>ADR 0017-0022 · 系统级落地控制台</span>
+      </div>
+    </div>
+    <div class="status-chip"><span class="pulse"></span> 建议状态: 先落护栏, 再写业务</div>
+  </header>
+
+  <section class="hero">
+    <div class="command">
+      <div class="eyebrow"><span></span> 教练判断 · 2026-06-08</div>
+      <h1>先把操作系统装好, 再让 agent 开工。</h1>
+      <p class="lead">
+        ADR 17-22 不是产品功能, 它们是这套 vibe coding 项目的<strong>施工规则、资料压缩、分支隔离、预算模型、前端权威参考</strong>。
+        现在正确动作不是一头扎进后端或前端, 而是做一次短促的系统落地冲刺: 让后面的每个 agent 都拿得到 brief、守得住边界、交得出可验收结果。
+      </p>
+      <div class="action-row">
+        <a class="button" href="#next">今天只做第一组动作</a>
+        <a class="button secondary" href="#switchboard">查看 17-22 状态</a>
+      </div>
+    </div>
+
+    <aside class="coach-card">
+      <div>
+        <h2>当前结论</h2>
+        <div class="decision">
+          <b>可以动手, 但先不写业务代码。</b>
+          <span>先落 ADR 0017 + 0018。它们是 agent 能否安全并行的总开关。</span>
+        </div>
+      </div>
+      <div class="meter">
+        <div class="meter-row">
+          <span>文档成熟</span>
+          <div class="track"><div class="bar" style="width:88%"></div></div>
+          <b>88%</b>
+        </div>
+        <div class="meter-row">
+          <span>可开工度</span>
+          <div class="track"><div class="bar" style="width:72%"></div></div>
+          <b>72%</b>
+        </div>
+        <div class="meter-row">
+          <span>护栏落地</span>
+          <div class="track"><div class="bar" style="width:28%"></div></div>
+          <b>28%</b>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="dashboard">
+    <aside class="side">
+      <div class="panel" id="next">
+        <div class="panel-head">
+          <h2>下一步只做什么</h2>
+          <span class="state" style="background:#dff1e7;color:#1e6941">DAY 1</span>
+        </div>
+        <div class="panel-body">
+          <div class="today-step">
+            <div class="step-num">1</div>
+            <div><b>建立 briefs/ 规则</b><span>创建 README 和 9 字段模板, 让 brief 成为子 agent 的唯一任务入口。</span></div>
+          </div>
+          <div class="today-step">
+            <div class="step-num">2</div>
+            <div><b>写第 1 批 7 个 brief</b><span>S0-04 / 15 / 16 / 17 / 18 / 22 / 29, 只覆盖 Sprint 0 主链关键路径。</span></div>
+          </div>
+          <div class="today-step">
+            <div class="step-num">3</div>
+            <div><b>补 git 协作护栏</b><span>worktree 规则、commit 格式、contract 保护、docs/git-workflow。</span></div>
+          </div>
+          <div class="today-step">
+            <div class="step-num">4</div>
+            <div><b>再派 infra-agent 试点</b><span>只让它做 S0-15 Docker Compose, 用最小风险验证整条链路。</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>开工前检查</h2>
+        </div>
+        <div class="panel-body checklist">
+          <div class="check"><div class="box">1</div><div><b>brief 有依赖和验收</b><span>没有验收命令的 brief 不派单。</span></div></div>
+          <div class="check"><div class="box">2</div><div><b>agent 边界写清</b><span>backend 只改 backend, frontend 只改 frontend。</span></div></div>
+          <div class="check"><div class="box">3</div><div><b>contracts 默认冻结</b><span>除主控明确派单, 子 agent 不碰 contracts。</span></div></div>
+          <div class="check"><div class="box">4</div><div><b>失败可回滚</b><span>每个任务必须知道失败后怎么退场。</span></div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <section class="panel" id="switchboard">
+        <div class="panel-head">
+          <h2>ADR 17-22 状态板</h2>
+          <span class="state" style="background:#e5e0d6;color:#33312b">6 个系统决策</span>
+        </div>
+        <div class="panel-body">
+          <div class="switchboard">
+            <article class="adr-card a-green">
+              <div>
+                <div class="adr-top"><span class="adr-id">0017</span><span class="state">先落地</span></div>
+                <h3>子 agent 预消化便当法</h3>
+                <p>主控把大资料压成 brief, 子 agent 直接按 brief 写代码。先建模板, 再写 7 个关键 brief。</p>
+              </div>
+              <div class="adr-footer"><span>产物</span><b>briefs/</b></div>
+            </article>
+
+            <article class="adr-card a-green">
+              <div>
+                <div class="adr-top"><span class="adr-id">0018</span><span class="state">先落地</span></div>
+                <h3>多 agent Git 协作规则</h3>
+                <p>一任务一分支 + worktree, commit 带任务 ID, contracts 受保护, 冲突由主控仲裁。</p>
+              </div>
+              <div class="adr-footer"><span>产物</span><b>git-workflow</b></div>
+            </article>
+
+            <article class="adr-card a-amber">
+              <div>
+                <div class="adr-top"><span class="adr-id">0019</span><span class="state">轻量/暂缓</span></div>
+                <h3>Harness 统一管理</h3>
+                <p>文档治理很重要, 但不应该挡住 Sprint 0。可先保留规则, M1 后再做完整自动扫描。</p>
+              </div>
+              <div class="adr-footer"><span>投入</span><b>最多 1.5h</b></div>
+            </article>
+
+            <article class="adr-card a-black">
+              <div>
+                <div class="adr-top"><span class="adr-id">0020</span><span class="state">已承接</span></div>
+                <h3>明日议题占位</h3>
+                <p>它不是要实施的系统, 主要内容已被 ADR 0021 消化。只需要留痕, 不单独开工。</p>
+              </div>
+              <div class="adr-footer"><span>动作</span><b>不单做</b></div>
+            </article>
+
+            <article class="adr-card a-blue">
+              <div>
+                <div class="adr-top"><span class="adr-id">0021</span><span class="state">写入 brief</span></div>
+                <h3>预算 / 模型 / 派单</h3>
+                <p>系统池 + BYOK, MiniMax token plan, 本地 Docker, 首个试点 infra-agent 做 S0-15。</p>
+              </div>
+              <div class="adr-footer"><span>首试点</span><b>S0-15</b></div>
+            </article>
+
+            <article class="adr-card a-blue">
+              <div>
+                <div class="adr-top"><span class="adr-id">0022</span><span class="state">写入 brief</span></div>
+                <h3>前端原型权威</h3>
+                <p>前端任务必须引用 5 个 HTML 原型、handoff 文档、真实截图。现在不复制原型。</p>
+              </div>
+              <div class="adr-footer"><span>适用</span><b>frontend-agent</b></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:18px">
+        <div class="panel-head">
+          <h2>系统落地顺序</h2>
+          <span class="state" style="background:#dcecf2;color:#245974">推荐路径</span>
+        </div>
+        <div class="panel-body">
+          <div class="lane">
+            <div class="lane-item"><small>01</small><b>ADR 0017</b><span>brief 模板 + 第 1 批 7 个 brief。</span></div>
+            <div class="lane-item"><small>02</small><b>ADR 0018</b><span>worktree / commit / contract 保护。</span></div>
+            <div class="lane-item"><small>03</small><b>ADR 0021</b><span>预算、模型、试点 agent 写进派单规则。</span></div>
+            <div class="lane-item"><small>04</small><b>ADR 0022</b><span>前端 brief 增加设计参考来源。</span></div>
+            <div class="lane-item"><small>05</small><b>ADR 0019</b><span>先轻量, M1 后再完整治理。</span></div>
+            <div class="lane-item"><small>06</small><b>ADR 0020</b><span>标记为历史占位, 不阻塞开工。</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:18px">
+        <div class="panel-head">
+          <h2>今天的边界</h2>
+          <span class="state" style="background:#f6e2c6;color:#8a5019">防跑偏</span>
+        </div>
+        <div class="panel-body">
+          <div class="rules">
+            <div class="rule ok">
+              <h3>今天可以做</h3>
+              <ul>
+                <li>创建 briefs 目录、README、模板。</li>
+                <li>写第 1 批 7 个 brief。</li>
+                <li>补 git 协作文档和契约保护脚本。</li>
+                <li>更新 progress.txt 留痕。</li>
+              </ul>
+            </div>
+            <div class="rule no">
+              <h3>今天不要做</h3>
+              <ul>
+                <li>不要直接写 backend / frontend 业务代码。</li>
+                <li>不要修改 contracts, 除非主控明确开契约任务。</li>
+                <li>不要复制外部 HTML 原型到 master。</li>
+                <li>不要一次写完 37 个 brief。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <p class="footnote">本页是给小白也能执行的教练操作台: 先护栏, 再派单, 最后才写产品功能。</p>
+</main>
+</body>
+</html>

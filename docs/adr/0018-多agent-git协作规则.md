@@ -120,6 +120,11 @@ Co-Authored-By: backend-agent <agent@orchestrator.local>
 
 #### Q5 · 契约保护 → **pre-commit hook + CI 双保险 (A+B)** ✅
 
+> 2026-06-08 实施备注:
+> 当前远程 `origin` 是 Gitee, 因此远程兜底从原讨论中的 GitHub Actions 调整为 Gitee Go (`.workflow/GitGuardPipeline.yml`)。
+> 本地 hook 也从不可提交的 `.git/hooks/` 调整为可提交的 `.githooks/`, 再用 `core.hooksPath=.githooks` 启用。
+> 决策意图不变: 本地先拦截, 远程再兜底。
+
 **🛡️ 第 1 道防线 · pre-commit hook (本地拦截)**
 
 ```bash
@@ -238,9 +243,10 @@ Q2 ([S0-XX] 前缀) ────► Q4 (3 层防御: 边界 → 自动 → 仲�
 | 文件 | 改动 |
 |------|------|
 | `master/CLAUDE.md` | 新增 "git 规则" 段 |
-| `.git/hooks/pre-commit` | 新建 (Q5 第 1 道防线) |
-| `.github/workflows/protect-contracts.yml` | 新建 (Q5 第 2 道防线) |
+| `.githooks/pre-commit` + `.githooks/commit-msg` | 新建 (Q5 第 1 道防线, 可提交) |
+| `.workflow/GitGuardPipeline.yml` | 新建 (Q5 第 2 道防线, Gitee Go) |
 | `scripts/contract-lint.py` | 新建 (S0-36 任务) |
+| `scripts/install-git-guard.py` | 新建 (启用 `.githooks/` + reflog 90 天) |
 | 每个子项目 `CLAUDE.md` | 新增 "边界约束" + "commit 规范" 段 |
 | `.gitconfig` | reflog 90 天 (E3) |
 | `docs/git-workflow.md` | 新增工作流文档 |

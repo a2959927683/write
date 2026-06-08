@@ -4,6 +4,29 @@
 
 ---
 
+## [2026-06-08] ✅ ADR 0018 Git 护栏开始落地
+
+### 执行结论
+
+用户决定先做 Git 护栏, 教练执行 ADR 0018 的工程落地。
+
+### 本次落地方向
+
+- 本地 hook 从 `.git/hooks/` 调整为可提交的 `.githooks/`
+- 通过 `scripts/install-git-guard.py` 设置 `core.hooksPath=.githooks`
+- reflog 保留期设置为 90 天
+- 远程 CI 按当前 Gitee origin 设计, 使用 `.workflow/GitGuardPipeline.yml`
+- `scripts/contract-lint.py` 先做 v0 轻量检查, 对已知 Sprint 0 缺口只 warning 不阻塞
+- 新增 `docs/git-workflow.md` 与五个子项目 `CLAUDE.md` 边界规则
+
+### 暂不执行
+
+- 不写 backend/frontend/AI 业务代码
+- 不补业务 contracts
+- 不处理既有未跟踪 explain HTML
+
+---
+
 ## [2026-06-08] ✅ B3/B4 拍板 + 前端原型权威决策
 
 ### 今日讨论结论

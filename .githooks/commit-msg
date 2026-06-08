@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""Validate commit messages for agent-driven Sprint work."""
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+
+PATTERN = re.compile(
+    r"^\[(?:S\d+-\d{2}|ADR-\d{4})\] "
+    r"(?:feat|fix|docs|refactor|test|chore|ci|build|perf|style|revert)"
+    r"\([a-z0-9][a-z0-9-]*\): .+"
+)
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print("commit-msg hook error: missing commit message file path", file=sys.stderr)
+        return 1
+
+    message_path = Path(sys.argv[1])
+    first_line = message_path.read_text(encoding="utf-8-sig").splitlines()[0].strip()
+
+    if first_line.startswith("Merge "):
+        return 0
+
+    if PATTERN.match(first_line):
+        return 0
+
+    print("Commit message rejected.", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("Expected format:", file=sys.stderr)
+    print("  [S0-18] feat(auth): 实现登录端点", file=sys.stderr)
+    print("  [ADR-0018] chore(git): 落地 Git 护栏", file=sys.stderr)
+    print("", file=sys.stderr)
+    print(f"Actual: {first_line}", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -66,7 +66,7 @@ paths:
                   items: { type: string }
       responses:
         '200': { description: 创建成功, 返回 Project }
-        '403': { description: 项目配额已满 (free: 1 个, pro: 10 个) }
+        '403': { description: "项目配额已满 (free: 1 个, pro: 10 个)" }
 
   /projects/my-quota:
     get:
