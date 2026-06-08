@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讨论复盘 · Sprint 0 / B3 B4 / ADR0017 / Agent 派单</title>
+<style>
+  :root {
+    --paper: #fbf2df;
+    --ink: #23170f;
+    --muted: #6f5b49;
+    --burnt: #c84c24;
+    --gold: #e5a72d;
+    --sage: #7f9b6f;
+    --blue: #315f7d;
+    --rose: #b65a67;
+    --line: rgba(35, 23, 15, .16);
+    --card: rgba(255, 252, 244, .86);
+    --shadow: 0 22px 60px rgba(77, 48, 22, .15);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: "LXGW WenKai", "Microsoft YaHei", "PingFang SC", serif;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(229, 167, 45, .25), transparent 28%),
+      radial-gradient(circle at 88% 16%, rgba(49, 95, 125, .18), transparent 30%),
+      linear-gradient(135deg, #fff7e6 0%, var(--paper) 48%, #ead8b9 100%);
+    min-height: 100vh;
+    padding: 32px 20px 56px;
+  }
+
+  .sheet {
+    max-width: 1180px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .hero {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    padding: 34px 38px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero:before {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px dashed rgba(35,23,15,.18);
+    border-radius: 24px;
+    pointer-events: none;
+  }
+
+  .stamp {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 13px;
+    border: 1px solid rgba(200, 76, 36, .35);
+    border-radius: 999px;
+    color: var(--burnt);
+    background: rgba(200, 76, 36, .08);
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+
+  h1 {
+    margin: 16px 0 10px;
+    font-size: clamp(32px, 6vw, 68px);
+    line-height: .98;
+    letter-spacing: -.05em;
+  }
+
+  .lead {
+    max-width: 820px;
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+    margin-top: 22px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 12px 34px rgba(77, 48, 22, .08);
+  }
+
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; }
+  .span-12 { grid-column: span 12; }
+
+  h2 {
+    margin: 0 0 14px;
+    font-size: 24px;
+    letter-spacing: -.02em;
+  }
+
+  h3 {
+    margin: 16px 0 8px;
+    font-size: 18px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .orange { background: var(--burnt); }
+  .gold { background: var(--gold); color: #3b2507; }
+  .sage { background: var(--sage); }
+  .blue { background: var(--blue); }
+  .rose { background: var(--rose); }
+
+  ul { margin: 0; padding-left: 19px; }
+  li { margin: 8px 0; line-height: 1.55; }
+  b { color: var(--burnt); }
+
+  .decision {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .decision:last-child { border-bottom: 0; }
+  .label { color: var(--muted); }
+  .value { font-weight: 800; }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+  }
+
+  .week {
+    min-height: 154px;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.55);
+    border: 1px solid var(--line);
+  }
+
+  .week-num {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 900;
+    margin-bottom: 10px;
+  }
+
+  .mini {
+    display: inline-block;
+    margin: 3px 3px 0 0;
+    padding: 4px 7px;
+    border-radius: 7px;
+    background: rgba(35,23,15,.08);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .flow {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .step {
+    flex: 1 1 150px;
+    padding: 15px;
+    border-radius: 18px;
+    background: rgba(229, 167, 45, .12);
+    border: 1px solid rgba(229, 167, 45, .35);
+  }
+
+  .step strong { display: block; font-size: 18px; margin-bottom: 6px; }
+
+  .note {
+    background: #24160f;
+    color: #fff6df;
+    border-radius: 24px;
+    padding: 24px;
+    font-size: 19px;
+    line-height: 1.7;
+  }
+
+  .note b { color: #ffd36a; }
+
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    margin-top: 26px;
+  }
+
+  @media (max-width: 900px) {
+    .span-4, .span-5, .span-6, .span-7 { grid-column: span 12; }
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .hero { padding: 28px 24px; }
+  }
+
+  @media (max-width: 560px) {
+    .timeline { grid-template-columns: 1fr; }
+    .decision { grid-template-columns: 1fr; }
+    body { padding: 18px 12px 40px; }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <section class="hero">
+    <span class="stamp">🧭 教练复盘 · 2026-06-08</span>
+    <h1>我们刚才到底讨论了什么?</h1>
+    <p class="lead">一句话: 我们把 Sprint 0 的钱、模型、派单、brief 机制、agent 顺序、前端设计来源全部重新梳理了一遍, 最后回到<strong>原方案: 先写第 1 批 7 个关键 brief, 再派 infra-agent 试点</strong>。</p>
+  </section>
+
+  <section class="grid">
+    <article class="card span-6">
+      <span class="tag orange">01 · B3 预算 / API key</span>
+      <h2>钱和模型怎么走?</h2>
+      <div class="decision"><div class="label">API 模式</div><div class="value">C 混合: 系统池 + BYOK</div></div>
+      <div class="decision"><div class="label">内置模型</div><div class="value">MiniMax token plan</div></div>
+      <div class="decision"><div class="label">协议支持</div><div class="value">OpenAI + Anthropic 协议都支持</div></div>
+      <div class="decision"><div class="label">部署阶段</div><div class="value">Sprint 0 先本地 Docker</div></div>
+      <p style="margin-top:14px;color:var(--muted);line-height:1.6;">教练判断: 这套最省钱, 最适合商用级 vibe coding 起步。MiniMax 做系统池, 其他 12 厂商保留 BYOK。</p>
+    </article>
+
+    <article class="card span-6">
+      <span class="tag gold">02 · B4 试点 agent</span>
+      <h2>第一个派谁?</h2>
+      <ul>
+        <li>最终试点: <b>infra-agent</b></li>
+        <li>试点任务: <b>S0-15 docker-compose</b></li>
+        <li>原因: 失败代价低, 又能解锁后端/前端/AI</li>
+        <li>不先派 ai-agent: 密钥、协议、流式、路由太复杂</li>
+        <li>不先派 backend-agent: 没 Docker 地基, 后端跑不稳</li>
+      </ul>
+    </article>
+
+    <article class="card span-7">
+      <span class="tag sage">03 · ADR 0017 brief 机制</span>
+      <h2>子 agent 怎么跳过研究阶段?</h2>
+      <div class="flow">
+        <div class="step"><strong>1. 主控读资料</strong>读 knowlage / ADR / contracts</div>
+        <div class="step"><strong>2. 主控写 brief</strong>把知识压成 9 字段任务包</div>
+        <div class="step"><strong>3. 子 agent 读 brief</strong>不读 87 页知识库</div>
+        <div class="step"><strong>4. 直接进计划</strong>plan → build → review → debug</div>
+      </div>
+      <h3>brief 的 9 字段</h3>
+      <p><span class="mini">任务</span><span class="mini">依赖任务</span><span class="mini">必读契约</span><span class="mini">技术约束</span><span class="mini">估算工时</span><span class="mini">验收</span><span class="mini">不要做</span><span class="mini">失败回滚</span><span class="mini">深挖参考</span></p>
+    </article>
+
+    <article class="card span-5">
+      <span class="tag blue">04 · 37 个 brief 怎么写</span>
+      <h2>不是一次写完</h2>
+      <ul>
+        <li><b>第 1 批 7 个</b>: S0-04/15/16/17/18/22/29</li>
+        <li><b>第 2 批约 15 个</b>: 主链剩余任务</li>
+        <li><b>第 3 批约 15 个</b>: 辅助 / 监控 / CI / 收尾</li>
+        <li>原因: 先试点, 避免一次写 37 个后大面积返工</li>
+      </ul>
+    </article>
+
+    <article class="card span-12">
+      <span class="tag rose">05 · Sprint 0 派单顺序</span>
+      <h2>6 周怎么走?</h2>
+      <div class="timeline">
+        <div class="week"><div class="week-num">W1</div><b>主控</b><br>补图纸 + 写第 1 批 7 brief<br><span class="mini">S0-04</span><span class="mini">S0-09</span><span class="mini">S0-10</span><span class="mini">S0-14</span></div>
+        <div class="week"><div class="week-num">W2</div><b>infra-agent</b><br>搭 Docker 工地<br><span class="mini">S0-15</span></div>
+        <div class="week"><div class="week-num">W3</div><b>backend + frontend</b><br>骨架并行<br><span class="mini">S0-16</span><span class="mini">S0-17</span><span class="mini">S0-22</span></div>
+        <div class="week"><div class="week-num">W4</div><b>业务模块</b><br>登录 / 项目 / 章节<br><span class="mini">S0-18</span><span class="mini">S0-19</span><span class="mini">S0-20</span><span class="mini">S0-23</span><span class="mini">S0-24</span></div>
+        <div class="week"><div class="week-num">W5</div><b>主链接通</b><br>编辑器 + AI 面板 + SSE<br><span class="mini">S0-21</span><span class="mini">S0-25</span><span class="mini">S0-26</span><span class="mini">S0-27</span><span class="mini">S0-28</span><span class="mini">S0-29</span></div>
+        <div class="week"><div class="week-num">W6</div><b>联调验收</b><br>MiniMax + E2E + 监控 CI<br><span class="mini">S0-30</span><span class="mini">S0-31</span><span class="mini">S0-32</span><span class="mini">S0-33</span><span class="mini">S0-36</span><span class="mini">S0-37</span></div>
+      </div>
+    </article>
+
+    <article class="card span-6">
+      <span class="tag orange">06 · 前端设计来源</span>
+      <h2>你提醒我找到了 5 个 HTML 原型</h2>
+      <ul>
+        <li>位置: <b>write_clone/docs/frontend-handoff/pages/</b></li>
+        <li><b>login.html</b> → 登录/注册</li>
+        <li><b>lib.html</b> → 项目库/项目列表</li>
+        <li><b>create.html</b> → 创建小说</li>
+        <li><b>editor.html</b> → 编辑器主界面</li>
+        <li><b>settings.html</b> → 设置 / AI 配置</li>
+      </ul>
+    </article>
+
+    <article class="card span-6">
+      <span class="tag blue">07 · 关键纠偏</span>
+      <h2>我们修正了几个误区</h2>
+      <ul>
+        <li>不是只有 5 张截图, 而是有 <b>5 个 HTML 原型 + 135 张真实截图</b></li>
+        <li>不是 Sprint 0 只写 7 个 brief, 而是先写第 1 批 7 个</li>
+        <li>不是 37 个 agent 同时跑, 而是 5 类 agent 分阶段派单</li>
+        <li>不是前端凭文字猜, 而是看 HTML 原型 + 真实截图</li>
+      </ul>
+    </article>
+
+    <article class="note span-12">
+      <b>最终状态:</b> 我们已经拍板 B3/B4, 明确 ADR0017 的 brief 机制, 回到原来的 7 个关键 brief 方案。现在先不动手; 等你说“开干”, 主控再写 brief 模板、7 个关键 brief、l3-v4-lite 配置, 然后派 infra-agent 试点 S0-15。
+    </article>
+  </section>
+
+  <div class="footer">explain/21-discussion-summary.html · 主控教练复盘板</div>
+</main>
+</body>
+</html>

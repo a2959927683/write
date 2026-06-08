@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Sprint 0 阶段划分 + Agent 派单顺序</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", sans-serif; background: #FAFAFA; padding: 30px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { color: #D84315; text-align: center; margin-bottom: 30px; }
+  h2 { color: #5D4037; margin: 25px 0 15px; padding-left: 10px; border-left: 5px solid #FF6F00; }
+  .phase {
+    background: white; border-radius: 12px; padding: 20px; margin: 15px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 6px solid #FF8A65;
+  }
+  .phase-num { display: inline-block; background: #FF6F00; color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; margin-right: 10px; }
+  .who { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.9em; margin-left: 8px; }
+  .who-master { background: #FFF3E0; color: #E65100; }
+  .who-infra { background: #E3F2FD; color: #0D47A1; }
+  .who-backend { background: #E8F5E9; color: #1B5E20; }
+  .who-frontend { background: #F3E5F5; color: #4A148C; }
+  .who-ai { background: #FCE4EC; color: #880E4F; }
+  .who-test { background: #ECEFF1; color: #263238; }
+  .timeline { position: relative; padding: 20px 0; }
+  .week-row { display: flex; align-items: center; margin: 12px 0; padding: 12px; background: white; border-radius: 8px; }
+  .week-label { width: 100px; font-weight: bold; color: #BF360C; }
+  .week-arrow { color: #999; margin: 0 15px; }
+  .agents { display: flex; gap: 8px; flex-wrap: wrap; }
+  .agent-chip {
+    padding: 6px 14px; border-radius: 16px; font-size: 0.9em; font-weight: 500;
+  }
+  .arrow-down { text-align: center; color: #FF6F00; font-size: 1.5em; margin: 5px 0; }
+  .legend { background: #FFF; padding: 15px; border-radius: 8px; margin: 20px 0; }
+  .legend-item { display: inline-block; margin-right: 20px; }
+  .key-point { background: #FFF8E1; padding: 15px; border-radius: 8px; border-left: 4px solid #FFC107; margin: 15px 0; }
+  .key-point b { color: #E65100; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📅 Sprint 0 = 5 个阶段 + 4 个 Agent 派单顺序</h1>
+
+<div class="legend">
+  <b>图例:</b>
+  <span class="legend-item"><span class="who who-master">主控</span> 自己干</span>
+  <span class="legend-item"><span class="who who-infra">infra-agent</span> Docker/部署</span>
+  <span class="legend-item"><span class="who who-backend">backend-agent</span> Node 后端</span>
+  <span class="legend-item"><span class="who who-frontend">frontend-agent</span> Vue 前端</span>
+  <span class="legend-item"><span class="who who-ai">ai-agent</span> Python AI</span>
+  <span class="legend-item"><span class="who who-test">test-agent</span> E2E 测试</span>
+</div>
+
+<h2>🗂️ Sprint 0 = 5 个阶段</h2>
+
+<div class="phase">
+  <span class="phase-num">阶段 1</span>
+  <b>主控画图纸</b> <span class="who who-master">主控</span>
+  <p style="margin-top: 10px;">📝 写 ADR / 契约 / schemas / brief → <b>已完成 82% (9/11)</b></p>
+  <p>📦 产出: CLAUDE.md / harness.config.json / contracts/ / docs/adr/ / master/briefs/</p>
+</div>
+
+<div class="phase">
+  <span class="phase-num">阶段 2</span>
+  <b>搭建工地</b> <span class="who who-infra">infra-agent</span>
+  <p style="margin-top: 10px;">🐳 写 docker-compose.yml, 一行命令起全栈 → <b>0/1 (未开始)</b></p>
+  <p>📦 产出: docker-compose.yml + docker-compose.dev.yml + init.sh</p>
+</div>
+
+<div class="phase">
+  <span class="phase-num">阶段 3</span>
+  <b>后端打地基</b> <span class="who who-backend">backend-agent</span>
+  <p style="margin-top: 10px;">🏛️ NestJS 骨架 + DB schema + 4 业务模块 → <b>0/6 (未开始)</b></p>
+  <p>📦 产出: backend/src/main.ts + prisma/schema + auth/project/chapter/outline 模块</p>
+</div>
+
+<div class="phase">
+  <span class="phase-num">阶段 4</span>
+  <b>前端 + AI 并行</b>
+  <span class="who who-frontend">frontend-agent</span>
+  <span class="who who-ai">ai-agent</span>
+  <p style="margin-top: 10px;">🎨 + 🧙 Vue 7 页面 + AI SSE 续写 → <b>0/9 (未开始)</b></p>
+  <p>📦 产出: pages/ + components/editor/ + ai-orchestrator/sse_gateway.py</p>
+</div>
+
+<div class="phase">
+  <span class="phase-num">阶段 5</span>
+  <b>联调验收</b>
+  <span class="who who-test">test-agent</span>
+  <span class="who who-master">主控</span>
+  <p style="margin-top: 10px;">✅ E2E 冒烟 + 监控 + CI → <b>0/9 (未开始)</b></p>
+  <p>📦 产出: tests/e2e/smoke.spec.ts + Prometheus + Grafana + ci.yml</p>
+</div>
+
+<h2>🚦 Agent 派单顺序 (Week 1 → Week 6)</h2>
+
+<div class="timeline">
+
+  <div class="week-row" style="background: #FFF3E0;">
+    <div class="week-label">Week 1</div>
+    <div class="week-arrow">►</div>
+    <div class="agents">
+      <span class="agent-chip who-master">🎩 主控 · 写 5 个关键 brief</span>
+    </div>
+  </div>
+
+  <div class="arrow-down">▼</div>
+
+  <div class="week-row">
+    <div class="week-label">Week 2</div>
+    <div class="week-arrow">►</div>
+    <div class="agents">
+      <span class="agent-chip who-infra">🐳 infra-agent · S0-15 docker-compose</span>
+    </div>
+  </div>
+
+  <div class="arrow-down">▼ infra 通, 后端/前端并行启动</div>
+
+  <div class="week-row">
+    <div class="week-label">Week 3</div>
+    <div class="week-arrow">►</div>
+    <div class="agents">
+      <span class="agent-chip who-backend">🏛️ backend-agent · S0-16 NestJS 骨架</span>
+      <span class="agent-chip who-frontend">🎨 frontend-agent · S0-22 Vue 骨架</span>
+    </div>
+  </div>
+
+  <div class="arrow-down">▼ 骨架通, 业务模块并行</div>
+
+  <div class="week-row">
+    <div class="week-label">Week 4</div>
+    <div class="week-arrow">►</div>
+    <div class="agents">
+      <span class="agent-chip who-backend">🏛️ backend-agent · S0-17/18 DB+auth</span>
+      <span class="agent-chip who-frontend">🎨 frontend-agent · S0-23/24 登录+列表</span>
+    </div>
+  </div>
+
+  <div class="arrow-down">▼ 业务模块完工, AI 上线</div>
+
+  <div class="week-row">
+    <div class="week-label">Week 5</div>
+    <div class="week-arrow">►</div>
+    <div class="agents">
+      <span class="agent-chip who-backend">🏛️ backend-agent · S0-19/20/21 project/chapter/outline</span>
+      <span class="agent-chip who-frontend">🎨 frontend-agent · S0-25/26/27/28 编辑器</span>
+      <span class="agent-chip who-ai">🧙 ai-agent · S0-29 SSE 续写</span>
+    </div>
+  </div>
+
+  <div class="arrow-down">▼ 主链完工, 联调</div>
+
+  <div class="week-row" style="background: #E8F5E9;">
+    <div class="week-label">Week 6</div>
+    <div class="week-arrow">►</div>
+    <div class="agents">
+      <span class="agent-chip who-ai">🧙 ai-agent · S0-30 接 MiniMax</span>
+      <span class="agent-chip who-test">🧪 test-agent · S0-31 E2E 冒烟</span>
+      <span class="agent-chip who-master">🎩 主控 · 联调 + 跑验收</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="key-point">
+  <b>🎯 关键判断:</b><br>
+  1. <b>强依赖 (串行):</b> infra → backend 骨架 → 业务模块 → AI<br>
+  2. <b>弱依赖 (并行):</b> backend 骨架 + frontend 骨架 同时开<br>
+  3. <b>最大并行数:</b> 3 个 (backend + frontend + ai 同时跑, Week 5)<br>
+  4. <b>主控当调度员:</b> 每天看 progress.txt, 决定下一个派给谁
+</div>
+
+<div class="key-point" style="background: #E3F2FD; border-left-color: #1976D2;">
+  <b>💡 你提的"5 个 brief + 4 agent 并行"方案落地:</b><br>
+  写 5 个 brief (S0-15/16/22/29 + 1 个) → 派 4 个 agent (infra/backend/frontend/ai) 并行开工 → 完工后 test-agent 联调<br>
+  ⚠️ 注意: backend-agent 一个人接 2 个 brief (S0-16 + S0-18), 串行
+</div>
+
+</div>
+</body>
+</html>

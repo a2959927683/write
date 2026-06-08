@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Sprint 0 完整 37 任务 + Agent 派单</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", sans-serif; background: #FAFAFA; padding: 30px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { color: #D84315; text-align: center; margin-bottom: 10px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+  h2 { color: #5D4037; margin: 25px 0 15px; padding-left: 10px; border-left: 5px solid #FF6F00; }
+  .who { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.9em; margin-left: 8px; }
+  .who-master { background: #FFF3E0; color: #E65100; }
+  .who-infra { background: #E3F2FD; color: #0D47A1; }
+  .who-backend { background: #E8F5E9; color: #1B5E20; }
+  .who-frontend { background: #F3E5F5; color: #4A148C; }
+  .who-ai { background: #FCE4EC; color: #880E4F; }
+  .who-test { background: #ECEFF1; color: #263238; }
+  .week {
+    background: white; border-radius: 12px; padding: 20px; margin: 15px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .week-header { display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px dashed #FFB199; }
+  .week-num { background: #FF6F00; color: white; width: 50px; height: 50px; line-height: 50px; border-radius: 50%; text-align: center; font-weight: bold; font-size: 1.2em; margin-right: 15px; }
+  .week-title { font-size: 1.3em; color: #BF360C; font-weight: bold; }
+  .task-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .task {
+    padding: 6px 12px; border-radius: 6px; font-size: 0.9em;
+    border: 1px solid #ddd; background: #fafafa;
+  }
+  .task.done { background: #C8E6C9; border-color: #4CAF50; text-decoration: line-through; }
+  .task-id { font-weight: bold; color: #E65100; margin-right: 5px; }
+  .summary { background: #FFF8E1; padding: 15px; border-radius: 8px; border-left: 4px solid #FFC107; margin: 20px 0; }
+  .summary b { color: #E65100; }
+  .total { text-align: center; font-size: 1.2em; margin: 20px 0; padding: 15px; background: #FF6F00; color: white; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📋 Sprint 0 完整 37 任务 · Agent 派单</h1>
+<p class="subtitle">6 周排期 · 4 agent 并行 · 主控当调度员</p>
+
+<h2>📊 任务分配统计</h2>
+<div class="total">
+  总 37 任务 = 9 已完成 + 28 未开始<br>
+  未开始中: 🎩主控 9 + 🐳infra 4 + 🏛️backend 6 + 🎨frontend 7 + 🧙ai 2 + 🧪test 1 = 29<br>
+  <span style="font-size: 0.8em;">(差 1 个, 因为 S0-31 E2E 既是 test 也算主控联调验收)</span>
+</div>
+
+<h2>🗓️ Week 1 → Week 6 详细排期</h2>
+
+<div class="week">
+  <div class="week-header">
+    <div class="week-num">W1</div>
+    <div class="week-title">主控冲刺 · 写 brief + 补契约</div>
+    <span class="who who-master">🎩 主控 (1 人)</span>
+  </div>
+  <div class="task-list">
+    <div class="task done"><span class="task-id">S0-01</span> monorepo 目录</div>
+    <div class="task done"><span class="task-id">S0-02</span> CLAUDE.md</div>
+    <div class="task done"><span class="task-id">S0-03</span> harness.config.json</div>
+    <div class="task"><span class="task-id">S0-04</span> init.sh</div>
+    <div class="task done"><span class="task-id">S0-05</span> feature_list.json</div>
+    <div class="task"><span class="task-id">S0-06</span> progress.txt 详化</div>
+    <div class="task done"><span class="task-id">S0-07</span> auth.yaml</div>
+    <div class="task done"><span class="task-id">S0-08</span> project.yaml</div>
+    <div class="task"><span class="task-id">S0-09</span> chapter.yaml</div>
+    <div class="task"><span class="task-id">S0-10</span> outline.yaml</div>
+    <div class="task done"><span class="task-id">S0-11</span> ai.yaml + ai-stream.ts</div>
+    <div class="task done"><span class="task-id">S0-12</span> 11 个 JSON Schema</div>
+    <div class="task done"><span class="task-id">S0-13</span> providers.json</div>
+    <div class="task"><span class="task-id">S0-14</span> routing-rules.yaml</div>
+  </div>
+  <p style="margin-top: 10px; color: #666;">📌 完成所有图纸 + 写 7 个关键 brief (S0-04/15/16/17/18/22/29)</p>
+</div>
+
+<div class="week">
+  <div class="week-header">
+    <div class="week-num">W2</div>
+    <div class="week-title">搭建工地 · infra-agent 上线</div>
+    <span class="who who-infra">🐳 infra-agent (1 人)</span>
+  </div>
+  <div class="task-list">
+    <div class="task"><span class="task-id">S0-15</span> docker-compose.yml + dev overlay</div>
+  </div>
+  <p style="margin-top: 10px; color: #666;">📌 一行 `docker compose up` 启动 PG+Redis+MinIO + 3 个服务</p>
+</div>
+
+<div class="week" style="background: #F3E5F5;">
+  <div class="week-header">
+    <div class="week-num">W3</div>
+    <div class="week-title">地基浇筑 · backend + frontend 启动</div>
+    <span class="who who-backend">🏛️ backend</span>
+    <span class="who who-frontend">🎨 frontend</span>
+  </div>
+  <div class="task-list">
+    <div class="task"><span class="task-id">S0-16</span> NestJS 骨架</div>
+    <div class="task"><span class="task-id">S0-17</span> Prisma/Drizzle schema</div>
+    <div class="task"><span class="task-id">S0-18</span> auth 模块</div>
+    <div class="task"><span class="task-id">S0-22</span> Vue 3 骨架</div>
+  </div>
+  <p style="margin-top: 10px; color: #666;">📌 backend 3 任务串行 · frontend 1 任务 · 2 agent 并行</p>
+</div>
+
+<div class="week" style="background: #F3E5F5;">
+  <div class="week-header">
+    <div class="week-num">W4</div>
+    <div class="week-title">业务模块 · backend + frontend 继续</div>
+    <span class="who who-backend">🏛️ backend</span>
+    <span class="who who-frontend">🎨 frontend</span>
+  </div>
+  <div class="task-list">
+    <div class="task"><span class="task-id">S0-19</span> project 模块</div>
+    <div class="task"><span class="task-id">S0-20</span> chapter 模块 (三重冗余)</div>
+    <div class="task"><span class="task-id">S0-21</span> outline 模块</div>
+    <div class="task"><span class="task-id">S0-23</span> 登录/注册页 + auth store</div>
+    <div class="task"><span class="task-id">S0-24</span> 项目列表页</div>
+  </div>
+  <p style="margin-top: 10px; color: #666;">📌 backend 3 任务 · frontend 2 任务 · 2 agent 并行</p>
+</div>
+
+<div class="week" style="background: #FCE4EC;">
+  <div class="week-header">
+    <div class="week-num">W5</div>
+    <div class="week-title">主链接通 · 3 agent 最大并行</div>
+    <span class="who who-backend">🏛️ backend</span>
+    <span class="who who-frontend">🎨 frontend</span>
+    <span class="who who-ai">🧙 ai</span>
+  </div>
+  <div class="task-list">
+    <div class="task"><span class="task-id">S0-25</span> 三栏布局</div>
+    <div class="task"><span class="task-id">S0-26</span> TipTap + 自动保存</div>
+    <div class="task"><span class="task-id">S0-27</span> 左侧大纲树</div>
+    <div class="task"><span class="task-id">S0-28</span> AI 助手面板</div>
+    <div class="task"><span class="task-id">S0-29</span> SSE 流式渲染 (mock provider)</div>
+  </div>
+  <p style="margin-top: 10px; color: #666;">📌 frontend 4 任务 + ai 1 任务 · 3 agent 并行</p>
+</div>
+
+<div class="week" style="background: #E8F5E9;">
+  <div class="week-header">
+    <div class="week-num">W6</div>
+    <div class="week-title">联调验收 · 全部收尾</div>
+    <span class="who who-ai">🧙 ai</span>
+    <span class="who who-test">🧪 test</span>
+    <span class="who who-infra">🐳 infra</span>
+    <span class="who who-master">🎩 主控</span>
+  </div>
+  <div class="task-list">
+    <div class="task"><span class="task-id">S0-30</span> ai-agent 接 MiniMax 真 API</div>
+    <div class="task"><span class="task-id">S0-31</span> E2E 冒烟测试</div>
+    <div class="task"><span class="task-id">S0-32</span> docker-compose 集成测试</div>
+    <div class="task"><span class="task-id">S0-33</span> Prometheus + Grafana</div>
+    <div class="task"><span class="task-id">S0-36</span> contract-lint.py</div>
+    <div class="task"><span class="task-id">S0-37</span> CI workflow</div>
+    <div class="task done"><span class="task-id">S0-34</span> 16 个 ADR (已写完=20)</div>
+    <div class="task done"><span class="task-id">S0-35</span> system-overview.md</div>
+  </div>
+  <p style="margin-top: 10px; color: #666;">📌 ai 1 + test 1 + infra 3 + 主控验收 + 跑主链 7 步</p>
+</div>
+
+<div class="summary">
+  <b>🎯 关键判断:</b><br>
+  ✅ <b>真实未开始:</b> 28 个任务 (9 个已 done, 28 个待做)<br>
+  ✅ <b>主控自己干:</b> 8 个 (S0-04/06/09/10/14 + 7 个 brief)<br>
+  ✅ <b>infra-agent 干:</b> 4 个 (S0-15/32/33/36/37 中 4 个, 含 W2 试点)<br>
+  ✅ <b>backend-agent 干:</b> 6 个 (S0-16/17/18/19/20/21)<br>
+  ✅ <b>frontend-agent 干:</b> 7 个 (S0-22/23/24/25/26/27/28)<br>
+  ✅ <b>ai-agent 干:</b> 2 个 (S0-29/30)<br>
+  ✅ <b>test-agent 干:</b> 1 个 (S0-31)<br>
+  ✅ <b>最大并行:</b> W5 的 3 个 agent (backend + frontend + ai)
+</div>
+
+</div>
+</body>
+</html>

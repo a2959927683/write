@@ -4,6 +4,48 @@
 
 ---
 
+## [2026-06-08] ✅ B3/B4 拍板 + 前端原型权威决策
+
+### 今日讨论结论
+
+1. ✅ **B3 预算/API key 来源** 已拍板
+   - API key 模式: **系统池 + BYOK 混合模式**
+   - 内置模型: **MiniMax token plan**
+   - MiniMax 支持 **OpenAI + Anthropic 协议**
+   - Sprint 0 部署: **先本地 Docker**, 不上云
+
+2. ✅ **B4 第一个试点子 agent** 已拍板
+   - 第一个试点: **infra-agent**
+   - 试点任务: **S0-15 docker-compose.yml**
+   - 目的: 验证 ADR 0017 brief 机制 + ADR 0018 git 协作规则
+
+3. ✅ **ADR 0017 补充讨论** 已确认
+   - 回到原方案: 第 1 批先写 **7 个关键 brief**
+   - 第 1 批: S0-04 / S0-15 / S0-16 / S0-17 / S0-18 / S0-22 / S0-29
+   - 不采用临时讨论的“5 个 brief + 4 agent 并行”方案
+
+4. ✅ **前端 HTML 原型权威来源** 已确认
+   - 5 个 HTML 原型: `C:/Users/Administrator/Desktop/claude/write_clone/docs/frontend-handoff/pages/`
+   - 5 个设计整合版: `C:/Users/Administrator/Desktop/claude/write_clone/docs/design/handoff/`
+   - 135 张真实截图: `C:/Users/Administrator/Desktop/claude/write_clone/knowlage/raw/screenshots/`
+   - 后续 frontend-agent brief 必须引用对应 HTML 原型 + handoff 文档 + 真实截图
+
+### 新增文档
+
+- `docs/adr/0021-sprint0-agent-dispatch-and-budget.md` ✅
+- `docs/adr/0022-frontend-html-prototypes-authoritative.md` ✅
+- `explain/21-discussion-summary.html` ✅
+
+### 暂不执行
+
+- 不写 brief
+- 不改 `harness.config.json`
+- 不派 agent
+- 不复制外部 HTML 原型
+- 不修改 contracts
+
+---
+
 ## [2026-06-07 深夜] 📅 明日议题(4 项,明天讨论)
 
 ### 项目定位(终版)

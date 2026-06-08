@@ -35,7 +35,9 @@
 | 了解 17 个 World Tab 模块 | [`docs/granular/05-world-tab-17-modules.md`](docs/granular/05-world-tab-17-modules.md) |
 | 了解 AI 调度机制 (12 厂商) | [`docs/granular/06-ai-orchestration.md`](docs/granular/06-ai-orchestration.md) |
 | 了解 11 条冲突裁决 | [`docs/granular/07-conflict-adjudication.md`](docs/granular/07-conflict-adjudication.md) |
-| 看架构决策 | [`docs/adr/`](docs/adr/) (18 个 ADR · 16 已定 + 2 PROPOSED) |
+| 看架构决策 | [`docs/adr/`](docs/adr/) (22 个 ADR · 20 已定 + 2 新决策) |
+| 看 Sprint 0 预算/派单决策 | [`docs/adr/0021-sprint0-agent-dispatch-and-budget.md`](docs/adr/0021-sprint0-agent-dispatch-and-budget.md) |
+| 看前端 HTML 原型权威来源 | [`docs/adr/0022-frontend-html-prototypes-authoritative.md`](docs/adr/0022-frontend-html-prototypes-authoritative.md) |
 | 看讨论稿 (子 agent/git 规则) | [`docs/discussions/`](docs/discussions/) |
 | 童话版可视化 (小白友好) | [`explain/index.html`](explain/index.html) (13 个 HTML 故事) |
 
