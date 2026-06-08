@@ -5,7 +5,7 @@
 ✅ **ACCEPTED · 已采纳** (2026-06-08)
 
 > 关联: `docs/adr/0011-frontend-vue3-tiptap-pinia.md` · `docs/adr/0007-editor-3-column-18-50-32.md`
-> 关联可视化: `explain/21-discussion-summary.html`
+> 关联可视化: `explain/21-B3B4与ADR0017讨论复盘.html`
 
 ---
 

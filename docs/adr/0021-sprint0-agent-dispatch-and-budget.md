@@ -5,7 +5,7 @@
 ✅ **ACCEPTED · 已采纳** (2026-06-08)
 
 > 关联: `docs/adr/0017-子agent预消化便当法.md` · `docs/adr/0018-多agent-git协作规则.md` · `docs/adr/0020-明日议题-4项.md`
-> 关联可视化: `explain/21-discussion-summary.html`
+> 关联可视化: `explain/21-B3B4与ADR0017讨论复盘.html`
 
 ---
 
