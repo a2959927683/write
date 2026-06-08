@@ -27,6 +27,21 @@
 
 ---
 
+## [2026-06-08] 🔁 GitHub Actions 迁移准备
+
+### 背景
+
+用户确认 Gitee Go 需要付费, 当前不打算付费。教练建议迁移到 GitHub 使用免费 GitHub Actions。
+
+### 执行方向
+
+- 保留 Gitee 远程和 `.workflow/GitGuardPipeline.yml` 作为备用
+- 新增 `.github/workflows/git-guard.yml`
+- `docs/git-workflow.md` 调整为 GitHub Actions 推荐路径
+- 后续需要用户创建 GitHub 仓库或提供 GitHub 远程 URL
+
+---
+
 ## [2026-06-08] ✅ B3/B4 拍板 + 前端原型权威决策
 
 ### 今日讨论结论

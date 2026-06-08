@@ -2,6 +2,7 @@
 
 > 权威来源: `docs/adr/0018-多agent-git协作规则.md`
 > 当前远程: Gitee (`origin`)
+> 推荐迁移方向: GitHub 为主远程, 使用 GitHub Actions 免费 CI
 
 ---
 
@@ -94,7 +95,40 @@ git config --get gc.reflogExpireUnreachable
 
 ---
 
-## 5. Gitee 远程护栏
+## 5. GitHub 远程护栏 (推荐)
+
+仓库内提供 GitHub Actions 流水线:
+
+```text
+.github/workflows/git-guard.yml
+```
+
+它会运行:
+
+- `python scripts/contract-lint.py`
+- Python hook 脚本语法检查
+
+GitHub 仓库页面需要手动设置保护分支:
+
+1. 打开 GitHub 仓库 `Settings`。
+2. 进入 `Branches`。
+3. 添加规则保护 `master-codex` 或 `master`。
+4. 勾选 `Require a pull request before merging`。
+5. 勾选 `Require status checks to pass before merging`。
+6. 选择 `Contract and hook guard` 作为必过检查。
+
+迁移命令示例:
+
+```bash
+git remote rename origin gitee
+git remote add origin https://github.com/<your-name>/<repo>.git
+git push -u origin master-codex
+git push origin codex/git-guard
+```
+
+---
+
+## 6. Gitee 远程护栏 (备用)
 
 仓库内提供 Gitee Go 流水线:
 
@@ -107,7 +141,7 @@ git config --get gc.reflogExpireUnreachable
 - `python scripts/contract-lint.py`
 - Python hook 脚本语法检查
 
-Gitee 页面还需要手动设置保护分支:
+Gitee Go 需要付费/开通时, 本项目不强依赖它。若仍使用 Gitee, 页面还需要手动设置保护分支:
 
 1. 打开 Gitee 仓库设置。
 2. 找到分支保护规则。
@@ -118,7 +152,7 @@ Gitee 页面还需要手动设置保护分支:
 
 ---
 
-## 6. 冲突处理
+## 7. 冲突处理
 
 优先级:
 
@@ -129,7 +163,7 @@ Gitee 页面还需要手动设置保护分支:
 
 ---
 
-## 7. 回滚
+## 8. 回滚
 
 每个任务分支必须可以单独回滚。
 
