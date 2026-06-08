@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git 本地护栏检查 · 小孩版</title>
+<style>
+  :root{
+    --ink:#182018;
+    --muted:#687063;
+    --paper:#fffaf0;
+    --card:#fffdf7;
+    --line:#d9cdb7;
+    --green:#2f8f5b;
+    --green-soft:#e2f4e8;
+    --blue:#2c6e91;
+    --blue-soft:#dff0f7;
+    --amber:#c77925;
+    --amber-soft:#f9e6c8;
+    --red:#b44b4b;
+    --red-soft:#f6dddd;
+    --shadow:0 22px 60px rgba(58,43,24,.16);
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC",sans-serif;
+    background:
+      linear-gradient(90deg,rgba(24,32,24,.055) 1px,transparent 1px) 0 0/34px 34px,
+      linear-gradient(0deg,rgba(24,32,24,.055) 1px,transparent 1px) 0 0/34px 34px,
+      radial-gradient(circle at 18% 12%,rgba(47,143,91,.24),transparent 27%),
+      radial-gradient(circle at 86% 18%,rgba(199,121,37,.24),transparent 25%),
+      linear-gradient(135deg,#fff7df 0%,#f2ead7 54%,#e7dbc2 100%);
+  }
+
+  .wrap{
+    width:min(1180px,calc(100% - 34px));
+    margin:0 auto;
+    padding:30px 0 52px;
+  }
+
+  .hero{
+    position:relative;
+    overflow:hidden;
+    min-height:350px;
+    border:2px solid rgba(24,32,24,.16);
+    border-radius:18px;
+    background:var(--paper);
+    box-shadow:var(--shadow);
+    padding:34px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 310px;
+    gap:24px;
+  }
+
+  .hero:after{
+    content:"";
+    position:absolute;
+    right:-90px;
+    bottom:-90px;
+    width:260px;
+    height:260px;
+    border:22px solid rgba(47,143,91,.18);
+    border-radius:50%;
+  }
+
+  .hero>*{position:relative;z-index:1}
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 11px;
+    border:1px solid rgba(47,143,91,.3);
+    border-radius:999px;
+    background:var(--green-soft);
+    color:#1e6b42;
+    font-weight:900;
+  }
+
+  .dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:var(--green);
+  }
+
+  h1{
+    margin:18px 0 12px;
+    max-width:780px;
+    font-family:"Georgia","Times New Roman","Microsoft YaHei",serif;
+    font-size:clamp(36px,6vw,74px);
+    line-height:1;
+    letter-spacing:0;
+  }
+
+  .lead{
+    max-width:760px;
+    margin:0;
+    color:#3b4139;
+    font-size:18px;
+    line-height:1.78;
+  }
+
+  .lead b{color:#111812}
+
+  .toy{
+    align-self:stretch;
+    border-radius:16px;
+    border:1px solid rgba(24,32,24,.14);
+    background:
+      linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,255,255,.18)),
+      var(--green-soft);
+    padding:20px;
+    display:grid;
+    align-content:center;
+    gap:14px;
+  }
+
+  .toy-title{
+    font-size:18px;
+    font-weight:900;
+  }
+
+  .road{
+    display:grid;
+    gap:10px;
+  }
+
+  .road span{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    min-height:38px;
+    padding:9px 11px;
+    border-radius:10px;
+    background:rgba(255,255,255,.62);
+    border:1px solid rgba(24,32,24,.1);
+    font-weight:800;
+  }
+
+  .road b{
+    color:var(--green);
+  }
+
+  .section-title{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    margin:26px 0 14px;
+  }
+
+  .section-title h2{
+    margin:0;
+    font-size:28px;
+  }
+
+  .section-title p{
+    margin:0;
+    color:var(--muted);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+  }
+
+  .check-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 12px 32px rgba(58,43,24,.1);
+  }
+
+  .check-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+  }
+
+  .num{
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:#192119;
+    color:#fffaf0;
+    font-weight:950;
+  }
+
+  .kind{
+    padding:7px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+  }
+
+  .must{background:var(--red-soft);color:#8d3434}
+  .good{background:var(--green-soft);color:#1e6b42}
+  .remote{background:var(--blue-soft);color:#255b78}
+  .doc{background:var(--amber-soft);color:#8a5019}
+
+  .check-card h3{
+    margin:0 0 10px;
+    font-size:21px;
+    line-height:1.25;
+  }
+
+  .explain{
+    color:#4a5047;
+    line-height:1.68;
+    margin:0 0 14px;
+  }
+
+  .result{
+    border-radius:12px;
+    border:1px solid rgba(47,143,91,.2);
+    background:var(--green-soft);
+    padding:13px;
+  }
+
+  .result b{
+    display:block;
+    margin-bottom:5px;
+    color:#1e6b42;
+  }
+
+  .result span{
+    color:#385242;
+    line-height:1.55;
+  }
+
+  .story{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:14px;
+  }
+
+  .panel{
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:rgba(255,253,247,.82);
+    padding:20px;
+    box-shadow:0 12px 32px rgba(58,43,24,.08);
+  }
+
+  .panel h3{
+    margin:0 0 12px;
+    font-size:22px;
+  }
+
+  .panel ul{
+    margin:0;
+    padding-left:20px;
+    line-height:1.75;
+    color:#41483f;
+  }
+
+  .command{
+    background:#182018;
+    color:#dff5e6;
+    border-radius:12px;
+    padding:14px 16px;
+    font-family:"Cascadia Code","Consolas",monospace;
+    font-size:14px;
+    line-height:1.65;
+    overflow:auto;
+    margin-top:10px;
+  }
+
+  .danger{
+    background:var(--red-soft);
+    border-color:rgba(180,75,75,.24);
+  }
+
+  .danger h3{color:#8d3434}
+
+  .final{
+    margin-top:16px;
+    border-radius:16px;
+    background:#182018;
+    color:#fffaf0;
+    padding:24px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:20px;
+    align-items:center;
+  }
+
+  .final h2{
+    margin:0 0 8px;
+    font-size:26px;
+  }
+
+  .final p{
+    margin:0;
+    color:rgba(255,250,240,.75);
+    line-height:1.65;
+  }
+
+  .stamp{
+    min-width:118px;
+    min-height:118px;
+    border:3px solid #dff5e6;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    color:#dff5e6;
+    font-weight:950;
+    transform:rotate(-8deg);
+  }
+
+  @media(max-width:980px){
+    .hero,.story{grid-template-columns:1fr}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .toy{min-height:240px}
+  }
+
+  @media(max-width:640px){
+    .wrap{width:min(100% - 22px,1180px);padding-top:16px}
+    .hero{padding:24px}
+    .grid,.final{grid-template-columns:1fr}
+    .section-title{align-items:flex-start;flex-direction:column}
+    .stamp{justify-self:center}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="badge"><span class="dot"></span> 小孩版 · Git 本地护栏检查</div>
+      <h1>不请远程检查员了, 我们在本地把门看好。</h1>
+      <p class="lead">
+        Git 护栏就像游乐场门口的检查员: <b>谁能进去、能走哪条路、不能碰哪扇门</b>, 都要先说清楚。
+        现在我们不绑卡、不付费、不走线上流水线。检查员就站在你本机门口, 每次提交和合并前都要看一遍。
+      </p>
+    </div>
+    <aside class="toy">
+      <div class="toy-title">这个系统像什么?</div>
+      <div class="road">
+        <span>agent 想提交代码 <b>→</b></span>
+        <span>本地门卫检查 <b>→</b></span>
+        <span>主控合并前再查 <b>→</b></span>
+        <span>都通过才合并 <b>OK</b></span>
+      </div>
+    </aside>
+  </section>
+
+  <div class="section-title">
+    <h2>你要检查的 6 件事</h2>
+    <p>看到“预期结果”就算正常。</p>
+  </div>
+
+  <section class="grid">
+    <article class="check-card">
+      <div class="check-top"><div class="num">1</div><span class="kind good">本地</span></div>
+      <h3>本地门卫有没有打开?</h3>
+      <p class="explain">像看门口有没有站人。Git 必须知道去 `.githooks` 找检查员。</p>
+      <div class="command">git config --get core.hooksPath</div>
+      <div class="result"><b>预期结果</b><span>输出 `.githooks`。</span></div>
+    </article>
+
+    <article class="check-card">
+      <div class="check-top"><div class="num">2</div><span class="kind must">最重要</span></div>
+      <h3>提交格式会不会被拦?</h3>
+      <p class="explain">像写作业必须写班级和姓名。提交标题必须带 `[S0-XX]` 或 `[ADR-XXXX]`。</p>
+      <div class="result"><b>预期结果</b><span>`[S0-37] ci(git): 落地 Git 护栏` 通过, `update stuff` 被拒绝。</span></div>
+    </article>
+
+    <article class="check-card">
+      <div class="check-top"><div class="num">3</div><span class="kind good">契约</span></div>
+      <h3>子 agent 能不能乱改 contracts?</h3>
+      <p class="explain">像仓库里的图纸柜上了锁。普通 agent 想改图纸, 本地门卫会拦住。</p>
+      <div class="result"><b>预期结果</b><span>没有 `AGENT_TYPE=orchestrator` 时, staged `contracts/` 改动会被拒绝。</span></div>
+    </article>
+
+    <article class="check-card">
+      <div class="check-top"><div class="num">4</div><span class="kind good">契约</span></div>
+      <h3>契约检查会不会通过?</h3>
+      <p class="explain">像检查施工图纸有没有破洞。现在有些图纸还没画完, 所以只提醒, 不拦住。</p>
+      <div class="command">python scripts/contract-lint.py</div>
+      <div class="result"><b>预期结果</b><span>最后显示 `contract-lint passed`, 只看到 4 个已知 warning。</span></div>
+    </article>
+
+    <article class="check-card">
+      <div class="check-top"><div class="num">5</div><span class="kind doc">文档</span></div>
+      <h3>工作流文档能不能看懂?</h3>
+      <p class="explain">打开 `docs/git-workflow.md`, 你应该能知道 agent 怎么开分支、怎么提交、谁能改 contracts。</p>
+      <div class="result"><b>预期结果</b><span>你能按文档说出: 一任务一分支、提交要带 `[S0-XX]`、子 agent 不碰 contracts。</span></div>
+    </article>
+
+    <article class="check-card">
+      <div class="check-top"><div class="num">6</div><span class="kind doc">合并前</span></div>
+      <h3>合并前有没有手动检查?</h3>
+      <p class="explain">像放学前老师再点一次名。主控合并前必须手动跑三条命令。</p>
+      <div class="command">python scripts/contract-lint.py
+python -m py_compile .githooks/pre-commit .githooks/commit-msg scripts/install-git-guard.py scripts/contract-lint.py
+git status --short</div>
+      <div class="result"><b>预期结果</b><span>lint 通过, 脚本编译通过, 没有意外 staged 文件。</span></div>
+    </article>
+  </section>
+
+  <div class="section-title">
+    <h2>你不用检查什么</h2>
+    <p>这一步不是验产品, 是验栏杆。</p>
+  </div>
+
+  <section class="story">
+    <div class="panel">
+      <h3>现在要看的</h3>
+      <ul>
+        <li>本地 hook 有没有启用。</li>
+        <li>commit 格式有没有拦截。</li>
+        <li>本地 hook 有没有启用。</li>
+        <li>文档是不是能指导 agent。</li>
+      </ul>
+    </div>
+    <div class="panel danger">
+      <h3>现在不要看的</h3>
+      <ul>
+        <li>不要看登录能不能用。</li>
+        <li>不要看前端页面漂不漂亮。</li>
+        <li>不要看 AI 续写能不能跑。</li>
+        <li>不要因为业务没开始就觉得失败。</li>
+        <li>不要再看 GitHub Actions 红叉, 我们当前不用线上流水线。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="final">
+    <div>
+      <h2>一句话结论</h2>
+      <p>
+        如果本地输出 `.githooks`、contract lint 通过、提交格式会被检查、contracts 会被锁住,
+        那 Git 护栏就算装好了。线上流水线以后需要时再加, 现在不花钱、不绑卡。
+      </p>
+    </div>
+    <div class="stamp">护栏<br>合格</div>
+  </section>
+</main>
+</body>
+</html>

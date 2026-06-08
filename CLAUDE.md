@@ -169,4 +169,35 @@
 
 ---
 
+## Git 护栏 (ADR 0018 已落地)
+
+本仓库按 **一任务一分支 + worktree** 协作:
+
+```bash
+git worktree add ../wt-S0-15 -b feature/S0-15-docker
+```
+
+提交标题必须符合:
+
+```text
+[S0-18] feat(auth): 实现登录端点
+[ADR-0018] chore(git): 落地 Git 护栏
+```
+
+本地护栏使用可提交目录 `.githooks/`, 每个 checkout / worktree 首次开工前运行:
+
+```bash
+python scripts/install-git-guard.py
+```
+
+规则:
+
+- 子 agent 默认不能修改 `contracts/`。
+- 主控改契约时必须设置 `AGENT_TYPE=orchestrator`, 并同步更新 `contracts/CHANGELOG.md`。
+- 所有提交都会运行 `scripts/contract-lint.py`。
+- 不依赖线上流水线; 合并前由主控在本地手动跑检查。
+- 详细流程见 `docs/git-workflow.md`。
+
+---
+
 *最后更新: 2026-06-07*

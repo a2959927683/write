@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Protect contracts and run lightweight contract lint before commits."""
+
+from __future__ import annotations
+
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def run_git(*args: str) -> list[str]:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode != 0:
+        print(result.stderr.strip(), file=sys.stderr)
+        raise SystemExit(result.returncode)
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def main() -> int:
+    staged = run_git("diff", "--cached", "--name-only", "--diff-filter=ACMRT")
+    contract_changes = [path for path in staged if path.startswith("contracts/")]
+
+    if contract_changes:
+        agent_type = os.environ.get("AGENT_TYPE", "")
+        if agent_type != "orchestrator":
+            print("Commit rejected: child agents cannot modify contracts/.", file=sys.stderr)
+            print("Set AGENT_TYPE=orchestrator only for master-controlled contract work.", file=sys.stderr)
+            print("Changed contract files:", file=sys.stderr)
+            for path in contract_changes:
+                print(f"  - {path}", file=sys.stderr)
+            return 1
+
+        if "contracts/CHANGELOG.md" not in staged:
+            print("Commit rejected: contracts/ changed without contracts/CHANGELOG.md.", file=sys.stderr)
+            print("Master-controlled contract changes must append a changelog entry.", file=sys.stderr)
+            return 1
+
+    lint = subprocess.run(
+        [sys.executable, "scripts/contract-lint.py"],
+        cwd=ROOT,
+        text=True,
+        check=False,
+    )
+    if lint.returncode != 0:
+        print("Commit rejected: scripts/contract-lint.py failed.", file=sys.stderr)
+        return lint.returncode
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
