@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Git 护栏人工检查 · 小孩版</title>
+<title>Git 本地护栏检查 · 小孩版</title>
 <style>
   :root{
     --ink:#182018;
@@ -342,20 +342,20 @@
 <main class="wrap">
   <section class="hero">
     <div>
-      <div class="badge"><span class="dot"></span> 小孩版 · Git 护栏人工检查</div>
-      <h1>我们给工地装了栏杆, 现在要亲眼看它有没有立住。</h1>
+      <div class="badge"><span class="dot"></span> 小孩版 · Git 本地护栏检查</div>
+      <h1>不请远程检查员了, 我们在本地把门看好。</h1>
       <p class="lead">
         Git 护栏就像游乐场门口的检查员: <b>谁能进去、能走哪条路、不能碰哪扇门</b>, 都要先说清楚。
-        我已经把本地检查员装好了, 你要人工看的, 主要是 Gitee 那边有没有也开始站岗。
+        现在我们不绑卡、不付费、不走线上流水线。检查员就站在你本机门口, 每次提交和合并前都要看一遍。
       </p>
     </div>
     <aside class="toy">
       <div class="toy-title">这个系统像什么?</div>
       <div class="road">
         <span>agent 想提交代码 <b>→</b></span>
-        <span>本地门卫先检查 <b>→</b></span>
-        <span>Gitee 远程再检查 <b>→</b></span>
-        <span>通过了才能合并 <b>OK</b></span>
+        <span>本地门卫检查 <b>→</b></span>
+        <span>主控合并前再查 <b>→</b></span>
+        <span>都通过才合并 <b>OK</b></span>
       </div>
     </aside>
   </section>
@@ -367,25 +367,25 @@
 
   <section class="grid">
     <article class="check-card">
-      <div class="check-top"><div class="num">1</div><span class="kind remote">Gitee</span></div>
-      <h3>Gitee 有没有看到流水线?</h3>
-      <p class="explain">像看学校门口有没有保安。推送分支后, 去 Gitee 看有没有出现叫 <b>git-guard</b> 的检查。</p>
-      <div class="result"><b>预期结果</b><span>能看到流水线运行, 两个检查都通过: Contract lint 和 Hook syntax check。</span></div>
+      <div class="check-top"><div class="num">1</div><span class="kind good">本地</span></div>
+      <h3>本地门卫有没有打开?</h3>
+      <p class="explain">像看门口有没有站人。Git 必须知道去 `.githooks` 找检查员。</p>
+      <div class="command">git config --get core.hooksPath</div>
+      <div class="result"><b>预期结果</b><span>输出 `.githooks`。</span></div>
     </article>
 
     <article class="check-card">
       <div class="check-top"><div class="num">2</div><span class="kind must">最重要</span></div>
-      <h3>master-codex 有没有被保护?</h3>
-      <p class="explain">像把主城门上锁。不能让任何 agent 直接往主分支扔东西。</p>
-      <div class="result"><b>预期结果</b><span>Gitee 设置里: 禁止直接 push, 必须走 PR/MR, 最好要求流水线通过才能合并。</span></div>
+      <h3>提交格式会不会被拦?</h3>
+      <p class="explain">像写作业必须写班级和姓名。提交标题必须带 `[S0-XX]` 或 `[ADR-XXXX]`。</p>
+      <div class="result"><b>预期结果</b><span>`[S0-37] ci(git): 落地 Git 护栏` 通过, `update stuff` 被拒绝。</span></div>
     </article>
 
     <article class="check-card">
-      <div class="check-top"><div class="num">3</div><span class="kind good">本地</span></div>
-      <h3>本地门卫有没有打开?</h3>
-      <p class="explain">运行一条命令, 看 Git 是不是知道要去 `.githooks` 找门卫。</p>
-      <div class="command">git config --get core.hooksPath</div>
-      <div class="result"><b>预期结果</b><span>输出 `.githooks`。</span></div>
+      <div class="check-top"><div class="num">3</div><span class="kind good">契约</span></div>
+      <h3>子 agent 能不能乱改 contracts?</h3>
+      <p class="explain">像仓库里的图纸柜上了锁。普通 agent 想改图纸, 本地门卫会拦住。</p>
+      <div class="result"><b>预期结果</b><span>没有 `AGENT_TYPE=orchestrator` 时, staged `contracts/` 改动会被拒绝。</span></div>
     </article>
 
     <article class="check-card">
@@ -404,10 +404,13 @@
     </article>
 
     <article class="check-card">
-      <div class="check-top"><div class="num">6</div><span class="kind doc">边界</span></div>
-      <h3>每个 agent 有没有自己的围栏?</h3>
-      <p class="explain">打开 `backend/CLAUDE.md`、`frontend/CLAUDE.md` 等, 看它们有没有写清楚“我只能改哪里”。</p>
-      <div class="result"><b>预期结果</b><span>backend 只能改 backend, frontend 只能改 frontend, 谁都不能私自改 contracts。</span></div>
+      <div class="check-top"><div class="num">6</div><span class="kind doc">合并前</span></div>
+      <h3>合并前有没有手动检查?</h3>
+      <p class="explain">像放学前老师再点一次名。主控合并前必须手动跑三条命令。</p>
+      <div class="command">python scripts/contract-lint.py
+python -m py_compile .githooks/pre-commit .githooks/commit-msg scripts/install-git-guard.py scripts/contract-lint.py
+git status --short</div>
+      <div class="result"><b>预期结果</b><span>lint 通过, 脚本编译通过, 没有意外 staged 文件。</span></div>
     </article>
   </section>
 
@@ -420,8 +423,8 @@
     <div class="panel">
       <h3>现在要看的</h3>
       <ul>
-        <li>Gitee 有没有跑检查。</li>
-        <li>主分支有没有被保护。</li>
+        <li>本地 hook 有没有启用。</li>
+        <li>commit 格式有没有拦截。</li>
         <li>本地 hook 有没有启用。</li>
         <li>文档是不是能指导 agent。</li>
       </ul>
@@ -433,6 +436,7 @@
         <li>不要看前端页面漂不漂亮。</li>
         <li>不要看 AI 续写能不能跑。</li>
         <li>不要因为业务没开始就觉得失败。</li>
+        <li>不要再看 GitHub Actions 红叉, 我们当前不用线上流水线。</li>
       </ul>
     </div>
   </section>
@@ -441,8 +445,8 @@
     <div>
       <h2>一句话结论</h2>
       <p>
-        如果 Gitee 流水线能跑、`master-codex` 被保护、本地输出 `.githooks`、contract lint 通过,
-        那 Git 护栏就算装好了。下一步才轮到 brief 机制和 infra-agent 试点。
+        如果本地输出 `.githooks`、contract lint 通过、提交格式会被检查、contracts 会被锁住,
+        那 Git 护栏就算装好了。线上流水线以后需要时再加, 现在不花钱、不绑卡。
       </p>
     </div>
     <div class="stamp">护栏<br>合格</div>

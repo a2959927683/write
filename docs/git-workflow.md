@@ -1,8 +1,7 @@
-# Git Workflow · 多 Agent 协作护栏
+# Git Workflow · 本地护栏优先
 
 > 权威来源: `docs/adr/0018-多agent-git协作规则.md`
-> 当前远程: Gitee (`origin`)
-> 推荐迁移方向: GitHub 为主远程, 使用 GitHub Actions 免费 CI
+> 当前策略: 不绑卡、不使用付费 Gitee Go、不依赖 GitHub Actions。本地 hook + 主控手动检查是硬规则。
 
 ---
 
@@ -21,8 +20,6 @@ git worktree add ../wt-S0-15 -b feature/S0-15-docker
 | Sprint 任务 | `feature/S0-XX-short-name` | `feature/S0-15-docker` |
 | 主控治理 | `codex/topic-name` | `codex/git-guard` |
 | 紧急修复 | `fix/S0-XX-short-name` | `fix/S0-18-auth-token` |
-
-主控分支 `master-codex` 必须保持可回滚、可审查。
 
 ---
 
@@ -50,26 +47,7 @@ feat fix docs refactor test chore ci build perf style revert
 
 ---
 
-## 3. Contracts 保护
-
-默认所有子 agent 禁止修改 `contracts/`。
-
-只有主控明确发起契约任务时, 才允许:
-
-```powershell
-$env:AGENT_TYPE='orchestrator'
-git commit -m "[S0-09] docs(contracts): 补充 chapter API 契约"
-```
-
-契约提交必须同时:
-
-1. 修改对应 `contracts/` 文件。
-2. 追加 `contracts/CHANGELOG.md`。
-3. 通过 `python scripts/contract-lint.py`。
-
----
-
-## 4. 安装本地护栏
+## 3. 本地护栏是硬规则
 
 每个 checkout / worktree 首次开工前运行:
 
@@ -95,60 +73,59 @@ git config --get gc.reflogExpireUnreachable
 
 ---
 
-## 5. GitHub 远程护栏 (推荐)
+## 4. Contracts 保护
 
-仓库内提供 GitHub Actions 流水线:
+默认所有子 agent 禁止修改 `contracts/`。
 
-```text
-.github/workflows/git-guard.yml
+只有主控明确发起契约任务时, 才允许:
+
+```powershell
+$env:AGENT_TYPE='orchestrator'
+git commit -m "[S0-09] docs(contracts): 补充 chapter API 契约"
 ```
 
-它会运行:
+契约提交必须同时:
 
-- `python scripts/contract-lint.py`
-- Python hook 脚本语法检查
-
-GitHub 仓库页面需要手动设置保护分支:
-
-1. 打开 GitHub 仓库 `Settings`。
-2. 进入 `Branches`。
-3. 添加规则保护 `master-codex` 或 `master`。
-4. 勾选 `Require a pull request before merging`。
-5. 勾选 `Require status checks to pass before merging`。
-6. 选择 `Contract and hook guard` 作为必过检查。
-
-迁移命令示例:
-
-```bash
-git remote rename origin gitee
-git remote add origin https://github.com/<your-name>/<repo>.git
-git push -u origin master-codex
-git push origin codex/git-guard
-```
+1. 修改对应 `contracts/` 文件。
+2. 追加 `contracts/CHANGELOG.md`。
+3. 通过 `python scripts/contract-lint.py`。
 
 ---
 
-## 6. Gitee 远程护栏 (备用)
+## 5. 主控合并前手动检查
 
-仓库内提供 Gitee Go 流水线:
+每次合并 PR / 任务分支前, 主控必须在本地运行:
 
-```text
-.workflow/GitGuardPipeline.yml
+```bash
+python scripts/contract-lint.py
+python -m py_compile .githooks/pre-commit .githooks/commit-msg scripts/install-git-guard.py scripts/contract-lint.py
+git status --short
 ```
 
-它会运行:
+预期:
 
-- `python scripts/contract-lint.py`
-- Python hook 脚本语法检查
+- `contract-lint passed`
+- 只出现已知 Sprint 0 缺口 warning
+- Python 脚本编译无输出、退出码 0
+- `git status --short` 中没有意外 staged 文件
 
-Gitee Go 需要付费/开通时, 本项目不强依赖它。若仍使用 Gitee, 页面还需要手动设置保护分支:
+后续业务代码出现后, 再按子项目补:
 
-1. 打开 Gitee 仓库设置。
-2. 找到分支保护规则。
-3. 保护 `master-codex`。
-4. 禁止直接 push。
-5. 要求 Pull Request / Merge Request。
-6. 要求流水线通过后再合并。
+- backend: 单测 / build
+- frontend: typecheck / build
+- ai-orchestrator: 单测
+- infra: docker compose smoke test
+
+---
+
+## 6. 远程仓库策略
+
+- GitHub 用作主要代码托管和 PR 记录。
+- Gitee 保留为备份远程。
+- 当前不使用 GitHub Actions, 因账号 billing locked 且用户不打算绑卡。
+- 当前不使用 Gitee Go, 因需要付费/开通。
+
+远程检查不是硬依赖。本地检查通过 + 主控 review 才是合并依据。
 
 ---
 

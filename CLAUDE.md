@@ -195,7 +195,7 @@ python scripts/install-git-guard.py
 - 子 agent 默认不能修改 `contracts/`。
 - 主控改契约时必须设置 `AGENT_TYPE=orchestrator`, 并同步更新 `contracts/CHANGELOG.md`。
 - 所有提交都会运行 `scripts/contract-lint.py`。
-- 远程 CI 优先按 Gitee Go, 配置在 `.workflow/GitGuardPipeline.yml`。
+- 不依赖线上流水线; 合并前由主控在本地手动跑检查。
 - 详细流程见 `docs/git-workflow.md`。
 
 ---

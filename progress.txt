@@ -42,6 +42,38 @@
 
 ---
 
+## [2026-06-08] ✅ 改为本地护栏优先 · 不走线上流水线
+
+### 背景
+
+用户确认:
+
+- Gitee Go 需要付费, 不使用
+- GitHub Actions 因账号 billing locked 需要处理付款信息, 当前不绑卡
+- 即使后期, 也倾向先用本地检查
+
+### 新策略
+
+- 删除 GitHub Actions workflow
+- 删除 Gitee Go workflow
+- `docs/git-workflow.md` 改成“本地 hook + 主控手动检查”
+- GitHub 继续作为代码托管和 PR 记录
+- Gitee 继续作为备份远程
+
+### 合并前手动检查
+
+```bash
+python scripts/contract-lint.py
+python -m py_compile .githooks/pre-commit .githooks/commit-msg scripts/install-git-guard.py scripts/contract-lint.py
+git status --short
+```
+
+### 当前权威状态
+
+以本条为准。前面关于 Gitee Go / GitHub Actions 的记录是探索过程留痕, 不再作为当前执行策略。
+
+---
+
 ## [2026-06-08] ✅ B3/B4 拍板 + 前端原型权威决策
 
 ### 今日讨论结论

@@ -74,6 +74,10 @@ Co-Authored-By: backend-agent <agent@orchestrator.local>
 
 **判断标准:** 看 `feature_list.json` 任务的 `subproject` 字段。
 
+> 当前执行调整 (2026-06-08):
+> 不使用线上 CI 自动合并。普通任务也必须由主控在本地手动跑 `docs/git-workflow.md` 的合并前检查后再合并。
+> 下面保留原两档制作为未来云 CI 恢复后的目标形态。
+
 **🟢 普通任务 → CI 自动合**
 ```
 子 agent 完工 → push feature/S0-XX → 触发 GitHub Actions
@@ -121,9 +125,9 @@ Co-Authored-By: backend-agent <agent@orchestrator.local>
 #### Q5 · 契约保护 → **pre-commit hook + CI 双保险 (A+B)** ✅
 
 > 2026-06-08 实施备注:
-> 当前远程 `origin` 是 Gitee, 因此远程兜底从原讨论中的 GitHub Actions 调整为 Gitee Go (`.workflow/GitGuardPipeline.yml`)。
-> 本地 hook 也从不可提交的 `.git/hooks/` 调整为可提交的 `.githooks/`, 再用 `core.hooksPath=.githooks` 启用。
-> 决策意图不变: 本地先拦截, 远程再兜底。
+> 用户确认不绑定支付方式, 不使用付费 Gitee Go, 也不依赖 GitHub Actions。
+> 本地 hook 从不可提交的 `.git/hooks/` 调整为可提交的 `.githooks/`, 再用 `core.hooksPath=.githooks` 启用。
+> 当前执行策略调整为: 本地 hook 是硬门禁, 主控合并前手动跑检查; 远程流水线以后需要时再恢复。
 
 **🛡️ 第 1 道防线 · pre-commit hook (本地拦截)**
 
@@ -150,7 +154,7 @@ fi
 python scripts/contract-lint.py || exit 1
 ```
 
-**🛡️ 第 2 道防线 · GitHub Actions CI (远程兜底)**
+**🛡️ 第 2 道防线 · 线上 CI (暂不启用, 未来恢复)**
 
 ```yaml
 # .github/workflows/protect-contracts.yml
@@ -244,7 +248,7 @@ Q2 ([S0-XX] 前缀) ────► Q4 (3 层防御: 边界 → 自动 → 仲�
 |------|------|
 | `master/CLAUDE.md` | 新增 "git 规则" 段 |
 | `.githooks/pre-commit` + `.githooks/commit-msg` | 新建 (Q5 第 1 道防线, 可提交) |
-| `.workflow/GitGuardPipeline.yml` | 新建 (Q5 第 2 道防线, Gitee Go) |
+| 线上流水线 | 暂不启用 (不绑卡、不付费; 后续需要时再恢复) |
 | `scripts/contract-lint.py` | 新建 (S0-36 任务) |
 | `scripts/install-git-guard.py` | 新建 (启用 `.githooks/` + reflog 90 天) |
 | 每个子项目 `CLAUDE.md` | 新增 "边界约束" + "commit 规范" 段 |
@@ -258,7 +262,7 @@ Q2 ([S0-XX] 前缀) ────► Q4 (3 层防御: 边界 → 自动 → 仲�
 | 步骤 | 任务 | 时长 |
 |------|------|------|
 | 1 | 写 `.git/hooks/pre-commit` | 10 分钟 |
-| 2 | 写 `.github/workflows/protect-contracts.yml` | 15 分钟 |
+| 2 | 线上流水线 | 暂不启用, 先用本地护栏 + 主控手动检查 |
 | 3 | 写 `scripts/contract-lint.py` | 20 分钟 |
 | 4 | 更新主控 `CLAUDE.md` 加 git 规则段 | 10 分钟 |
 | 5 | 更新每个子项目 `CLAUDE.md` 边界段 (×5) | 25 分钟 |
